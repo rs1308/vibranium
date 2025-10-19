@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+# A small piece of logic that runs when the session starts.
+# Nothing much is happening here right now, but in the future, 
+# I think it will be possible to implement something like self-check for the entire setup.
+
+source "$VIBRANIUM_PATH/vibranium-core-lib"
+
+[[ ! -d "$VIBRANIUM_STATE" ]] && mkdir "$VIBRANIUM_STATE"
+
+if [[ -f "$VIBRANIUM_STATE/first-boot" ]]; then
+	vibranium-utils-first-boot
+fi
+
+if [[ ! -f "$VIBRANIUM_STATE/night-light" ]]; then
+	echo "suspended" > "$VIBRANIUM_STATE/night-light"
+fi
+
+if [[ ! -d "$VIBRANIUM_STATE/wallpaper" ]]; then
+	mkdir -p "$VIBRANIUM_STATE"/wallpaper
+	vibranium-utils-wallpaper-get \
+		> "$VIBRANIUM_STATE/wallpaper/$(vibranium-theme-get)"
+fi
+
+# ddcutil (external monitor brightness control)
+if [[ $VIBRANIUM_BRIGHTNESS_USE_DDC_CONTROL == true ]]; then
+	if [[ ! -f "$VIBRANIUM_STATE/i2c-bus" ]]; then
+		ddcutil detect 2> /dev/null | awk -F'i2c-' '/I2C bus/{print $2}' \
+			> "$VIBRANIUM_STATE/i2c-bus"
+	fi
+fi
+

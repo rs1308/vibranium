@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+source "$VIBRANIUM_PATH/vibranium-core-lib"
+
+ACTIONS=("System update" "Install a package" "Install by category" "Uninstall a package")
+
+while true; do
+    chosen="$(printf "%s\n" "${ACTIONS[@]}" | rofi_cmd "System" "ESC to go back")"
+
+    case "$chosen" in
+		"System update")
+			vibranium-cmd-launch-terminal vibranium-cmd-system-update
+			vibranium-cmd-kill-rofi
+			exit 0
+			;;
+        "Install a package")
+            vibranium-cmd-launch-terminal vibranium-pkg-install
+			vibranium-cmd-kill-rofi
+            exit 0
+            ;;
+		"Install by category")
+			vibranium-pkg-install-category
+			;;
+		"Uninstall a package")
+			vibranium-cmd-launch-terminal vibranium-pkg-uninstall
+			vibranium-cmd-kill-rofi
+			exit 0
+			;;
+        "" | *)
+            exit 1
+            ;;
+    esac
+done

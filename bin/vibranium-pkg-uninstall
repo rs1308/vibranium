@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+
+# shellcheck disable=SC2034
+
+source "$VIBRANIUM_PATH/vibranium-core-lib"
+
+export SUDO_PROMPT
+SUDO_PROMPT="$(printf '\n\033[1;31m[sudo]\033[0m Password for %s: ' "$USER")"
+
+if ! tty -s; then
+	exec setsid vibranium-cmd-launch-terminal "$0"
+	exit 0
+fi
+
+echo
+cat "$VIBRANIUM/logo.txt" &
+
+# Source: omarchy
+fzf_args=(
+    --multi
+    --preview 'pacman -Qi {1}'
+    --preview-label='alt-p: toggle description, alt-j/k: scroll preview pane, ctrl-j/k: next/prev item, tab: multi-select'
+    --preview-label-pos='bottom'
+    --preview-window 'right:65%:wrap'
+    --bind 'alt-p:toggle-preview'
+    --bind 'alt-d:preview-half-page-down,alt-u:preview-half-page-up'
+    --bind 'alt-k:preview-up,alt-j:preview-down'
+    --color 'pointer:blue,marker:white'
+)
+
+if ! sudo -v; then
+	echo -e "${RED}[VIBRANIUM]${RESET} Operation aborted"
+    exit 1
+fi
+
+# you don't wanna delete important system packages, do you?
+# so keep -Qqe to show only explicitly installed packages
+mapfile -t chosen < <(pacman -Qqe | fzf "${fzf_args[@]}")
+
+if [ ${#chosen[@]} -eq 0 ]; then
+	echo -e "${RED}[VIBRANIUM]${RESET} Operation aborted"
+    exit 1
+fi
+
+read -p $'\e[0;33m[VIBRANIUM]\e[0m You are about to remove the following packages: \e[0;33m'"${chosen[*]}"$'\e[0m. Proceed? (Y/n): ' answer
+
+case "$answer" in
+    [Yy]es | y | "")
+        sudo pacman -Rnsc --noconfirm "${chosen[@]}" &> /dev/null &
+        spinner $! "${YELLOW}[VIBRANIUM]${RESET} Removing ${chosen[*]}" ""
+		echo -e "${YELLOW}[VIBRANIUM]${RESET} Operation completed successfully"
+        read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
+        exit 0
+        ;;
+    [Nn]o | n)
+		echo -e "${RED}[VIBRANIUM]${RESET} Operation aborted"
+        exit 1
+        ;;
+esac

@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+
+source "$VIBRANIUM_PATH/vibranium-core-lib"
+
+# Category:[subcategory:]package_name
+declare -A packages=(
+    ["Communication:Telegram"]="telegram-desktop"
+    ["Communication:Discord"]="discord"
+    ["Communication:Vesktop"]="vesktop"
+    ["Communication:Signal"]="signal-desktop"
+    ["Entertainment:Spotify"]="spotify"
+	["Network:qBittorrent"]="qbittorrent"
+	["Network:Transmission"]="transmission-gtk"
+	["Network:Syncthing"]="syncthing"
+    ["Gaming:Game launchers:Steam"]="steam"
+    ["Gaming:Game launchers:Heroic"]="heroic-games-launcher"
+    ["Gaming:Game launchers:Lutris"]="lutris"
+    ["Gaming:Game launchers:Prismlauncher"]="prismlauncher"
+    ["Gaming:Games:Xonotic"]="xonotic"
+    ["Gaming:Games:osu!Lazer"]="osu-lazer"
+    ["Gaming:Games:Minecraft"]="minecraft-launcher"
+    ["Office:Libreoffice"]="libreoffice-fresh"
+    ["Office:ONLYOFFICE"]="onlyoffice-bin"
+    ["Office:Obsidian"]="obsidian"
+    ["Utilities:Virt Manager"]="virt-manager qemu-full dnsmasq"
+)
+
+declare -A selected_indexes
+
+install_and_exit() {
+    vibranium-pkg-install "$1"
+    vibranium-cmd-kill-rofi
+    exit 0
+}
+
+get_options() {
+    local current_path="$1"          # The current menu path
+    local prefix="${current_path:+${current_path}:}"  # Prefix to match the hierarchy
+    declare -A items                 # Temporary array to store unique sub-items
+
+    # Loop through all keys in the packages array
+    for key in "${!packages[@]}"; do
+        # Check if the key starts with the current prefix
+        if [[ "$key" == "${prefix}"* ]]; then
+            # Remove the prefix from the key to get the remainder
+            local remainder="${key#"${prefix}"}"
+            # Extract the first component of the remainder
+            local sub="${remainder%%:*}"
+            # Add it to items if it's not empty
+            if [[ -n "$sub" ]]; then
+                items["$sub"]=1
+            fi
+        fi
+    done
+
+    mapfile -t OPTIONS < <(printf '%s\n' "${!items[@]}" | awk '{print length($0), $0}' | sort -r -n -s | cut -d' ' -f2-)
+}
+
+CURRENT_PATH=""
+
+while true; do
+    if [[ -z "$CURRENT_PATH" ]]; then
+        TITLE="Install"          # Root menu title
+        KEY="_ROOT_"             # Root menu key
+    else
+        TITLE="${CURRENT_PATH##*:}"  # Last component of path as title
+        KEY="$CURRENT_PATH"           # Full path as key
+    fi
+
+    get_options "$CURRENT_PATH"
+    INDEX=${selected_indexes["$KEY"]:-0}
+    CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "$TITLE" "ESC to go back" -selected-row "$INDEX")"
+
+    # If no selection, either go back or exit
+    if [[ -z "$CHOSEN" ]]; then
+        if [[ -z "$CURRENT_PATH" ]]; then
+            break
+        else
+            # Go one level up
+            if [[ "$CURRENT_PATH" == *:* ]]; then
+                CURRENT_PATH="${CURRENT_PATH%:*}"
+            else
+                CURRENT_PATH=""
+            fi
+            continue
+        fi
+    fi
+
+    # Store the selected index for this menu level
+    for i in "${!OPTIONS[@]}"; do
+        if [ "${OPTIONS[$i]}" = "$CHOSEN" ]; then
+            selected_indexes["$KEY"]=$i
+            break
+        fi
+    done
+
+    # Construct the new path including the chosen option
+    NEW_PATH="${CURRENT_PATH:+${CURRENT_PATH}:}${CHOSEN}"
+
+    # Determine if the new path is a subcategory
+    is_dir=0
+    for key in "${!packages[@]}"; do
+        if [[ "$key" == "${NEW_PATH}:"* ]]; then
+            is_dir=1
+            break
+        fi
+    done
+
+    if [[ $is_dir -eq 1 ]]; then
+        CURRENT_PATH="$NEW_PATH"
+    else
+        install_and_exit "${packages[$NEW_PATH]}"
+    fi
+done

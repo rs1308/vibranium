@@ -1,0 +1,72 @@
+# This file linked to $VIBRANIUM. DO NOT EDIT!!!
+
+# If you want to edit / add / remove environment variables, 
+# consider using "$XDG_CONFIG_HOME/vibranium/environment",
+# which will take priority over this file.
+
+# shellcheck source=/dev/null
+
+if [[ -f "$XDG_CONFIG_HOME/user-dirs.dirs" ]]; then
+	while IFS='=' read -r var val; do
+		[[ -z "$var" || "$var" == \#* ]] && continue
+
+		val="${val//\"/}"
+		[[ "$val" == ~* ]] && {
+			val="$HOME${val:1}"
+		} 
+
+		export "$var"="$val"
+	done < "$XDG_CONFIG_HOME/user-dirs.dirs"
+	export VIBRANIUM_XDG_DIRS_EXPOSED=true
+else
+	export VIBRANIUM_XDG_DIRS_EXPOSED=false
+fi
+
+# https://specifications.freedesktop.org/basedir-spec/latest
+export XDG_CONFIG_HOME="${HOME}/.config"
+export XDG_DATA_HOME="${HOME}/.local/share"
+export XDG_STATE_HOME="${HOME}/.local/state"
+export XDG_CACHE_HOME="${HOME}/.cache"
+export XDG_DATA_DIRS="/usr/local/share:/usr/share"
+export XDG_CONFIG_DIRS="/etc/xdg"
+
+export VIBRANIUM_STATE="$XDG_STATE_HOME/vibranium"
+export VIBRANIUM="$XDG_DATA_HOME/vibranium"
+export VIBRANIUM_PATH="$VIBRANIUM/bin"
+export PATH="$HOME/.local/bin:$VIBRANIUM_PATH:$PATH"
+
+# Export user-defined environment
+source "$XDG_CONFIG_HOME/vibranium/environment"
+
+# Theming
+export XCURSOR_THEME="macOS"
+export XCURSOR_SIZE=22
+export QT_QPA_PLATFORMTHEME="qt6ct"
+
+# Use Wayland where possible
+export ELECTRON_OZONE_PLATFORM_HINT="auto"
+export SDV_VIDEODRIVER="wayland"
+export GDK_BACKEND="wayland,x11"
+export QT_QPA_PLATFORM="wayland;xcb"
+export CLUTTER_BACKEND="wayland"
+
+# So far, this variable has little use
+if [[ "$(</sys/class/dmi/id/chassis_type)" == "10" ]]; then
+	export VIBRANIUM_IS_LAPTOP=true
+else
+	export VIBRANIUM_IS_LAPTOP=false
+fi
+
+if [[ "$(</sys/class/dmi/id/chassis_type)" == "1" ]]; then
+	export VIBRANIUM_IS_VIRTUAL_MACHINE=true
+else
+	export VIBRANIUM_IS_VIRTUAL_MACHINE=false
+fi
+
+if lspci | grep -qE "(Radeon RX|ATI|UHD|Iris|Arc)"; then
+	export VIBRANIUM_GPU_IS_SUPPORTED=true
+else
+	export VIBRANIUM_GPU_IS_SUPPORTED=false
+fi
+
+# vim:ft=bash

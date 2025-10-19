@@ -1,0 +1,211 @@
+#!/usr/bin/env bash
+
+# shellcheck disable=SC2034
+
+source "$VIBRANIUM_PATH/vibranium-core-lib"
+
+export SUDO_PROMPT
+SUDO_PROMPT="$(printf '\n\033[1;31m[sudo]\033[0m Password for %s: ' "$USER")"
+
+if ! tty -s; then
+	exec setsid vibranium-cmd-launch-terminal "$0" "$@"
+	exit 0
+fi
+
+echo 
+cat "$VIBRANIUM/logo.txt"
+
+if ! sudo -v; then
+	echo -e "${RED}[VIBRANIUM]${RESET} Operation aborted"
+	exit 1
+fi
+
+printf '\e[?25l' # Hide cursor
+
+# Source: omarchy
+fzf_args=(
+    --multi
+    --preview 'pacman -Sii {1} 2>/dev/null || yay -Sii {1}'
+    --preview-label='alt-p: toggle description, alt-j/k: scroll description, ctrl-j/k: next/prev item, tab: multi-select'
+    --preview-label-pos='bottom'
+    --preview-window 'right:75%:wrap'
+    --bind 'alt-p:toggle-preview'
+    --bind 'alt-d:preview-half-page-down,alt-u:preview-half-page-up'
+    --bind 'alt-k:preview-up,alt-j:preview-down'
+    --color 'pointer:blue,marker:white'
+)
+
+if [ $# -gt 0 ]; then
+	chosen=()
+	for pkg in "$@"; do
+		if ! pacman -Qq "$pkg" &>/dev/null; then
+			chosen+=("$pkg")
+		fi
+	done
+else
+    arch_file=$(mktemp)
+    yay_file=$(mktemp)
+
+    (pacman -Slq > "$arch_file") &
+    spinner $! "${YELLOW}[VIBRANIUM]${RESET} Fetching Arch packages" ""
+    mapfile -t arch_packages < "$arch_file"
+    total_packages=("${arch_packages[@]}")
+
+    (yay -Slqa > "$yay_file") &> /dev/null &
+    spinner $! "${YELLOW}[VIBRANIUM]${RESET} Fetching AUR packages" ""
+    mapfile -t aur_packages < "$yay_file"
+    total_packages+=("${aur_packages[@]}")
+
+    rm "$arch_file" "$yay_file"
+
+	mapfile -t chosen < <(printf "%s\n" "${total_packages[@]}" | fzf "${fzf_args[@]}")
+
+    if [ ${#chosen[@]} -eq 0 ]; then
+		echo -e "${RED}[VIBRANIUM]${RESET} Operation aborted"
+		printf '\e[?25h'  # show cursor
+        exit 1
+    fi
+fi
+
+filtered=()
+for package in "${chosen[@]}"; do
+    if ! pacman -Qq "$package" &> /dev/null; then
+        filtered+=("$package")
+    fi
+done
+
+if [ ${#filtered[@]} -eq 0 ]; then
+	echo -e "${YELLOW}[VIBRANIUM]${RESET} Selected packages are already installed"
+	read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
+	printf '\e[?25h'  # show cursor
+	exit 0
+fi
+
+printf '\e[?25h'  # show cursor
+prompt=$'\e[0;33m[VIBRANIUM]\e[0m You are about to install following packages: \e[0;33m'"${chosen[*]}"$'\e[0m. Proceed? (Y/n): \e[0m'
+
+while true; do
+    printf "%s" "$prompt"
+    read -r answer
+    case "$answer" in
+        [Yy][Ee][Ss] | [Yy] | "")
+            yay -S --noconfirm "${filtered[@]}" &> /dev/null &
+            printf '\e[?25l' # Hide cursor
+            spinner $! "${YELLOW}[VIBRANIUM]${RESET} Installing packages" ""
+
+            services=()
+            provides_systemd_service=()
+            user_units=()
+            unit_types=()
+
+            for pkg in "${filtered[@]}"; do
+                units=$(pacman -Ql "$pkg" | grep -E '/systemd/.+\.(service|socket)$' | awk '{print $2}')
+                [[ -z $units ]] && continue
+
+                user_socket=$(echo "$units" | grep "/systemd/user/" | grep '\.socket$' | sort | head -n1)
+                user_service=$(echo "$units" | grep "/systemd/user/" | grep '\.service$' | sort | head -n1)
+
+                if [[ -n $user_socket ]]; then
+                    provides_systemd_service+=("$pkg")
+                    user_units+=("$(basename "$user_socket")")
+                    unit_types+=("socket")
+                    continue
+                elif [[ -n $user_service ]]; then
+                    provides_systemd_service+=("$pkg")
+                    user_units+=("$(basename "$user_service")")
+                    unit_types+=("service")
+                    continue
+                fi
+
+                sys_socket=$(echo "$units" | grep '/systemd/system/' | grep '\.socket$' | sort | head -n1)
+                sys_service=$(echo "$units" | grep '/systemd/system/' | grep '\.service$' | sort | head -n1)
+
+                if [[ -n $sys_socket ]]; then
+                    provides_systemd_service+=("$pkg")
+                    services+=("$(basename "$sys_socket")")
+                    unit_types+=("socket")
+                    continue
+                elif [[ -n $sys_service ]]; then
+                    provides_systemd_service+=("$pkg")
+                    services+=("$(basename "$sys_service")")
+                    unit_types+=("service")
+                fi
+            done
+
+            if [[ ${#provides_systemd_service[@]} -eq 0 ]]; then
+				echo -e "${YELLOW}[VIBRANIUM]${RESET} Installation complete"
+                read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
+                printf '\e[?25h'  # show cursor
+                exit 0
+            fi
+
+            has_socket=false
+            has_service=false
+            for type in "${unit_types[@]}"; do
+                [[ $type == "socket" ]] && has_socket=true
+                [[ $type == "service" ]] && has_service=true
+            done
+
+            if $has_socket && $has_service; then
+                unit_label="systemd ${YELLOW}services${RESET} and ${YELLOW}sockets${RESET}"
+            elif $has_socket; then
+                unit_label="systemd ${YELLOW}sockets${RESET}"
+            else
+                unit_label="systemd ${YELLOW}services${RESET}"
+            fi
+
+            echo -e "${YELLOW}[VIBRANIUM]${RESET} The following packages provide systemd units:"
+            for i in "${!provides_systemd_service[@]}"; do
+                pkg="${provides_systemd_service[$i]}"
+                type="${unit_types[$i]}"
+                if [[ $type == "socket" ]]; then
+                    echo "  - ${YELLOW}$pkg${RESET} (socket)"
+                else
+                    echo "  - ${YELLOW}$pkg${RESET} (service)"
+                fi
+            done
+
+            prompt2=$'\e[0;33m[VIBRANIUM]\e[0m Do you wish to enable and start them now? (Y/n): '
+            while true; do
+                printf '\e[?25h' # show cursor
+                printf "%s" "$prompt2"
+                read -r answer
+                case "$answer" in
+                    [Yy][Ee][Ss] | [Yy] | "")
+                        printf '\e[?25l' # Hide cursor
+                        # Enable user units first
+                        if [[ ${#user_units[@]} -gt 0 ]]; then
+                            systemctl --user --now enable "${user_units[@]}"
+                        fi
+
+                        # Enable system-wide units
+                        if [[ ${#services[@]} -gt 0 ]]; then
+                            systemctl enable --now "${services[@]}"
+                        fi
+                        break
+                        ;;
+                    [Nn][Oo] | [Nn])
+                        printf '\e[?25l' # Hide cursor
+                        break  # Just skip enabling, continue to complete
+                        ;;
+                    *)
+                        printf '\e[A\r\e[K'  # Go up, to start, clear line
+                        ;;
+                esac
+            done
+
+			echo -e "${YELLOW}[VIBRANIUM]${RESET} Installation complete"
+            read -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
+            # Show cursor
+            printf '\e[?25h'
+
+            exit 0
+            ;;
+        [Nn][Oo] | [Nn])
+            exit 1
+            ;;
+        *)
+            printf '\e[A\r\e[K'  # Go up, to start, clear line
+            ;;
+    esac
+done
