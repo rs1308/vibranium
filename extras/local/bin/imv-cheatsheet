@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+YELLOW='#e0af68'
+
+msg="\n<span foreground='${YELLOW}'><b>SHIFT + PLUS</b></span> - zoom in\n"
+msg+="<span foreground='${YELLOW}'><b>SHIFT + L</b></span>    - move right\n"
+msg+="<span foreground='${YELLOW}'><b>SHIFT + J</b></span>    - move left\n"
+msg+="<span foreground='${YELLOW}'><b>MINUS</b></span>        - zoom out\n\n"
+
+msg+="<span foreground='${YELLOW}'><b>L</b></span> - next image\n"
+msg+="<span foreground='${YELLOW}'><b>J</b></span> - prev image\n"
+msg+="<span foreground='${YELLOW}'><b>R</b></span> - rotate by 90°\n"
+msg+="<span foreground='${YELLOW}'><b>O</b></span> - show info\n"
+msg+="<span foreground='${YELLOW}'><b>F</b></span> - fullscreen\n"
+msg+="<span foreground='${YELLOW}'><b>C</b></span> - copy to clipboard\n"
+msg+="<span foreground='${YELLOW}'><b>W</b></span> - set as wallpaper\n"
+notify-send -r 3 -t 30000 "Keyboard shortcuts for Image Viewer" "$msg"
