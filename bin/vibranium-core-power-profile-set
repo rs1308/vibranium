@@ -33,74 +33,75 @@ notify() {
             ;;
     esac
 
-    log "Setting power profile to ${YELLOW}'""${profile}""'${RESET}"
+    log "Setting power profile to ${YELLOW}'${profile}'${RESET}"
     check_bool VIBRANIUM_GLOBAL_POWER_PROFILE_USE_OSD true
 
-    if [ $VIBRANIUM_GLOBAL_USE_OSD = true ] && [ $VIBRANIUM_GLOBAL_POWER_PROFILE_USE_OSD = true ]; then
-        if ! command -v swayosd-client > /dev/null; then
+    if [ "$VIBRANIUM_GLOBAL_USE_OSD" = true ] && [ "$VIBRANIUM_GLOBAL_POWER_PROFILE_USE_OSD" = true ]; then
+        if ! command -v swayosd-client > /dev/null || ! pidof swayosd-server > /dev/null; then
             notify-send -r 2 -t 1500 "Vibranium" "Power profile set to <span foreground='${P_ACCENT}'>${label,,}</span>"
         else
-			if ! pidof swayosd-server >/dev/null; then
-				notify-send -r 2 -t 1500 "Vibranium" "Power profile set to <span foreground='${P_ACCENT}'>${label,,}</span>"
-			else
-				swayosd-client --custom-message "$label" --custom-icon "$icon"
-			fi
+            swayosd-client --custom-message "$label" --custom-icon "$icon"
         fi
     else
         notify-send -r 2 -t 1500 "Vibranium" "Power profile set to <span foreground='${P_ACCENT}'>${label,,}</span>"
     fi
 
-	check_bool VIBRANIUM_BAR_POWER_PROFILE_MODULE_ENABLE false
-	if [ $VIBRANIUM_BAR_POWER_PROFILE_MODULE_ENABLE = true ]; then
-		log "Updating waybar module"
-		vibranium-cmd-refresh-waybar-module power-profile
-	fi
+    check_bool VIBRANIUM_BAR_POWER_PROFILE_MODULE_ENABLE false
+    if [ "$VIBRANIUM_BAR_POWER_PROFILE_MODULE_ENABLE" = true ]; then
+        log "Updating waybar module"
+        vibranium-cmd-refresh-waybar-module power-profile
+    fi
 }
 
-for i in "${!profiles[@]}"; do
-    if [ "${profiles[$i]}" = "$current" ]; then
-        current_index=$i
-        break
-    fi
-done
+arg="${1,,}"
 
-case "$1" in
-    "up" | "+")
-        next_index=$(((current_index + 1) % ${#profiles[@]}))
-        ;;
-    "down" | "-")
-        next_index=$(((current_index - 1 + ${#profiles[@]}) % ${#profiles[@]}))
-        ;;
-    "")
-        next_index=$(((current_index + 1) % ${#profiles[@]}))
-		;;
-    *)
-        error "Invalid input"
-        exit 1
-        ;;
-esac
-
-powerprofilesctl set "${profiles[$next_index]}" &
-echo "${profiles[$next_index]}" > "${VIBRANIUM_STATE}/power-profile"
-notify "${profiles[$next_index]}"
-
-# CONF="$XDG_CONFIG_HOME/hypr/hyprland.conf.d/look-and-feel.conf"
-# BLUR_ENABLED="$(sed -n '/decoration[[:space:]]*{/,/}/{/blur[[:space:]]*{/,/}/{s/.*enabled[[:space:]]*=[[:space:]]*\([^;]*\).*/\1/p}}' "$CONF")"
-
-# If VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE is true, and blur was enabled before switching to power-saver mode,
-# we must remember this state so that we can restore it later when switching to another power profile.
-BLUR_ENABLED="$(hyprctl -j getoption decoration:blur:enabled | jq -r '.int')"
-if [ "${profiles[$next_index]}" = "power-saver" ]; then
-	if [ "$VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE" = "true" ]; then
-
-		if [[ $BLUR_ENABLED == 1 ]]; then
-			touch "$VIBRANIUM_STATE/blur.restore"
-			vibranium-cmd-toggle-blur
-		fi
-	fi
+if [[ " ${profiles[*]} " == *" $arg "* ]]; then
+    target_profile="$arg"
 else
-	[[ $BLUR_ENABLED == 0 ]] && [ -f "$VIBRANIUM_STATE/blur.restore" ] && {
-		vibranium-cmd-toggle-blur
-		rm "$VIBRANIUM_STATE/blur.state"
-	}
+    current_index=0
+    for i in "${!profiles[@]}"; do
+        if [[ "${profiles[$i]}" == "$current" ]]; then
+            current_index=$i
+            break
+        fi
+    done
+
+    case "$arg" in
+        "up" | "+")
+            next_index=$(((current_index + 1) % ${#profiles[@]}))
+            ;;
+        "down" | "-")
+            next_index=$(((current_index - 1 + ${#profiles[@]}) % ${#profiles[@]}))
+            ;;
+        "")
+            next_index=$(((current_index + 1) % ${#profiles[@]}))  # default: cycle up
+            ;;
+        *)
+            error "Invalid input: '$1'"
+            exit 1
+            ;;
+    esac
+
+    target_profile="${profiles[$next_index]}"
 fi
+
+powerprofilesctl set "$target_profile" &
+echo "$target_profile" > "${VIBRANIUM_STATE}/power-profile"
+notify "$target_profile"
+
+BLUR_ENABLED="$(hyprctl -j getoption decoration:blur:enabled | jq -r '.int')"
+
+if [ "$target_profile" = "power-saver" ]; then
+    if [ "$VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE" = "true" ]; then
+        if [[ "$BLUR_ENABLED" == 1 ]]; then
+            touch "$VIBRANIUM_STATE/blur.restore"
+            vibranium-cmd-toggle-blur
+        fi
+    fi
+else
+    if [[ "$BLUR_ENABLED" == 0 ]] && [ -f "$VIBRANIUM_STATE/blur.restore" ]; then
+        vibranium-cmd-toggle-blur
+        rm "$VIBRANIUM_STATE/blur.state"
+    fi
+fi
+
