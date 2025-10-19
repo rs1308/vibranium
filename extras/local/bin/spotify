@@ -37,6 +37,7 @@ loop() {
 	msg+="The Spotify window will restart automatically."
 	notify-send -r 1 -t 5000 "Vibranium" "$msg"
 
+        download_theme
 	spicetify backup
 	spicetify config current_theme text color_scheme main
 	spicetify apply

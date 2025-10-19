@@ -4,7 +4,7 @@
 
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 
-export SUDO_PROMPT; SUDO_PROMPT="$(printf '\n%s[VIBRANIUM]%s Password for %s: ' "$RED" "$RESET" "$USER")"
+export SUDO_PROMPT; SUDO_PROMPT="$(printf '%s[VIBRANIUM]%s Password for %s: ' "$RED" "$RESET" "$USER")"
 
 if ! tty -s; then
 	exec setsid vibranium-cmd-launch-terminal "$0"
