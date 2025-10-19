@@ -141,12 +141,12 @@ enable_system_services() {
 create_directories() {
 	mkdir -p \
 		"${HOME}"/.config/{Vencord,vesktop}/{themes,settings} \
+		"$HOME"/.config/heroic/{themes,store} \
 		"$HOME/.config/spicetify/Themes/text" \
 		"$HOME/.config/hypr/hyprland.conf.d" \
 		"$HOME/.local/share/applications" \
 		"$HOME/.local/state/vibranium/" \
 		"$HOME/.config/vibranium/theme" \
-		"$HOME/.config/heroic/themes" \
 		"$HOME/.config/qt6ct/colors" \
 		"$HOME/.config/btop/themes/" \
 		"$HOME/.config/wlogout" \
@@ -248,10 +248,9 @@ done
 # Set heroic theme
 ln -sf "$HOME/.config/vibranium/theme/current/heroic.css" \
 	"$HOME/.config/heroic/themes/vibranium.css"
-printf "{\n\t\"defaultSettings\": {\n\t\t\"customThemesPath\": \"%s/.config/heroic/themes\",\n\t}\n}" "$HOME" \
+printf "{\n\t\"defaultSettings\": {\n\t\t\"customThemesPath\": \"%s/.config/heroic/themes\"\n\t}\n}" "$HOME" \
 	> "$HOME/.config/heroic/config.json"
-mkdir "$HOME/.config/heroic/store"
-printf "{\n\t\"theme\": \"vibranium.css\",\n}" \
+printf "{\n\t\"theme\": \"vibranium.css\"\n}" \
 	> "$HOME/.config/heroic/store/config.json"
 
 ln -sf "$HOME/.local/share/vibranium/defaults/uwsm/env" \
