@@ -84,7 +84,7 @@ install_packages() {
 
 		if ! pacman -Si "$pkg" >/dev/null 2>&1; then
 			aur_flag=" (AUR)"
-			extra_note=" (may take longer)"
+			extra_note=" (may take longer time to install)"
 		else
 			aur_flag=""
 			extra_note=""
@@ -96,7 +96,7 @@ install_packages() {
 		start_time=$(date +%s)
 
 		if [[ "$pkg" == "pipewire-jack" ]]; then
-			sudo pacman -Rdd --noconfirm jack &>/dev/null
+			sudo pacman -Rdd --noconfirm jack2 &>/dev/null
 		fi
 
 		yay -S --noconfirm --needed "$pkg" >/dev/null 2>&1 &
