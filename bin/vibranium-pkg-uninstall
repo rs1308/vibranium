@@ -4,16 +4,14 @@
 
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 
-export SUDO_PROMPT
-SUDO_PROMPT="$(printf '\n\033[1;31m[sudo]\033[0m Password for %s: ' "$USER")"
+export SUDO_PROMPT; SUDO_PROMPT="$(printf '\n%s[VIBRANIUM]%s Password for %s: ' "$RED" "$RESET" "$USER")"
 
 if ! tty -s; then
 	exec setsid vibranium-cmd-launch-terminal "$0"
 	exit 0
 fi
 
-echo
-cat "$VIBRANIUM/logo.txt" &
+printf "\n\e[33m%s\e[0m\n\n" "$(cat "$VIBRANIUM/logo.txt")"
 
 # Source: omarchy
 fzf_args=(

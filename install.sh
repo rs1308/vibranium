@@ -2,11 +2,7 @@
 
 set -euo pipefail
 
-export SUDO_PROMPT
-SUDO_PROMPT="$(printf '\n\033[1;31m[sudo]\033[0m Password for %s: ' "$USER")"
-
 THEME_PATH="$HOME/.local/share/vibranium/themes/nightfox-nightfox"
-
 PACMAN_CONF="/etc/pacman.conf"
 MAKEPKG_CONF="/etc/makepkg.conf"
 SUDOERS_CONF="/etc/sudoers"
@@ -18,6 +14,8 @@ YELLOW=$'\e[0;33m'
 GREEN=$'\e[0;32m'
 GRAY=$'\e[90m'
 RESET=$'\e[0m'
+
+export SUDO_PROMPT; SUDO_PROMPT="$(printf '\n%s[VIBRANIUM]%s Password for %s: ' "$RED" "$RESET" "$USER")"
 
 if [[ "$(id -u)" == 0 ]]; then
 	echo "${RED}[ERROR]${RESET} Do not run this as root!"
