@@ -2,6 +2,7 @@
 
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 
+msg+="\nPress <span foreground='${P_YELLOW}'><b>SUPER + A</b></span> to open app launcher\n"
 msg+="\nPress <span foreground='${P_YELLOW}'><b>CTRL + ALT + V</b></span> to open the Vibranium menu\n"
 msg+="Press <span foreground='${P_YELLOW}'><b>CTRL + ALT + K</b></span> to view all available shortcuts\n\n"
 msg+="Right-click to dismiss this notification"
