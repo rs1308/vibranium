@@ -4,4 +4,4 @@ Name=Image Viewer
 Exec=imv %F
 Icon=multimedia-photo-viewer
 MimeType=image/jpeg;image/png;image/svg+xml;
-Keywords=image;png;jpeg;jpg;avif;media;
+Keywords=image;png;jpeg;jpg;avif;media;imv;

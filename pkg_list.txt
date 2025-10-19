@@ -7,7 +7,6 @@ power-profiles-daemon
 omarchy-chromium-bin
 gpu-screen-recorder
 alacritty-sixel-git
-gtk-engine-murrine
 zathura-pdf-mupdf
 ttf-cascadia-code
 yaru-sound-theme
@@ -33,7 +32,6 @@ hyprsunset
 hyprpicker
 mediainfo
 hyprpaper
-fastfetch
 pipewire
 nwg-look
 hyprlock

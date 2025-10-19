@@ -91,13 +91,11 @@ if [[ $show_spinner == true ]]; then
 
     # collect statuses after both finished
     wait "$arch_pid"
-    arch_status=$?
     wait "$aur_pid"
     aur_status=$?
 else
     # no spinner — wait synchronously and capture statuses exactly once
     wait "$arch_pid"
-    arch_status=$? || true
     wait "$aur_pid"
     aur_status=$? || true
 fi
