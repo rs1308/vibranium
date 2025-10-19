@@ -5,6 +5,11 @@
 
 file=''"$1"''
 
+if [[ ! -f "$file" ]]; then
+	printf ""
+	exit 0
+fi
+
 human_size() {
     local bytes=$1
     [[ -z "$bytes" || ! "$bytes" =~ ^[0-9]+$ ]] && { echo "-"; return; }
@@ -35,9 +40,6 @@ IFS=$'\t' read -r filename filesize resolution colorspace compression < <(
     } | [.filename, .filesize, .resolution, .colorspace, .compression] | @tsv'
 )
 
-printf "\n"
-printf " filename: %s \n" "$filename"
-printf " filesize: %sB (%s) \n" "$filesize" "$(human_size "$filesize")"
-printf " resolution: %s \n" "$resolution"
-printf " colorspace: %s \n" "$colorspace"
-printf " compression: %s \n" "${compression,,}"
+
+printf " filename: %s \n filesize: %sB (%s) \n resolution: %s \n colorspace: %s \n compression: %s \n\n See keyboard shortcuts: Ctrl + H" \
+	"$filename" "$filesize" "$(human_size "$filesize")" "$resolution" "$colorspace" "${compression,,}"
