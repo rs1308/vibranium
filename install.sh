@@ -44,17 +44,20 @@ cleanup() {
 }
 
 install_packages() {
-	local packages pkg start_time elapsed pid aur_flag
+	local packages pkg start_time elapsed pid aur_flag extra_note
 
 	mapfile -t packages < ./pkg_list.txt
+
+	if [ -n "$(find /sys/class/backlight -mindepth 1 -maxdepth 1 2>/dev/null)" ]; then
+		packages+=("brightnessctl")
+	fi
 
 	case "$(lspci | grep VGA)" in
 		*Radeon*|*ATI*)
 			packages+=(
 				"mesa"
 				"lib32-mesa"
-				"mesa-vdpau"
-				"lib32-mesa-vdpau"
+				"rocm-smi-lib"
 				"vulkan-radeon"
 				"lib32-vulkan-radeon"
 				"libvdpau-va-gl"
@@ -65,8 +68,6 @@ install_packages() {
 				"mesa"
 				"lib32-mesa"
 				"libvpl"
-				"mesa-vdpau"
-				"lib32-mesa-vdpau"
 				"vulkan-intel"
 				"lib32-vulkan-intel"
 				"libvdpau-va-gl"
@@ -83,23 +84,30 @@ install_packages() {
 
 		if ! pacman -Si "$pkg" >/dev/null 2>&1; then
 			aur_flag=" (AUR)"
+			extra_note=" (may take longer)"
 		else
 			aur_flag=""
+			extra_note=""
 		fi
 
-		printf "\r\033[K%s[VIBRANIUM]%s Installing %s%s%s%s " \
-			"$YELLOW" "$RESET" "$GRAY" "$pkg" "$aur_flag" "$RESET"
+		printf "\r\033[K%s[VIBRANIUM]%s Installing %s%s%s " \
+			"$YELLOW" "$RESET" "$GRAY" "$pkg" "$aur_flag$extra_note"
 
 		start_time=$(date +%s)
+
+		if [[ "$pkg" == "pipewire-jack" ]]; then
+			sudo pacman -Rdd --noconfirm jack &>/dev/null
+		fi
+
 		yay -S --noconfirm --needed "$pkg" >/dev/null 2>&1 &
 		pid=$!
 
 		while kill -0 "$pid" 2>/dev/null; do
-			sleep 1
+			sudo -v; sleep 1
 			elapsed=$(( $(date +%s) - start_time ))
 			if (( elapsed > 10 )); then
 				printf "\r\033[K%s[VIBRANIUM]%s Installing %s%s [%ds] %s" \
-					"$YELLOW" "$RESET" "$GRAY" "$pkg$aur_flag" "$elapsed" "$RESET"
+					"$YELLOW" "$RESET" "$GRAY" "$pkg$aur_flag$extra_note" "$elapsed" "$RESET"
 			fi
 		done
 
