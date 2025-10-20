@@ -3,61 +3,72 @@
 ACTION="$1"
 EXT_DIR="$XDG_CONFIG_HOME/spicetify/Extensions"
 FILE="$EXT_DIR/adblock.js"
+LOG="$XDG_CACHE_HOME/spotify_adblock.log"
 
-show_progress() {
-	echo "$1" > "$XDG_RUNTIME_DIR/worker.active"
-	vibranium-cmd-refresh-waybar-module worker
-	vibranium-cmd-refresh-waybar-module dynamic-separator
+notify() {
+	local urgency="$1" title="Vibranium" msg="$2"
+	notify-send -r 1 -u "$urgency" "$title" "$msg"
 }
 
-clear_progress() {
-	rm -f "$XDG_RUNTIME_DIR/worker.active"
-	vibranium-cmd-refresh-waybar-module worker
-	vibranium-cmd-refresh-waybar-module dynamic-separator
+progress() {
+	local msg="$1"
+	case "$msg" in
+		clear)
+			rm -f "$XDG_RUNTIME_DIR/worker.active"
+			;;
+		*)
+			echo "$msg" > "$XDG_RUNTIME_DIR/worker.active"
+			;;
+	esac
+	vibranium-cmd-refresh-waybar-module worker dynamic-separator
+}
+
+fail() {
+	local msg="Adblock installation failed\n<b><i>Click to view logs</i></b>"
+	if [ "$(notify-send -A true -r 1 -t 10000 -u critical 'Vibranium' "$msg")" = "0" ]; then
+		vibranium-cmd-launch-terminal "$EDITOR" "$LOG"
+	fi
+	progress clear
+	exit 1
 }
 
 install_adblock() {
+	progress "Applying Spotify adblock"
 	mkdir -p "$EXT_DIR"
 
 	if [ ! -f "$FILE" ]; then
-		URL="https://raw.githubusercontent.com/rxri/spicetify-extensions/refs/heads/main/adblock/adblock.js"
-		curl -s "$URL" -o "$FILE"
+		curl -fsSL "https://raw.githubusercontent.com/rxri/spicetify-extensions/refs/heads/main/adblock/adblock.js" \
+			-o "$FILE" &> "$LOG" || fail
 	fi
-
-	show_progress "Applying Spotify adblock"
 
 	spicetify -q config extensions adblock.js
-	if spicetify -qn apply; then
-		notify-send -r 1 "Vibranium" "Adblock installed successfully"
-	else
-		notify-send -r 1 "Vibranium" "Adblock installation failed"
-	fi
+	spicetify -n apply &> "$LOG" || fail
 
-	clear_progress
+	progress clear
+	if pkill -0 spotify; then
+		notify normal "Adblock installed successfully\n<b><i>Spotify restart required</i></b>"
+	else
+		notify normal "Adblock installed successfully"
+	fi
+	rm -f "$LOG"
 }
 
 remove_adblock() {
-	notify-send -r 1 "Vibranium" "Removing Spotify adblock"
-	show_progress "Removing Spotify adblock"
-
+	progress "Removing Spotify adblock"
 	rm -f "$FILE"
 	spicetify -q config extensions adblock.js-
 	spicetify -qn apply
+	progress clear
 
-	clear_progress
-	notify-send -r 1 "Vibranium" "Removed Spotify adblock"
+	if pkill -0 spotify; then
+		notify normal "Removed Spotify adblock\n<b><i>Spotify restart required</i></b>"
+	else
+		notify normal "Removed Spotify adblock"
+	fi
 }
 
 case "$ACTION" in
-	install)
-		notify-send -r 1 "Vibranium" "Installing Spotify adblock"
-		install_adblock
-		;;
-	remove)
-		remove_adblock
-		;;
-	*)
-		echo "Usage: $0 {install|remove}"
-		exit 1
-		;;
+	install) install_adblock ;;
+	remove)  remove_adblock ;;
+	*) echo "Usage: $0 {install|remove}" >&2; exit 1 ;;
 esac
