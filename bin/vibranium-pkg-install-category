@@ -31,9 +31,9 @@ declare -A packages=(
     ["Office:Obsidian"]="obsidian"
     ["Utilities:Virt Manager"]="virt-manager qemu-full dnsmasq"
     ["Coding:VS Code"]="visual-studio-code"
-    ["Coding:VSCodium"]="code"
-    ["Sublime Text 3"]="sublime-text-3"
-    ["Sublime Text 4"]="sublime-text-4"
+    ["Coding:VS Codium"]="code"
+    ["Coding:Sublime Text 3"]="sublime-text-3"
+    ["Coding:Sublime Text 4"]="sublime-text-4"
 )
 
 declare -A selected_indexes
