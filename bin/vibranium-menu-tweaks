@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+source "$VIBRANIUM_PATH/vibranium-core-lib"
+
+if ! grep -q "adblock" "$XDG_CONFIG_HOME/spicetify/config-xpui.ini"; then
+	OPTIONS=("Install Spotify adblock")
+else
+	OPTIONS=("Remove Spotify adblock")
+fi
+
+if ! grep -q "oauth2-client-id" "$XDG_CONFIG_HOME/chromium-flags.conf"; then
+	OPTIONS+=("Enable Google sync for Chromium")
+else
+	OPTIONS+=("Disable Google sync for Chromium")
+fi
+
+CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "App tweaks" "ESC to go back")"
+[[ -z "$CHOSEN" ]] && exit
+
+case "$CHOSEN" in
+	"Install Spotify adblock")
+		vibranium-cmd-spicetify-adblock install
+		vibranium-cmd-kill-rofi
+		exit 0
+		;;
+	"Remove Spotify adblock")
+		vibranium-cmd-spicetify-adblock remove
+		vibranium-cmd-kill-rofi
+		exit 0
+		;;
+	"Enable Google sync for Chromium")
+		vibranium-cmd-chromium-sync enable
+		;;
+	"Disable Google sync for Chromium")
+		vibranium-cmd-chromium-sync disable
+		;;
+esac
+
+vibranium-cmd-kill-rofi

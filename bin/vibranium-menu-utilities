@@ -6,11 +6,7 @@ if command -v pass >/dev/null; then
 	ACTIONS=("Password manager")
 fi
 
-ACTIONS+=("Downscale a video")
-
-if [ -f /opt/spicetify-cli/spicetify ]; then
-	ACTIONS+=("Apply custom tweaks")
-fi
+ACTIONS+=("Downscale a video" "Apply custom tweaks")
 
 if systemd-inhibit | grep "Prevent system suspend is active" > /dev/null; then
 	ACTIONS+=("<b><i><u>Disable sleep inhibition</u></i></b>")
@@ -34,30 +30,7 @@ while true; do
 
     case "$CHOSEN" in
 		"Apply custom tweaks")
-			while true; do
-				custom_tweaks_chosen=()
-				if ! grep -q "adblock" "$XDG_CONFIG_HOME/spicetify/config-xpui.ini"; then
-					custom_tweaks_options+=("Install Spotify adblock")
-				else
-					custom_tweaks_options+=("Remove Spotify adblock")
-				fi
-
-				custom_tweaks_chosen="$(printf "${custom_tweaks_options[@]}" | rofi_cmd "App tweaks" "ESC to go back")"
-				[[ -z "$custom_tweaks_chosen" ]]
-
-				case "$custom_tweaks_chosen" in
-					"Install Spotify adblock")
-						vibranium-cmd-spicetify-adblock install
-						vibranium-cmd-kill-rofi
-						exit 0
-						;;
-					"Remove Spotify adblock")
-						vibranium-cmd-spicetify-adblock remove
-						vibranium-cmd-kill-rofi
-						exit 0
-						;;
-				esac
-			done
+			vibranium-menu-tweaks
 			;;
 		"Reload Vibranium configuration")
 			vibranium-utils-reload
