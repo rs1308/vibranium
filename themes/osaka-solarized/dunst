@@ -1,21 +1,21 @@
 [global]
-format      = "<span foreground='#bafb00' size='10000'><b>%s</b></span>\n%b"
+format      = "<span foreground='#2aa198' size='10000'><b>%s</b></span>\n%b"
 background  = "#002b36"
 foreground  = "#f3efe2"
-frame_color = "#bafb00"
-highlight   = "#bafb00"
+frame_color = "#2aa198"
+highlight   = "#2aa198"
 
 [urgency_low]
 background  = "#002b36"
 foreground  = "#f3efe2"
-frame_color = "#bafb00"
-highlight   = "#bafb00"
+frame_color = "#196265"
+highlight   = "#196265"
 
 [urgency_critical]
 background  = "#002b36"
 foreground  = "#f3efe2"
 frame_color = "#f6524f"
-highlight   = "#bafb00"
+highlight   = "#2aa198"
 # Disable timeout for urgent notifications
 timeout     = 0
 

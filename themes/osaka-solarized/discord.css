@@ -24,10 +24,10 @@ body {
     --colors: on;
 
     --text-0: var(--text-2);
-    --text-1: #d5d9a4;
-    --text-2: #f3efe2;
-    --text-3: #e4e6c3;
-    --text-4: #c7cc84;
+    --text-1: #829496;
+    --text-2: #efe8d5;
+    --text-3: #93a1a1;
+    --text-4: #93a1a1;
     --text-5: var(--text-4);
 
     /* background and dark colors */
@@ -72,11 +72,11 @@ body {
     --red-4: #f6524f;
     --red-5: #f6524f;
 
-    --green-1: #859901;
-    --green-2: #859901;
-    --green-3: #859901;
-    --green-4: #bafb00;
-    --green-5: #bafb00;
+    --green-1: #2aa198;
+    --green-2: #2aa198;
+    --green-3: #2aa198;
+    --green-4: #27eee0;
+    --green-5: #27eee0;
 
     --blue-1: #278bd2;
     --blue-2: #278bd2;

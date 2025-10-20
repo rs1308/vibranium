@@ -51,8 +51,8 @@
 #537f8e # Background 5
 
 #fdf6e3 # Foreground Hard
-#f3efe2 # Foreground 0
-#e4e6c3 # Foreground 1
-#d5d9a4 # Foreground 2
-#c7cc84 # Foreground 3
-#b9bf65 # Foreground 4
+#efe8d5 # Foreground 0
+#93a1a1 # Foreground 1
+#829496 # Foreground 2
+#647b83 # Foreground 3
+#576e74 # Foreground 4

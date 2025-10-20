@@ -7,11 +7,11 @@ body.vibranium {
 	--background-5: #417383;
 	--background-6: #537f8e;
 
-	--foreground-0: #f3efe2;
-	--foreground-1: #e4e6c3;
-	--foreground-2: #d5d9a4;
-	--foreground-3: #c7cc84;
-	--foreground-4: #b9bf65;
+	--foreground-0: #efe8d5;
+	--foreground-1: #93a1a1;
+	--foreground-2: #829496;
+	--foreground-3: #647b83;
+	--foreground-4: #576e74;
 
 	--green-0: #859901;
 	--green-1: #bafb00;
@@ -50,8 +50,8 @@ body.vibranium {
 
 	/* ============================================== */
 
-    --accent:         var(--green-0);
-    --accent-overlay: var(--green-1);
+    --accent:         var(--aqua-0);
+    --accent-overlay: var(--aqua-1);
 
     --success:        var(--green-0);
     --success-hover:  var(--green-1);
