@@ -5,7 +5,7 @@
 	"format-discharging": "{icon}",
 	"format-charging": "{icon}",
 	"format-plugged": "{icon}",
-	"format-full": "\uf240",
+	"format-full": "\udb80\udc79",
 	"states": { "warning": 20, "critical": 5 },
 	"tooltip-format-discharging": "Battery: {capacity}%\nPower draw: {power:>1.0f}W",
 	"tooltip-format-charging": "Charging ({capacity}%)\nPower draw: {power:>1.0f}W",
