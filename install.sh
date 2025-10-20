@@ -54,6 +54,7 @@ install_packages() {
 
 	case "$(lspci | grep VGA)" in
 		*Radeon*|*ATI*)
+			printf "\r\033[K%s[VIBRANIUM]%s Detected AMD GPU - adding drivers to install queue" "$YELLOW" "$RESET"
 			packages+=(
 				"mesa"
 				"lib32-mesa"
@@ -64,6 +65,7 @@ install_packages() {
 			)
 			;;
 		*UHD*|*Iris*|*Arc*)
+			printf "\r\033[K%s[VIBRANIUM]%s Detected Intel GPU - adding drivers to install queue" "$YELLOW" "$RESET"
 			packages+=(
 				"mesa"
 				"lib32-mesa"
