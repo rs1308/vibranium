@@ -29,3 +29,10 @@ if [[ $VIBRANIUM_BRIGHTNESS_USE_DDC_CONTROL == true ]]; then
 			> "$VIBRANIUM_STATE/i2c-bus"
 	fi
 fi
+
+if [ ! -f "$VIBRANIUM_STATE/wallpaper.enabled" ]; then
+	case "$(systemctl --user show hyprpaper -p UnitFileState --value)" in
+		enabled)   echo "true" > "$VIBRANIUM_STATE/wallpaper.enabled" ;;
+		ddisabled) echo "true" > "$VIBRANIUM_STATE/wallpaper.enabled" ;;
+	esac
+fi

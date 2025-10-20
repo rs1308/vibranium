@@ -9,7 +9,12 @@ while true; do
 	source "$VIBRANIUM_USER_SETTINGS"
 
 	power_menu_style="$([ "$VIBRANIUM_GLOBAL_POWER_MENU_STYLE" = "overlay" ] && echo overlay || echo menu)"
-	wallpaper_status="$([ "$(systemctl --user show hyprpaper -p UnitFileState --value)" = enabled ] && echo true || echo false)"
+	
+	if [ ! -f "$VIBRANIUM_STATE/wallpaper.enabled" ]; then
+		wallpaper_status="$(<"$VIBRANIUM_STATE/wallpaper.enabled")"
+	else
+		wallpaper_status="$([ "$(systemctl --user show hyprpaper -p UnitFileState --value)" = enabled ] && echo true || echo false)"
+	fi
 
 	if [[ $VIBRANIUM_GLOBAL_USE_OSD == false ]]; then
 		power_profile_osd="Power profile OSD       : $VIBRANIUM_GLOBAL_POWER_PROFILE_USE_OSD ()"
@@ -77,14 +82,12 @@ while true; do
 		"Show wallpaper"*)
 			case "$wallpaper_status" in
 				true)
+					echo "false" > "$VIBRANIUM_STATE/wallpaper.enabled"
 					systemctl -q --user disable --now hyprpaper
-					echo "false" \
-						> "$VIBRANIUM_STATE/wallpaper.enabled"
 					;;
 				false)
+					echo "true" > "$VIBRANIUM_STATE/wallpaper.enabled"
 					systemctl -q --user enable --now hyprpaper
-					echo "true" \
-						> "$VIBRANIUM_STATE/wallpaper.enabled"
 					;;
 			esac
 			;;
