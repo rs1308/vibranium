@@ -8,7 +8,7 @@ declare -A packages=(
     ["Communication:Discord"]="discord"
     ["Communication:Vesktop"]="vesktop"
     ["Communication:Signal"]="signal-desktop"
-    ["Entertainment:Spotify"]="spotify"
+    ["Entertainment:Spotify"]="spicetify-cli spotify"
 	["Network:qBittorrent"]="qbittorrent"
 	["Network:Transmission"]="transmission-gtk"
 	["Network:Syncthing"]="syncthing"
@@ -39,7 +39,8 @@ declare -A packages=(
 declare -A selected_indexes
 
 install_and_exit() {
-    vibranium-pkg-install "$1"
+    IFS=' ' read -r -a pkgs <<< "$1"
+    vibranium-pkg-install "${pkgs[@]}"
     vibranium-cmd-kill-rofi
     exit 0
 }
