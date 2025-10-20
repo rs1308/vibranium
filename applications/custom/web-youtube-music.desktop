@@ -4,6 +4,6 @@ Type=Application
 Name=YouTube Music
 Icon=youtube
 Keywrods=Google;Youtube;Music
-Exec=https://music.youtube.com
+Exec=chromium --app='https://music.youtube.com'
 Terminal=false
 Categories=WebApp;

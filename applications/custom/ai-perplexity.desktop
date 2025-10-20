@@ -4,6 +4,6 @@ Type=Application
 Name=Perplexity
 Icon=perplexity
 Keywords=PerplexityAI;Labs;
-Exec=https://www.perplexity.ai
+Exec=chromium --app='https://www.perplexity.ai'
 Terminal=false
 Categories=AI;

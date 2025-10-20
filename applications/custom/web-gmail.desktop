@@ -4,6 +4,6 @@ Type=Application
 Name=GMail
 Icon=gmail
 Keywords=Mail;Google;
-Exec=https://mail.google.com
+Exec=chromium --app='https://mail.google.com'
 Terminal=false
 Categories=WebApp;

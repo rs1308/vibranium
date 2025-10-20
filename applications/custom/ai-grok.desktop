@@ -4,6 +4,6 @@ Type=Application
 Name=Grok AI
 Icon=grok
 Keywords=Grok;Twitter;X;Elon;Musk;Tesla
-Exec=https://grok.com
+Exec=chromium --app='https://grok.com'
 Terminal=false
 Categories=AI;

@@ -4,6 +4,6 @@ Version=1.0
 Name=Claude AI
 Icon=claude
 Keywords=AI;Claude;Anthropic
-Exec=https://claude.ai/chats
+Exec=chromium --app='https://claude.ai/chats'
 Terminal=false
 Categories=AI;
