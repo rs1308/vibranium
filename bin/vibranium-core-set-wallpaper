@@ -47,6 +47,12 @@ toggle_wallpaper() {
     esac
 }
 
+if [ -f "$VIBRANIUM_STATE/wallpaper.enabled" ]; then
+	if [[ "$(<"$VIBRANIUM_STATE/wallpaper.enabled")" == false ]]; then
+		exit 0
+	fi
+fi
+
 case "$1" in
     "--next"|"--prev") WALLPAPER_PATH="$(toggle_wallpaper "$1")" ;;
 	*)                 WALLPAPER_PATH="$(realpath "$1")"         ;;
@@ -59,10 +65,14 @@ if [ -z "$1" ] || [[ ! $WALLPAPER_PATH =~ \.(png|jp(e)?g|webp)$ ]]; then
     exit 0
 fi
 
-if [[ "$(systemctl --user is-active hyprpaper)" != "active" ]]; then
-	msg="For some reason, the Wallpaper Daemon wasn't enabled.\nThe system service was enabled and the wallpaper was set"
-	notify-send -r 1 -t 5000 "Vibranium" "$msg"
-	systemctl --user enable --now hyprpaper
+if [ -f "$VIBRANIUM_STATE/wallpaper.enabled" ]; then
+	if [[ "$(<"$VIBRANIUM_STATE/wallpaper.enabled")" == true ]]; then
+		if [[ "$(systemctl --user is-active hyprpaper)" != "active" ]]; then
+			msg="For some reason, the Wallpaper Daemon wasn't enabled.\nThe system service was enabled and the wallpaper was set"
+			notify-send -r 1 -t 5000 "Vibranium" "$msg"
+			systemctl --user enable --now hyprpaper
+		fi
+	fi
 fi
 
 # Update on all monitors

@@ -9,6 +9,7 @@ while true; do
 	source "$VIBRANIUM_USER_SETTINGS"
 
 	power_menu_style="$([ "$VIBRANIUM_GLOBAL_POWER_MENU_STYLE" = "overlay" ] && echo overlay || echo menu)"
+	wallpaper_status="$([ "$(systemctl --user show hyprpaper -p UnitFileState --value)" = enabled ] && echo true || echo false)"
 
 	if [[ $VIBRANIUM_GLOBAL_USE_OSD == false ]]; then
 		power_profile_osd="Power profile OSD       : $VIBRANIUM_GLOBAL_POWER_PROFILE_USE_OSD ()"
@@ -43,6 +44,7 @@ while true; do
 	fi
 
 	OPTIONS+=(
+		"Show wallpaper          : $wallpaper_status"
 		"Confirm to kill         : $VIBRANIUM_GLOBAL_CONFIRM_TO_KILL"
 		"Blur lockscreen         : $VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_BACKGROUND"
 		"Power menu style        : $power_menu_style"
@@ -72,6 +74,20 @@ while true; do
     done
 
 	case "$CHOSEN" in
+		"Show wallpaper"*)
+			case "$wallpaper_status" in
+				true)
+					systemctl -q --user disable --now hyprpaper
+					echo "false" \
+						> "$VIBRANIUM_STATE/wallpaper.enabled"
+					;;
+				false)
+					systemctl -q --user enable --now hyprpaper
+					echo "true" \
+						> "$VIBRANIUM_STATE/wallpaper.enabled"
+					;;
+			esac
+			;;
 		"Playerctl options")
 			configure-playerctl
 			;;
