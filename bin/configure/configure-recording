@@ -191,11 +191,9 @@ while true; do
 									break
 									;;
 								"What"*)
-									# When the active window is fullscreen, a brief flash effect will be
-									# shown to indicate when recording starts or stops.
-									msg="When the active window is <span foreground='${P_YELLOW}'><b>fullscreen</b></span>, a brief flash effect will be\n"
-									msg+="shown to indicate when recording <span foreground='${P_GREEN}'><b>starts</b></span> "
-									msg+="or <span foreground='${P_RED}'><b>stops</b></span>."
+									msg="Whether to <span foreground='${P_YELLOW}'><b>flash</b></span> the whole screen when recording "
+									msg+="<span foreground='${P_GREEN}'><b>starts</b></span> or <span foreground='${P_RED}'><b>stops</b></span>.\n"
+									msg+="Purely aesthetic feature. The flashing effect isn't shown in the video itself"
 									notify-send -r 3 -t 7500 "What is this?" "$msg"
 									continue
 							esac
