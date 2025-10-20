@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+
+ACTION="$1"
+EXT_DIR="$XDG_CONFIG_HOME/spicetify/Extensions"
+FILE="$EXT_DIR/adblock.js"
+
+show_progress() {
+	echo "$1" > "$XDG_RUNTIME_DIR/worker.active"
+	vibranium-cmd-refresh-waybar-module worker
+	vibranium-cmd-refresh-waybar-module dynamic-separator
+}
+
+clear_progress() {
+	rm -f "$XDG_RUNTIME_DIR/worker.active"
+	vibranium-cmd-refresh-waybar-module worker
+	vibranium-cmd-refresh-waybar-module dynamic-separator
+}
+
+install_adblock() {
+	mkdir -p "$EXT_DIR"
+
+	if [ ! -f "$FILE" ]; then
+		URL="https://raw.githubusercontent.com/rxri/spicetify-extensions/refs/heads/main/adblock/adblock.js"
+		curl -s "$URL" -o "$FILE"
+	fi
+
+	show_progress "Applying Spotify adblock"
+
+	spicetify -q config extensions adblock.js
+	if spicetify -qn apply; then
+		notify-send -r 1 "Vibranium" "Adblock installed successfully"
+	else
+		notify-send -r 1 "Vibranium" "Adblock installation failed"
+	fi
+
+	clear_progress
+}
+
+remove_adblock() {
+	notify-send -r 1 "Vibranium" "Removing Spotify adblock"
+	show_progress "Removing Spotify adblock"
+
+	rm -f "$FILE"
+	spicetify -q config extensions adblock.js-
+	spicetify -qn apply
+
+	clear_progress
+	notify-send -r 1 "Vibranium" "Removed Spotify adblock"
+}
+
+case "$ACTION" in
+	install)
+		notify-send -r 1 "Vibranium" "Installing Spotify adblock"
+		install_adblock
+		;;
+	remove)
+		remove_adblock
+		;;
+	*)
+		echo "Usage: $0 {install|remove}"
+		exit 1
+		;;
+esac
