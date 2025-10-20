@@ -3,7 +3,7 @@
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 export PATH="$PATH:$VIBRANIUM_PATH/configure"
 
-OPTIONS=("WM" "Idle" "Audio" "General" "Set font" "Set theme" "Recording" "Brightness" "Screenshots" "Night Light" "Color Picker" "Factory Reset")
+OPTIONS=("Idle" "Audio" "General" "Set font" "Hyprland" "Set theme" "Recording" "Brightness" "Screenshots" "Night Light" "Color Picker" "Factory Reset")
 INDEX=0
 
 while true; do
@@ -50,7 +50,7 @@ while true; do
 		"General")
 			configure-global-options
 			;;
-		"WM")
+		"Hyprland")
 			configure-window-manager
 			;;
 		"Factory Reset")

@@ -41,7 +41,14 @@ while true; do
 		OPTIONS+=("Blur enabled        : ${current_blur}")
 	fi
 
-	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "WM" "ESC to go back" -selected-row "$INDEX")"
+	OPTIONS+=(
+		"Configure input devices"
+		"Configure window rules"
+		"Configure monitors"
+		"Configure binds"
+	)
+
+	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Hyprland" "ESC to go back" -selected-row "$INDEX")"
 	[ -z "$CHOSEN" ] && break
 
     for i in "${!OPTIONS[@]}"; do
@@ -52,6 +59,26 @@ while true; do
     done
 
 	case "$CHOSEN" in
+		"Configure input devices")
+			vibranium-cmd-launch-terminal "$EDITOR" "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
+			vibranium-cmd-kill-rofi
+			exit 0
+			;;
+		"Configure window rules")
+			vibranium-cmd-launch-terminal "$EDITOR" "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/window-rules.conf"
+			vibranium-cmd-kill-rofi
+			exit 0
+			;;
+		"Configure monitors")
+			vibranium-cmd-launch-terminal "$EDITOR" "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/monitors.conf"
+			vibranium-cmd-kill-rofi
+			exit 0
+			;;
+		"Configure binds")
+			vibranium-cmd-launch-terminal "$EDITOR" "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/binds.conf"
+			vibranium-cmd-kill-rofi
+			exit 0
+			;;
 		"Drop"*)
 			if [[ $current_shadow == true ]]; then
 				vibranium-cmd-edit-wm-config decoration:shadow:enabled:false "$HYPR_CONFIG"
