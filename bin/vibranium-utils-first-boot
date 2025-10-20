@@ -8,5 +8,5 @@ msg+="Press <span foreground='${P_YELLOW}'><b>CTRL + ALT + K</b></span> to view 
 msg+="<b>Right-click</b> to dismiss this notification"
 notify-send -r 1 -t 1800000 "Welcome to Vibranium" "$msg"
 
-# chromium --no-startup-window --set-theme-color="25, 35, 48"
-# rm "$VIBRANIUM_STATE/first-boot"
+chromium --no-startup-window --set-theme-color="25, 35, 48"
+rm "$VIBRANIUM_STATE/first-boot"

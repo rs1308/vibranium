@@ -270,8 +270,6 @@ ln -sf "$HOME/.local/share/vibranium/defaults/wlogout/layout" \
 ln -sf "$HOME/.config/vibranium/theme/current/spicetify.ini" \
 	"$HOME/.config/spicetify/Themes/text/color.ini" >/dev/null
 
-printf "# vim:ft=bash\n# Place your environment variables here\n" \
-	> "$HOME/.config/vibranium/environment"
 printf "# vim:ft=bash\n# shellcheck disable=all\n# Auto-generated file. Do not edit!\n\n" \
 	> "$HOME/.config/vibranium/settings"
 
