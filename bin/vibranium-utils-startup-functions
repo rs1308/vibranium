@@ -12,10 +12,6 @@ if [ -f "$VIBRANIUM_STATE/first-boot" ]; then
 	vibranium-utils-first-boot
 fi
 
-if [ ! -f "$VIBRANIUM_STATE/night-light" ]; then
-	echo "suspended" > "$VIBRANIUM_STATE/night-light"
-fi
-
 if [ ! -d "$VIBRANIUM_STATE/wallpaper" ]; then
 	mkdir -p "$VIBRANIUM_STATE"/wallpaper
 	vibranium-utils-wallpaper-get \
@@ -35,4 +31,19 @@ if [ ! -f "$VIBRANIUM_STATE/wallpaper.enabled" ]; then
 		enabled)   echo "true" > "$VIBRANIUM_STATE/wallpaper.enabled" ;;
 		ddisabled) echo "true" > "$VIBRANIUM_STATE/wallpaper.enabled" ;;
 	esac
+fi
+
+# If state file doesn't exist - create one and disable
+# night light (by default). We still need hyprsunset
+# running in background because screen flashing effect
+# depends on it. It is not the best solution though, and
+# because of the while loop we must keep this check at the end
+if [ ! -f "$VIBRANIUM_STATE/night-light" ]; then
+	echo "suspended" > "$VIBRANIUM_STATE/night-light"
+	hyprctl -q hyprsunset identity
+elif [ "$(<"$VIBRANIUM_STATE/night-light")" = "suspended" ]; then
+	while ! pkill -0 hyprsunset; do
+		sleep 0.05
+	done
+	hyprctl -q hyprsunset identity
 fi
