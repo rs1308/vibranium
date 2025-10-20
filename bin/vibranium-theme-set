@@ -48,11 +48,11 @@ declare -A PAPIRUS_COLORS=(
     [Nightfox-Nightfox]=bluegrey
     [Nightfox-Carbonfox]=black
     [Nightfox-Nordfox]=nordic
-    [Nightfox-Terafox]=yeal
+    [Nightfox-Terafox]=teal
 
     [Rosepine]=violet
     [Rosepine-Moon]=violet
-    [Rosepine-Dawn]=pink
+    [Rosepine-Dawn]=indigo
 
     [Tokyonight-Night]=blue
     [Tokyonight-Moon]=blue
@@ -253,13 +253,13 @@ get_wallpaper() {
     # Use first available wallpaper for the theme
     if [[ ! -d $state_dir ]]; then
         mkdir -p "$state_dir"
-        find "$LINK_TARGET/backgrounds/" -type f,l | head -n1
+        find "$LINK_TARGET/backgrounds/" -type f,l | sort | head -n1
         return 0
     else 
         if [[ -f "$state_file" ]]; then
             cat "$state_file"
         else
-            find "$LINK_TARGET/backgrounds/" -type f,l | head -n1
+            find "$LINK_TARGET/backgrounds/" -type f,l | sort | head -n1
             return 0
         fi
     fi
