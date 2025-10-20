@@ -1,6 +1,6 @@
 {
     "label" : "lock",
-    "action" : "vibranium-core-lock-session",
+    "action" : "loginctl lock-session",
     "text" : "Lock session",
     "keybind" : "l"
 }
@@ -24,7 +24,7 @@
 }
 {
     "label" : "suspend",
-    "action" : "vibranium-core-lock-session; systemctl suspend",
+    "action" : "vibranium-cmd-suspend",
     "text" : "Suspend this PC",
     "keybind" : "u"
 }
