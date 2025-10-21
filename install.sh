@@ -226,6 +226,11 @@ printf "\n%s[VIBRANIUM]%s Setting default theme" "${YELLOW}" "${RESET}"
 
 printf "\n%s[VIBRANIUM]%s Installing systemd services" "${YELLOW}" "${RESET}"
 enable_system_services
+
+printf "\n%s[VIBRANIUM]%s Applying systemd units overrides" "${YELLOW}" "${RESET}"
+./install/set_systemd_overrides.sh
+
+printf "\n%s[VIBRANIUM]%s Cleaning up" "${YELLOW}" "${RESET}"
 post_install
 cleanup
 
