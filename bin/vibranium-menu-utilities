@@ -6,7 +6,7 @@ if command -v pass >/dev/null; then
 	ACTIONS=("Password manager")
 fi
 
-ACTIONS+=("Downscale a video" "Apply custom tweaks")
+ACTIONS+=("Video downscaler" "Apply custom tweaks")
 
 if systemd-inhibit | grep "Prevent system suspend is active" > /dev/null; then
 	ACTIONS+=("<b><i><u>Disable sleep inhibition</u></i></b>")
@@ -42,8 +42,8 @@ while true; do
 			vibranium-cmd-kill-rofi
 			exit 0
             ;;
-        "Downscale a video")
-            if ! vibranium-utils-video-downscale; then
+        "Video downscaler")
+            if ! vibranium-utils-video-downscaler; then
 				exit 0
 			fi
             ;;
