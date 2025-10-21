@@ -54,10 +54,10 @@ done
 
 # Icon theme
 mkdir -p "$HOME/.local/share/icons"
-cp -r ../extras/icon_theme/Vibranium "$HOME/.local/share/icons"
+cp -r ./extras/icon_theme/Vibranium "$HOME/.local/share/icons"
 
 printf "# vim:ft=bash\n# shellcheck disable=all\n# Auto-generated file. Do not edit!\n\n" \
 	> "$HOME/.config/vibranium/settings"
 
-cp -r ../config/* "$HOME/.config"
+cp -r ./config/* "$HOME/.config"
 sed -i "s/user/$USER/" "$HOME/.config/qt6ct/qt6ct.conf"

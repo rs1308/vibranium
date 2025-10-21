@@ -7,9 +7,9 @@ FAILLOCK_CONF="/etc/security/faillock.conf"
 SYSTEM_AUTH_CONF="/etc/pam.d/system-auth"
 LOGIND_CONF="/etc/systemd/logind.conf"
 
-sudo cp -r ../extras/udev/rules.d/*  /etc/udev/rules.d
-sudo cp -r ../extras/pacman.d/hooks  /etc/pacman.d
-sudo cp -r ../extras/usr/local/bin/* /usr/local/bin
+sudo cp -r ./extras/udev/rules.d/*  /etc/udev/rules.d
+sudo cp -r ./extras/pacman.d/hooks  /etc/pacman.d
+sudo cp -r ./extras/usr/local/bin/* /usr/local/bin
 
 sudo sed -Ei '/^#?HandlePowerKey=/s/^#//;s/=.*/=ignore/' "$LOGIND_CONF"
 
