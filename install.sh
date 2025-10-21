@@ -228,6 +228,20 @@ for entry in ./applications/*.desktop ./applications/hidden/*; do
     ln -sf "$(realpath "$entry")" "$HOME/.local/share/applications/" >/dev/null
 done
 
+LOOKNFEEL_CONF="$HOME/.config/hypr/hyprland.conf.d/look-and-feel.conf"
+LOOKNFEEL_OPTS=(
+	"animations:enabled:true"
+	"decoration:dim_inactive:true"
+	"decoration:rounding:0"
+	"decoration:blur:enabled:false"
+	"decoration:blur:size:5"
+	"decoration:shadow:enabled:true"
+)
+
+for opt in "${LOOKNFEEL_OPTS[@]}"; do
+	./bin/vibranium-cmd-edit-wm-config "$opt" "$LOOKNFEEL_CONF"
+done
+
 for file in ./install/generate_*; do
 	bash "$file"
 done
