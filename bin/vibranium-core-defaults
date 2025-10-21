@@ -89,11 +89,11 @@ VIBRANIUM_GLOBAL_COPY_TO_CLIPBOARD=true
 # Default is true
 VIBRANIUM_GLOBAL_PAUSE_MUSIC_ON_SESSION_LOCK=true
 
-# Whether to show "Welcome back, user" notification on session unlock.
+# Whether to show "Welcome back, $USER!" notification on session unlock.
 # Available options: bool
 #
-# Default is true
-VIBRANIUM_GLOBAL_SHOW_WELCOME_BACK_NOTIFICATION=true
+# Default is false
+VIBRANIUM_GLOBAL_SHOW_WELCOME_BACK_NOTIFICATION=false
 
 # Whether to show "Now Playing" notification on session unlock.
 # Available options: bool
