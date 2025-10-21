@@ -169,7 +169,7 @@ case "$method" in
         if [[ $VIBRANIUM_GLOBAL_USE_OSD == true ]] && [[ $VIBRANIUM_BRIGHTNESS_USE_OSD == true ]]; then
             osd "$new" &
         else
-            notify-send -r 2 -t 1000 "Brightness" -h int:value:"$new"
+            notify-send -r 2 -t 1000 "Brightness ${new}%" -h int:value:"$new"
         fi
         ;;
 	"brightnessctl")
@@ -212,7 +212,7 @@ case "$method" in
 			swayosd-client --brightness="$arg"
 		else
 			brightnessctl -q set "${new}%"
-			notify-send -r 1 -t 1000 "Brightness" -h int:value:"$new"
+			notify-send -r 1 -t 1000 "Brightness ${new}%" -h int:value:"$new"
 		fi
 
 		printf "%s" "$new" > "$VIBRANIUM_STATE/brightness"
