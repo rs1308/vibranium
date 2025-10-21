@@ -10,10 +10,17 @@ if command -v spotify >/dev/null && command -v spicetify; then
 	fi
 fi
 
-if ! grep -q "oauth2-client-id" "$XDG_CONFIG_HOME/chromium-flags.conf"; then
-	OPTIONS+=("Enable Google sync for Chromium")
-else
-	OPTIONS+=("Disable Google sync for Chromium")
+if command -v chromium >/dev/null; then
+	if ! grep -q "oauth2-client-id" "$XDG_CONFIG_HOME/chromium-flags.conf"; then
+		OPTIONS+=("Enable Google sync for Chromium")
+	else
+		OPTIONS+=("Disable Google sync for Chromium")
+	fi
+fi
+
+if [ -z "$OPTIONS" ]; then
+	notify-send -r 4 -t 5000 -u critical "Vibranium" "There is no tweaks available"
+	exit 1
 fi
 
 CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "App tweaks" "ESC to go back")"
@@ -21,20 +28,20 @@ CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "App tweaks" "ESC to go back"
 
 case "$CHOSEN" in
 	"Install Spotify adblock")
-		vibranium-cmd-spicetify-adblock install
+		vibranium-tweaks-spicetify-adblock install
 		vibranium-cmd-kill-rofi
 		exit 0
 		;;
 	"Remove Spotify adblock")
-		vibranium-cmd-spicetify-adblock remove
+		vibranium-tweaks-spicetify-adblock remove
 		vibranium-cmd-kill-rofi
 		exit 0
 		;;
 	"Enable Google sync for Chromium")
-		vibranium-cmd-chromium-sync enable
+		vibranium-tweaks-chromium-sync enable
 		;;
 	"Disable Google sync for Chromium")
-		vibranium-cmd-chromium-sync disable
+		vibranium-tweaks-chromium-sync disable
 		;;
 esac
 
