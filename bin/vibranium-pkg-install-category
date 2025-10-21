@@ -8,10 +8,14 @@ declare -A packages=(
     ["Communication:Discord"]="discord"
     ["Communication:Vesktop"]="vesktop"
     ["Communication:Signal"]="signal-desktop"
+	["Communication:Slack"]="slack-desktop-wayland"
+
     ["Entertainment:Spotify"]="spicetify-cli spotify"
+
 	["Network:qBittorrent"]="qbittorrent"
 	["Network:Transmission"]="transmission-gtk"
 	["Network:Syncthing"]="syncthing"
+
 	["Web browsers:Firefox"]="firefox"
 	["Web browsers:Google Chrome"]="google-chrome"
 	["Web browsers:Vivaldi"]="vivaldi"
@@ -19,21 +23,67 @@ declare -A packages=(
 	["Web browsers:Brave"]="brave"
 	["Web browsers:Qutebrowser"]="qutebrowser"
 	["Web browsers:Microsoft Edge"]="microsoft-edge-stable-bin"
-    ["Gaming:Game launchers:Steam"]="steam"
-    ["Gaming:Game launchers:Heroic"]="heroic-games-launcher"
-    ["Gaming:Game launchers:Lutris"]="lutris"
-    ["Gaming:Game launchers:Prismlauncher"]="prismlauncher"
+
+    ["Gaming:Game Launchers:Steam"]="steam"
+    ["Gaming:Game Launchers:Heroic"]="heroic-games-launcher"
+    ["Gaming:Game Launchers:Lutris"]="lutris"
+    ["Gaming:Game Launchers:Prismlauncher"]="prismlauncher"
+
     ["Gaming:Games:Xonotic"]="xonotic"
     ["Gaming:Games:osu!Lazer"]="osu-lazer"
     ["Gaming:Games:Minecraft"]="minecraft-launcher"
+
+    ["Gaming:Emulators:RetroArch"]="retroarch"
+    ["Gaming:Emulators:Dolphin"]="dolphin-emu"
+
+    ["Gaming:Utilities:ProtonUp-Qt"]="protonup-qt"
+    ["Gaming:Utilities:MangoHud"]="mangohud"
+    ["Gaming:Utilities:Gamemode"]="gamemode"
+
     ["Office:Libreoffice"]="libreoffice-fresh"
     ["Office:ONLYOFFICE"]="onlyoffice-bin"
     ["Office:Obsidian"]="obsidian"
-    ["Utilities:Virt Manager"]="virt-manager qemu-full dnsmasq"
-    ["Coding:VS Code"]="visual-studio-code"
-    ["Coding:VS Codium"]="code"
-    ["Coding:Sublime Text 3"]="sublime-text-3"
-    ["Coding:Sublime Text 4"]="sublime-text-4"
+    ["Office:Joplin"]="joplin"
+
+    ["Virtualization:Virt Manager"]="virt-manager qemu-full dnsmasq"
+    ["Virtualization:Oracle VirtualBox"]="virtualbox"
+    ["Virtualization:VMWare Workstation"]="vmware-workstation"
+
+    ["Coding:Languages:Python"]="python python-pip"
+    ["Coding:Languages:JavaScript"]="nodejs npm"
+    ["Coding:Languages:TypeScript"]="typescript"
+    ["Coding:Languages:C/C++"]="gcc gdb make cmake clang"
+    ["Coding:Languages:Java"]="jdk-openjdk"
+    ["Coding:Languages:Kotlin"]="kotlin"
+    ["Coding:Languages:Lua"]="lua luarocks"
+    ["Coding:Languages:Perl"]="perl"
+    ["Coding:Languages:PHP"]="php composer"
+
+    ["Coding:Build Tools"]="make cmake ninja pkgconf"
+    ["Coding:Debugging"]="gdb lldb valgrind strace"
+
+    ["Coding:Utilities:Linters"]="eslint flake8 black mypy"
+    ["Coding:Utilities:Formatters"]="prettier clang-format"
+
+    ["Coding:IDEs:JetBrains Toolbox"]="jetbrains-toolbox"
+    ["Coding:IDEs:IntelliJ IDEA"]="intellij-idea-community-edition"
+    ["Coding:IDEs:PyCharm"]="pycharm-community-edition"
+    ["Coding:IDEs:CLion"]="clion"
+
+    ["Coding:Terminal Tools:Tmux"]="tmux"
+
+    ["Coding:Containerization:Docker"]="docker docker-compose"
+    ["Coding:Containerization:Podman"]="podman podman-compose"
+    ["Coding:Containerization:Docker Desktop"]="docker-desktop"
+    ["Coding:Containerization:Podman Desktop"]="podman-desktop"
+
+    ["Coding:Code Editors:Visual Studio Code"]="visual-studio-code"
+    ["Coding:Code Editors:VS Codium"]="code"
+    ["Coding:Code Editors:Sublime Text 3"]="sublime-text-3"
+    ["Coding:Code Editors:Sublime Text 4"]="sublime-text-4"
+
+    ["Coding:Utilities:Bash:shellcheck"]="shellcheck"
+    ["Coding:Utilities:Bash:shfmt"]="shfmt"
 )
 
 declare -A selected_indexes
