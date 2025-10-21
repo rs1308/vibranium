@@ -102,7 +102,9 @@ install_packages() {
 
 		start_time=$(date +%s)
 
-		yes | yay -S --noconfirm --needed "$pkg" >/dev/null 2>&1 &
+		(
+			yes | yay -S --needed "$pkg" >/dev/null 2>&1
+		) &
 		pid=$!
 
 		while kill -0 "$pid" 2>/dev/null; do
