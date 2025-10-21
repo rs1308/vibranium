@@ -110,7 +110,9 @@ install_packages() {
 		start_time=$(date +%s)
 
 		if [[ "$pkg" == "pipewire-jack" ]]; then
-			sudo pacman -Rdd --noconfirm jack2 &>/dev/null
+			if pacman -Qq jack2 &>/dev/null; then
+				sudo pacman -Rdd --noconfirm jack2 &>/dev/null
+			fi
 		fi
 
 		yay -S --noconfirm --needed "$pkg" >/dev/null 2>&1 &
