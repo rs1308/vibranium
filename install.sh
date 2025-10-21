@@ -51,6 +51,7 @@ cleanup() {
 
 install_packages() {
 	local packages pkg start_time elapsed pid aur_flag
+	local pipewire_pkgs=("pipewire" "pipewire-jack" "pipewire-pulse" "pipewire-alsa" "wireplumber")
 
 	mapfile -t packages < ./pkg_list.txt
 
@@ -58,6 +59,7 @@ install_packages() {
 		packages+=("brightnessctl")
 	fi
 
+	# GPU detection
 	case "$(lspci | grep VGA)" in
 		*Radeon*|*ATI*)
 			printf "%s[VIBRANIUM]%s Detected AMD GPU - adding drivers to install queue\n" "$YELLOW" "$RESET"
@@ -86,9 +88,13 @@ install_packages() {
 
 	mapfile -t packages < <(printf "%s\n" "${packages[@]}" | sort -u)
 
-	printf "%s[VIBRANIUM]%s Initializing package installation" "$YELLOW" "$RESET"
+	printf "%s[VIBRANIUM]%s Initializing package installation\n" "$YELLOW" "$RESET"
 
-	for pkg in "${packages[@]}"; do
+	for pkg in "${pipewire_pkgs[@]}"; do
+		if [[ " ${packages[*]} " == *" $pkg "* ]]; then
+			packages=("${packages[@]/$pkg}")
+		fi
+
 		[[ -z "${pkg//[[:space:]]/}" ]] && continue
 		[[ "${pkg:0:1}" == "#" ]] && continue
 
@@ -106,6 +112,36 @@ install_packages() {
 		if [[ "$pkg" == "pipewire-jack" ]]; then
 			sudo pacman -Rdd --noconfirm jack2 &>/dev/null
 		fi
+
+		yay -S --noconfirm --needed "$pkg" >/dev/null 2>&1 &
+		pid=$!
+
+		while kill -0 "$pid" 2>/dev/null; do
+			sudo -v; sleep 1
+			elapsed=$(( $(date +%s) - start_time ))
+			if (( elapsed > 10 )); then
+				printf "\r\033[K%s[VIBRANIUM]%s Installing %s%s [%ds] %s" \
+					"$YELLOW" "$RESET" "$GRAY" "$pkg$aur_flag" "$elapsed" "$RESET"
+			fi
+		done
+
+		wait "$pid"
+	done
+
+	for pkg in "${packages[@]}"; do
+		[[ -z "${pkg//[[:space:]]/}" ]] && continue
+		[[ "${pkg:0:1}" == "#" ]] && continue
+
+		if ! pacman -Si "$pkg" >/dev/null 2>&1; then
+			aur_flag=" (AUR, may take longer time to install)"
+		else
+			aur_flag=""
+		fi
+
+		printf "\r\033[K%s[VIBRANIUM]%s Installing %s%s%s " \
+			"$YELLOW" "$RESET" "$GRAY" "$pkg" "$aur_flag"
+
+		start_time=$(date +%s)
 
 		yay -S --noconfirm --needed "$pkg" >/dev/null 2>&1 &
 		pid=$!
