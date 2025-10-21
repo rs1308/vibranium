@@ -6,19 +6,19 @@
 		"show-passive-items": true,
 		"spacing": 8,
 		"icons": {
-			"TelegramDesktop": "telegram-desktop",
+			"TelegramDesktop": "org.telegram.desktop-symbolic",
 			"discordcanary": "discord-canary",
 			"virt-manager": "virtualbox",
 			"syncthing-gtk": "syncthing",
-			"qBittorrent": "qbittorrent",
-			"spotify-client": "spotify",
+			"qBittorrent": "qbittorrent-tray",
+			"spotify-client": "spotify-indicator",
 			"flameshot": "flameshot",
 			"blueman": "bluetooth",
-			"discord": "discord",
-			"vesktop": "vesktop",
+			"discord": "discord-tray",
+			"vesktop": "discord-tray",
 			"lutris": "lutris",
 			"heroic": "heroic",
-			"steam": "steam"
+			"steam": "steam_tray_mono"
 		}
 	}
 }
