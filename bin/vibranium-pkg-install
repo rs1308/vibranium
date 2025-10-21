@@ -129,7 +129,6 @@ while true; do
                 user_socket= user_service=
                 sys_socket= sys_service=
 
-                # один проход по unit-файлам
                 while read -r unit; do
                     case "$unit" in
                         */systemd/user/*.socket)
