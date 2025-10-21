@@ -15,10 +15,18 @@ if ! tty -s; then
 fi
 
 _operation_aborted() {
-    printf "%s[VIBRANIUM]%s Operation aborted" "$RED" "$RESET"
-    read -n1 -r -p $'\n\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
-    printf '\e[?25h' # show cursor
-    exit 1
+	case "$1" in
+		quit)
+			notify-send -r 1 "Vibranium" "Operation aborted"
+			kill 0 &>/dev/null
+			;;
+		*)
+			printf "%s[VIBRANIUM]%s Operation aborted" "$RED" "$RESET"
+			read -n1 -r -p $'\n\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
+			printf '\e[?25h' # show cursor
+			;;
+	esac
+	exit 1
 }
 
 _installation_complete() {
@@ -27,6 +35,9 @@ _installation_complete() {
     printf '\e[?25h' # show cursor
     exit 0
 }
+
+trap '_operation_aborted quit' SIGHUP
+trap 'printf "\n"; _operation_aborted' SIGINT
 
 if [[ "$1" =~ ^(-h|--help)$ ]]; then
     echo -e "${GREEN}$(basename "$0") ${GRAY}<pkgs>${RESET} - install passed packages"
@@ -40,7 +51,7 @@ printf '\e[?25l' # Hide cursor
 # Source: omarchy
 fzf_args=(
     --multi
-    --preview 'pacman -Sii {1} 2>/dev/null || yay -Sii {1}'
+    --preview 'yay -Sii {1} 2>/dev/null || yay -Sii {1}'
     --preview-label='alt-p: toggle description, alt-j/k: scroll description, ctrl-j/k: next/prev item, tab: multi-select'
     --preview-label-pos='bottom'
     --preview-window 'right:75%:wrap'
@@ -107,15 +118,15 @@ while true; do
             _operation_aborted
         fi
 
+        printf '\e[?25l' # Hide cursor
 		printf "%s[VIBRANIUM]%s Validating selected packages\n" "$YELLOW" "$RESET"
 		for package in "${filtered[@]}"; do
-		    if ! pacman -Si "$package" &>/dev/null; then
+		    if ! yay -Si "$package" &>/dev/null; then
 		        printf "%s[VIBRANIUM]%s %s does not exists!\n" "$RED" "$RESET" "$package"
 		        _operation_aborted
 		    fi
 		done
 
-        printf '\e[?25l' # Hide cursor
         yay -S --noconfirm "${filtered[@]}" &>/dev/null &
         spinner $! "${YELLOW}[VIBRANIUM]${RESET} Installing packages" ""
 
