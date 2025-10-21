@@ -3,7 +3,6 @@
 set -euo pipefail
 
 
-THEME_PATH="$HOME/.local/share/vibranium/themes/nightfox-nightfox"
 LOOKNFEEL_CONF="$HOME/.config/hypr/hyprland.conf.d/look-and-feel.conf"
 LOOKNFEEL_OPTS=(
 	"animations:enabled:true"

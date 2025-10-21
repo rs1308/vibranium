@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+THEME_PATH="$HOME/.local/share/vibranium/themes/nightfox-nightfox"
+
 # Symlinks
 ln -sf "$THEME_PATH" "$HOME/.config/vibranium/theme/current" >/dev/null
 
