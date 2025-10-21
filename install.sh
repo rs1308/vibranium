@@ -102,6 +102,12 @@ install_packages() {
 
 		start_time=$(date +%s)
 
+		if [ "$pkg" == "pipewire-jack" ]; then
+			if pacman -Qq jack2 &>/dev/null; then
+				sudo pacman -Rdd jack2 --noconfirm &>/dev/null
+			fi
+		fi
+
 		yay -S --noconfirm --needed "$pkg" &>/dev/null
 		pid=$!
 
