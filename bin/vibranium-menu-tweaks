@@ -44,5 +44,3 @@ case "$CHOSEN" in
 		vibranium-tweaks-chromium-sync disable
 		;;
 esac
-
-vibranium-cmd-kill-rofi
