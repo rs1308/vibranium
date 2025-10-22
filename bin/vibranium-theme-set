@@ -31,36 +31,36 @@ declare -A GTK_MAP=(
 # Capitalized folder name = papirus icon color name
 # Temporarily set to blue for all; user will adjust manually
 declare -A PAPIRUS_COLORS=(
-    [Gruvbox - Hard]=yaru
-    [Gruvbox - Medium]=yaru
-    [Gruvbox - Soft]=yaru
-    [Gruvbox - Light]=palebrown
+    [Gruvbox-Hard]=yaru
+    [Gruvbox-Medium]=yaru
+    [Gruvbox-Soft]=yaru
+    [Gruvbox-Light]=palebrown
 
-    [Everforest - Hard]=green
-    [Everforest - Medium]=green
-    [Everforest - Soft]=green
+    [Everforest-Hard]=green
+    [Everforest-Medium]=green
+    [Everforest-Soft]=green
 
-    [Catppuccin - Mocha]=indigo
-    [Catppuccin - Macchiato]=indigo
-    [Catppuccin - Frappe]=nordic
-    [Catppuccin - Latte]=blue
+    [Catppuccin-Mocha]=indigo
+    [Catppuccin-Macchiato]=indigo
+    [Catppuccin-Frappe]=nordic
+    [Catppuccin-Latte]=blue
 
-    [Nightfox - Nightfox]=bluegrey
-    [Nightfox - Carbonfox]=black
-    [Nightfox - Nordfox]=nordic
-    [Nightfox - Terafox]=teal
+    [Nightfox-Nightfox]=bluegrey
+    [Nightfox-Carbonfox]=black
+    [Nightfox-Nordfox]=nordic
+    [Nightfox-Terafox]=teal
 
     [Rosepine]=violet
-    [Rosepine - Moon]=violet
-    [Rosepine - Dawn]=indigo
+    [Rosepine-Moon]=violet
+    [Rosepine-Dawn]=indigo
 
-    [Tokyonight - Night]=blue
-    [Tokyonight - Moon]=blue
+    [Tokyonight-Night]=blue
+    [Tokyonight-Moon]=blue
 
-    [Osaka - Osaka]=teal
-    [Osaka - Jade]=teal
-    [Osaka - Solarized]=darkcyan
-    [Osaka - Light]=green
+    [Osaka-Osaka]=teal
+    [Osaka-Jade]=teal
+    [Osaka-Solarized]=darkcyan
+    [Osaka-Light]=green
 )
 
 LINK_TARGET="$XDG_CONFIG_HOME/vibranium/theme/current"
@@ -216,9 +216,19 @@ apply_theme() {
     ln -sf "$theme_path" "$LINK_TARGET"
 
     local gtk_theme="${GTK_MAP[$chosen]:-$chosen}"
-	if [[ "$gtk_theme" == "Nightfox-Nightfox" ]]; then
-		gtk_theme="Nightfox"
-	fi
+	echo "GTK THEME $gtk_theme"
+
+	case "$gtk_theme" in
+		"Nightfox-Nightfox")
+			gtk_theme="Nightfox"
+			;;
+		"Osaka-Jade")
+			gtk_theme="Nightfox-Terafox"
+			;;
+		"Osaka-Osaka")
+			gtk_theme="Osaka-Dark"
+			;;
+	esac
 
     log "Applying GTK 4 settings"
     sed -i -e "/gtk-theme-name/s/=.*/=$gtk_theme/" "$XDG_CONFIG_HOME"/gtk-{3,4}.0/settings.ini
