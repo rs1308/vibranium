@@ -7,32 +7,64 @@ INDEX=0
 
 HYPR_CONFIG="$XDG_CONFIG_HOME/hypr/hyprland.conf.d/look-and-feel.conf"
 
+edit_int() {
+	local name="$1" # prompt
+	local key="$2" # hyprland config key
+	local input prompt
+
+	while true; do
+		prompt="$name (int)"
+		input="$(printf "%s" "$prompt" | rofi_cmd "$name" "ESC to go back")"
+
+		[[ -z $input ]] && break
+		[[ "$input" == "$prompt" ]] && continue
+
+		if [[ ! "$input" =~ ^[0-9]+$ ]]; then
+			notify-send -r 4 -u critical -t 2000 "Vibranium" "Only integers allowed"
+			continue
+		fi
+
+		vibranium-cmd-edit-wm-config "$key:$input" "$HYPR_CONFIG"
+		break
+	done
+}
+
 while true; do
 	mapfile -t lines < <(
 		hyprctl --batch -j \
 			"getoption decoration:rounding; \
 			 getoption animations:enabled; \
+			 getoption general:gaps_in; \
+			 getoption general:gaps_out; \
+			 getoption general:border_size; \
 			 getoption decoration:blur:enabled; \
 			 getoption decoration:dim_inactive; \
 			 getoption decoration:shadow:enabled" \
 		| jq -r '
-			if .option == "decoration:rounding" then
+			  if (.option | test("rounding|border_size")) then
 				.int
-			else
+			elif (.option | test("gaps_in|gaps_out")) then
+				(.custom | split(" ")[0])
+			  else
 				if .int == 1 then "true" else "false" end
-			end'
+			  end
+			'
 	)
+
 	current_rounding="${lines[0]}"
 	current_animations="${lines[1]}"
-	current_blur="${lines[2]}"
-	current_dim="${lines[3]}"
-	current_shadow="${lines[4]}"
+	current_gaps_in="${lines[2]}"
+	current_gaps_out="${lines[3]}"
+	current_border="${lines[4]}"
+	current_blur="${lines[5]}"
+	current_dim="${lines[6]}"
+	current_shadow="${lines[7]}"
 
 	OPTIONS=(
 		"Dim inactive window : ${current_dim}"
 		"Drop window shadow  : ${current_shadow}"
-		"Border rounding     : ${current_rounding}px"
 		"Animations enabled  : ${current_animations}"
+		"Border rounding     : ${current_rounding}px"
 	)
 
 	if [ "$VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE" = "true" ] && [ "$(<$VIBRANIUM_STATE/power-profile)" = "power-saver" ]; then
@@ -42,10 +74,10 @@ while true; do
 	fi
 
 	OPTIONS+=(
-		"Configure input devices"
-		"Configure window rules"
-		"Configure monitors"
-		"Configure binds"
+		"Border size         : ${current_border}"
+		"Outer gaps          : ${current_gaps_out}"
+		"Inner gaps          : ${current_gaps_in}"
+		"Advanced"
 	)
 
 	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Hyprland" "ESC to go back" -selected-row "$INDEX")"
@@ -59,25 +91,46 @@ while true; do
     done
 
 	case "$CHOSEN" in
-		"Configure input devices")
-			vibranium-cmd-launch-terminal "$EDITOR" "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
-			vibranium-cmd-kill-rofi
-			exit 0
+		"Advanced")
+			while true; do
+				advanced_options=(
+					"Configure input devices"
+					"Configure window rules"
+					"Configure monitors"
+					"Configure binds"
+				)
+				advanced_chosen="$(printf "%s\n" "${advanced_options[@]}" | rofi_cmd "Advanced options" "ESC togo back")"
+				[[ -z "$advanced_chosen" ]] && break
+
+				case "$advanced_chosen" in
+					"Configure input devices")
+						vibranium-cmd-launch-terminal "$EDITOR" "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
+						;;
+					"Configure window rules")
+						vibranium-cmd-launch-terminal "$EDITOR" "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/window-rules.conf"
+						;;
+					"Configure monitors")
+						vibranium-cmd-launch-terminal "$EDITOR" "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/monitors.conf"
+						;;
+					"Configure binds")
+						vibranium-cmd-launch-terminal "$EDITOR" "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/binds.conf"
+						;;
+					*)
+						continue
+				esac
+
+				vibranium-cmd-kill-rofi
+				exit 0
+			done
 			;;
-		"Configure window rules")
-			vibranium-cmd-launch-terminal "$EDITOR" "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/window-rules.conf"
-			vibranium-cmd-kill-rofi
-			exit 0
+		"Inner gaps"*)
+			edit_int "Inner gaps" "general:gaps_in"
 			;;
-		"Configure monitors")
-			vibranium-cmd-launch-terminal "$EDITOR" "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/monitors.conf"
-			vibranium-cmd-kill-rofi
-			exit 0
+		"Outer gaps"*)
+			edit_int "Outer gaps" "general:gaps_out"
 			;;
-		"Configure binds")
-			vibranium-cmd-launch-terminal "$EDITOR" "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/binds.conf"
-			vibranium-cmd-kill-rofi
-			exit 0
+		"Border size"*)
+			edit_int "Border size" "general:border_size"
 			;;
 		"Drop"*)
 			if [[ $current_shadow == true ]]; then
