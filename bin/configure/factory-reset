@@ -29,6 +29,69 @@ reset_settings() {
     notify-send -r 1 -t 5000 "Vibranium" "<span foreground='${P_RED}'><b>${message}</b></span>"
 }
 
+factory_reset() {
+	local looknfeel_opts=(
+		"animations:enabled:true"
+		"decoration:dim_inactive:true"
+		"decoration:rounding:0"
+		"decoration:blur:enabled:false"
+		"decoration:blur:size:5"
+		"decoration:shadow:enabled:true"
+	)
+
+	sed -i "/border-radius/s/:.*/:\t0px;/g" "$XDG_CONFIG_HOME/rofi/config.rasi"
+
+	sed -i -e '/corner_radius/s/=.*/= 0/' \
+		   -e '/progress_bar_height/s/=.*/= 15/' \
+		   -e '/progress_bar_corner_radius/s/=.*/= 0/' \
+		   "$XDG_CONFIG_HOME/dunst/dunstrc"
+
+	vibranium-cmd-refresh-dunst
+    reset_settings "FACTORY RESET" "VIBRANIUM_" "All settings have been reset to defaults!"
+
+	for opt in "${looknfeel_opts[@]}"; do
+		vibranium-cmd-edit-wm-config "$opt" \
+			"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/look-and-feel.conf"
+	done
+
+	rm "$XDG_CONFIG_HOME/vibranium/theme/current"
+	ln -sf "$VIBRANIUM/themes/nightfox-nightfox" \
+		"$XDG_CONFIG_HOME/vibranium/theme/current"
+
+	touch "$XDG_CONFIG_HOME/alacritty/alacritty.toml"
+
+	vibranium-core-set-wallpaper \
+		$(find .config/vibranium/theme/current/backgrounds -type f,l | sort | head -n1)
+
+	discord_folders=("Vencord" "vesktop")
+	for folder in "${discord_folders[@]}"; do
+		if [[ -f "$XDG_CONFIG_HOME/${folder}/themes/vibranium.theme.css" ]]; then
+			rm -f "$XDG_CONFIG_HOME/${folder}/themes/vibranium.theme.css"
+			ln -s "$XDG_CONFIG_HOME/vibranium/theme/current/discord.css" \
+				"$XDG_CONFIG_HOME/${folder}/themes/vibranium.theme.css"
+		fi
+	done
+
+	hyprctl -q reload config-only
+
+	rm "$VIBRANIUM_STATE"/{wallpaper,power-profile,blur.restore}
+
+	if [ ! "$(vibranium-utils-power-profile-get)" = "balanced" ]; then
+		vibranium-core-power-profile-set balanced
+	fi
+
+	printf "suspended" > "$VIBRANIUM_STATE/night-light"
+	vibranium-cmd-refresh-waybar-module worker
+
+	if ! grep -E '^\s*//.*"hyprland/language"' "$XDG_CONFIG_HOME/waybar/config.jsonc"; then
+		sed -i 's|^\(\s*\)\("\s*hyprland/language".*\)|\1// \2|' \
+			"$XDG_CONFIG_HOME/waybar/config.jsonc"
+	fi
+
+	vibranium-cmd-set-waybar-position -q top; systemctl --user restart waybar
+
+}
+
 while true; do
     OPTIONS=(
         "Reset audio settings"
@@ -79,17 +142,8 @@ while true; do
             reset_settings "screen recording" "VIBRANIUM_RECORDING" "Screen recording settings have been restored to defaults!"
         ;;
 		*"FACTORY RESET"*)
-            reset_settings "FACTORY RESET" "VIBRANIUM_" "All settings have been reset to defaults!"
-			rm "$VIBRANIUM_STATE"/{night-light,wallpaper,power-profile,blur.restore}
-			rm "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/look-and-feel.conf"
-			vibranium-cmd-set-waybar-position -q top; systemctl --user restart waybar
-			vibranium-cmd-edit-wm-config decoration:rounding:0 "$HYPR_CONFIG"
-			sed -i "/border-radius/s/:.*/:\t0px;/g" "$XDG_CONFIG_HOME/rofi/config.rasi"
-			sed -i "/corner_radius/s/=.*/= 0/" "$XDG_CONFIG_HOME/dunst/dunstrc"
-			vibranium-cmd-refresh-dunst
-			hyprctl -q reload config-only
-
-			vibranium-cmd-refresh-waybar-module worker
-			printf "suspended" > "$VIBRANIUM_STATE/night-light"
+			factory_reset
+			vibranium-cmd-kill-rofi
+			exit 0
     esac
 done
