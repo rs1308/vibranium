@@ -39,15 +39,15 @@ factory_reset() {
 		"decoration:shadow:enabled:true"
 	)
 
-	sed -i "/border-radius/s/:.*/:\t0px;/g" "$XDG_CONFIG_HOME/rofi/config.rasi"
+    reset_settings "FACTORY RESET" "VIBRANIUM_" "All settings have been reset to defaults!"
 
+	sed -i "/border-radius/s/:.*/:\t0px;/g" "$XDG_CONFIG_HOME/rofi/config.rasi"
 	sed -i -e '/corner_radius/s/=.*/= 0/' \
 		   -e '/progress_bar_height/s/=.*/= 15/' \
 		   -e '/progress_bar_corner_radius/s/=.*/= 0/' \
 		   "$XDG_CONFIG_HOME/dunst/dunstrc"
 
 	vibranium-cmd-refresh-dunst
-    reset_settings "FACTORY RESET" "VIBRANIUM_" "All settings have been reset to defaults!"
 
 	for opt in "${looknfeel_opts[@]}"; do
 		vibranium-cmd-edit-wm-config "$opt" \
@@ -89,8 +89,8 @@ factory_reset() {
 	fi
 
 	vibranium-cmd-set-waybar-position -q top; systemctl --user restart waybar
+	chromium --no-startup-window --set-theme-color="25, 35, 48"
 	vibranium-theme-update-svgs
-
 }
 
 while true; do
