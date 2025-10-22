@@ -70,7 +70,7 @@ for pkg in "${pkg_list[@]}"; do
     if [[ $pkg =~ $important_regex ]]; then
         echo -e "${YELLOW}[VIBRANIUM]${RESET} Important system components have been updated"
 
-        prompt=$'\e[0;33m[VIBRANIUM]\e[0m It is recommended that you restart your computer. Restart now? (Y/n): '
+        prompt=$'\e[0;33m[VIBRANIUM]\e[0m System restart is recommended. Restart now? (Y/n): '
         while true; do
             printf "%s\e[?25h" "$prompt"
             read -r answer
