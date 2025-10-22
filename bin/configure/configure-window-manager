@@ -6,6 +6,7 @@ source "$VIBRANIUM_PATH/configure/configure-lib"
 INDEX=0
 
 HYPR_CONFIG="$XDG_CONFIG_HOME/hypr/hyprland.conf.d/look-and-feel.conf"
+SMART_GAPS_CONFIG="$XDG_CONFIG_HOME/hypr/hyprland.conf.d/smart-gaps.conf"
 
 edit_int() {
 	local name="$1" # prompt
@@ -51,6 +52,7 @@ while true; do
 			'
 	)
 
+	smart_gaps_enabled="$([ -f "$SMART_GAPS_CONFIG" ] && echo "true" || echo "false")"
 	current_rounding="${lines[0]}"
 	current_animations="${lines[1]}"
 	current_gaps_in="${lines[2]}"
@@ -77,6 +79,7 @@ while true; do
 		"Border size         : ${current_border}"
 		"Outer gaps          : ${current_gaps_out}"
 		"Inner gaps          : ${current_gaps_in}"
+		"Smart gaps          : ${smart_gaps_enabled}"
 		"Advanced"
 	)
 
@@ -91,6 +94,9 @@ while true; do
     done
 
 	case "$CHOSEN" in
+		"Smart gaps"*)
+			vibranium-cmd-toggle-smart-gaps
+			;;
 		"Advanced")
 			while true; do
 				advanced_options=(
