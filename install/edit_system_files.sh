@@ -44,3 +44,6 @@ sudo sed -Ei '/^auth.*pam_unix\.so.*try_first_pass nullok/ s/\bnullok\b/& nodela
 
 echo -e "[zram0]\nzram-size = ram\ncompression-algorithm = lzo-rle zstd(level=3) (type=idle)" \
 	| sudo tee "$ZRAM_GENERATOR_CONF"
+
+echo -e "# Vibranium: disable hardware watchdog\nblacklist sp5100_tco\nblacklist iTCO_wdt\n" \
+	sudo tee /etc/modprobe.d/blacklist.conf
