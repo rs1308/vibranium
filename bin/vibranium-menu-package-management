@@ -2,12 +2,13 @@
 
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 
-ACTIONS=("System update" "Install a package" "Install by category" "Uninstall a package")
+ACTIONS=("System update" "Install a package" "Uninstall a package" "Install by category")
 
 while true; do
-    chosen="$(printf "%s\n" "${ACTIONS[@]}" | rofi_cmd "System" "ESC to go back")"
+    CHOSEN="$(printf "%s\n" "${ACTIONS[@]}" | rofi_cmd "Package management" "ESC to go back")"
+	[[ -z $CHOSEN ]] && break
 
-    case "$chosen" in
+    case "$CHOSEN" in
 		"System update")
 			vibranium-cmd-launch-terminal vibranium-cmd-system-update
 			vibranium-cmd-kill-rofi
@@ -26,8 +27,8 @@ while true; do
 			vibranium-cmd-kill-rofi
 			exit 0
 			;;
-        "" | *)
-            exit 1
+        *)
+            continue
             ;;
     esac
 done

@@ -2,7 +2,7 @@
 
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 
-ACTIONS=("Help"  "System" "Utilities" "Vibranium settings")
+ACTIONS=("Package Management" "Vibranium Settings" "Utilities" "Help")
 
 if pidof gpu-screen-recorder &> /dev/null; then
 	ACTIONS+=("<b><i><u>Stop screen recording</u></i></b>")
@@ -17,7 +17,7 @@ while true; do
     [ -z "$CHOSEN" ] && break
 
     case "$CHOSEN" in
-        "Vibranium settings")
+        "Vibranium Settings")
             while true; do
                 vibranium_opts=("Configure Waybar" "Configure Vibranium")
                 vibranium_chosen="$(printf "%s\n" "${vibranium_opts[@]}" | rofi_cmd "${CHOSEN[0]}" "ESC to go back")"
@@ -36,8 +36,8 @@ while true; do
 		"Help")
 			vibranium-menu-help
 			;;
-        "System")
-            vibranium-menu-system
+        "Package Management")
+            vibranium-menu-package-management
             ;;
         "Utilities")
             vibranium-menu-utilities
