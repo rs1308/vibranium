@@ -89,6 +89,7 @@ factory_reset() {
 	fi
 
 	vibranium-cmd-set-waybar-position -q top; systemctl --user restart waybar
+	vibranium-theme-update-svgs
 
 }
 
