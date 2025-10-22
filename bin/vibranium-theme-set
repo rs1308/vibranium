@@ -21,53 +21,53 @@ declare -A STANDALONE_THEMES=(
 
 # Map theme to GTK theme name if special
 declare -A GTK_MAP=(
-    [Osaka-Jade]="Nightfox-Terafox"
-    [Osaka-Osaka]="Osaka-Dark"
-    [Osaka-Solarized]="Osaka-Solarized"
-    [Osaka-Light]="Osaka-Light"
-    [Nightfox-Nightfox]="Nightfox"
+    [Osaka - Jade]="Nightfox-Terafox"
+    [Osaka - Osaka]="Osaka-Dark"
+    [Osaka - Solarized]="Osaka-Solarized"
+    [Osaka - Light]="Osaka-Light"
+    [Nightfox - Nightfox]="Nightfox"
 )
 
 # Capitalized folder name = papirus icon color name
 # Temporarily set to blue for all; user will adjust manually
 declare -A PAPIRUS_COLORS=(
-    [Gruvbox-Hard]=yaru
-    [Gruvbox-Medium]=yaru
-    [Gruvbox-Soft]=yaru
-    [Gruvbox-Light]=palebrown
+    [Gruvbox - Hard]=yaru
+    [Gruvbox - Medium]=yaru
+    [Gruvbox - Soft]=yaru
+    [Gruvbox - Light]=palebrown
 
-    [Everforest-Hard]=green
-    [Everforest-Medium]=green
-    [Everforest-Soft]=green
+    [Everforest - Hard]=green
+    [Everforest - Medium]=green
+    [Everforest - Soft]=green
 
-    [Catppuccin-Mocha]=indigo
-    [Catppuccin-Macchiato]=indigo
-    [Catppuccin-Frappe]=nordic
-    [Catppuccin-Latte]=blue
+    [Catppuccin - Mocha]=indigo
+    [Catppuccin - Macchiato]=indigo
+    [Catppuccin - Frappe]=nordic
+    [Catppuccin - Latte]=blue
 
-    [Nightfox-Nightfox]=bluegrey
-    [Nightfox-Carbonfox]=black
-    [Nightfox-Nordfox]=nordic
-    [Nightfox-Terafox]=teal
+    [Nightfox - Nightfox]=bluegrey
+    [Nightfox - Carbonfox]=black
+    [Nightfox - Nordfox]=nordic
+    [Nightfox - Terafox]=teal
 
     [Rosepine]=violet
-    [Rosepine-Moon]=violet
-    [Rosepine-Dawn]=indigo
+    [Rosepine - Moon]=violet
+    [Rosepine - Dawn]=indigo
 
-    [Tokyonight-Night]=blue
-    [Tokyonight-Moon]=blue
+    [Tokyonight - Night]=blue
+    [Tokyonight - Moon]=blue
 
-    [Osaka-Osaka]=teal
-    [Osaka-Jade]=teal
-    [Osaka-Solarized]=darkcyan
-    [Osaka-Light]=green
+    [Osaka - Osaka]=teal
+    [Osaka - Jade]=teal
+    [Osaka - Solarized]=darkcyan
+    [Osaka - Light]=green
 )
 
 LINK_TARGET="$XDG_CONFIG_HOME/vibranium/theme/current"
 CURRENT_LINK="$LINK_TARGET"
 
 to_display_name() { echo "${1//-/ }"; }
-to_theme_name()   { echo "${1// /-}"; }
+to_theme_name() { echo "${1// /-}"; }
 
 capitalize() {
     echo "$1" | awk -F- '{ for (i=1; i<=NF; i++) $i = toupper(substr($i,1,1)) substr($i,2); }1' OFS="-"
@@ -76,7 +76,7 @@ capitalize() {
 get_current_target_basename() {
     if [ -e "$CURRENT_LINK" ] || [ -L "$CURRENT_LINK" ]; then
         local realpath
-        realpath="$(readlink -f "$CURRENT_LINK" 2>/dev/null || true)"
+        realpath="$(readlink -f "$CURRENT_LINK" 2> /dev/null || true)"
         if [ -n "$realpath" ]; then
             basename "$realpath"
             return 0
@@ -105,9 +105,9 @@ pick_family() {
     local keys=("${!FAMILIES[@]}")
     local i j temp
 
-    for ((i=0; i<${#keys[@]}; i++)); do
-        for ((j=i+1; j<${#keys[@]}; j++)); do
-            if (( ${#keys[i]} < ${#keys[j]} )); then
+    for ((i = 0; i < ${#keys[@]}; i++)); do
+        for ((j = i + 1; j < ${#keys[@]}; j++)); do
+            if ((${#keys[i]} < ${#keys[j]})); then
                 temp="${keys[i]}"
                 keys[i]="${keys[j]}"
                 keys[j]="$temp"
@@ -126,9 +126,9 @@ pick_variant() {
     local variants=(${FAMILIES[$family]})
     local i j temp
 
-    for ((i=0; i<${#variants[@]}; i++)); do
-        for ((j=i+1; j<${#variants[@]}; j++)); do
-            if (( ${#variants[i]} < ${#variants[j]} )); then
+    for ((i = 0; i < ${#variants[@]}; i++)); do
+        for ((j = i + 1; j < ${#variants[@]}; j++)); do
+            if ((${#variants[i]} < ${#variants[j]})); then
                 temp="${variants[i]}"
                 variants[i]="${variants[j]}"
                 variants[j]="$temp"
@@ -138,49 +138,50 @@ pick_variant() {
 
     local display
     display="$(for v in "${variants[@]}"; do to_display_name "$v"; done | rofi_cmd "$family variants" "search")"
-	if [[ -z "$display" ]]; then
-		return 1
-	else
-		echo "$display"
-	fi
+    if [[ -z "$display" ]]; then
+        return 1
+    else
+        echo "$display"
+    fi
     # [[ -z "$display" ]] && exit 0
     # echo "$display"
 }
 
 # Thank you to the Omarchy team for this wonderful fork
 apply_chromium_colors() {
-    local current_theme; current_theme="$(vibranium-theme-get)"
+    local current_theme
+    current_theme="$(vibranium-theme-get)"
     case "$current_theme" in
-        "catppuccin-mocha")      color="30, 30, 46"    ;;
-        "catppuccin-macchiato")  color="36, 39, 58"    ;;
-        "catppuccin-frappe")     color="48, 52, 70"    ;;
-        "catppuccin-latte")      color="239, 241, 245" ;;
+    "catppuccin-mocha") color="30, 30, 46" ;;
+    "catppuccin-macchiato") color="36, 39, 58" ;;
+    "catppuccin-frappe") color="48, 52, 70" ;;
+    "catppuccin-latte") color="239, 241, 245" ;;
 
-        "everforest-hard")       color="39, 46, 51" ;;
-        "everforest-medium")     color="45, 53, 59" ;;
-        "everforest-soft")       color="51, 60, 67" ;;
+    "everforest-hard") color="39, 46, 51" ;;
+    "everforest-medium") color="45, 53, 59" ;;
+    "everforest-soft") color="51, 60, 67" ;;
 
-        "gruvbox-hard")          color="29, 32, 33" ;;
-        "gruvbox-medium")        color="40, 40, 40" ;;
-        "gruvbox-soft")          color="50, 48, 47" ;;
-        "gruvbox-light")         color="251, 241, 199" ;;
+    "gruvbox-hard") color="29, 32, 33" ;;
+    "gruvbox-medium") color="40, 40, 40" ;;
+    "gruvbox-soft") color="50, 48, 47" ;;
+    "gruvbox-light") color="251, 241, 199" ;;
 
-        "nightfox-carbonfox")    color="22, 22, 22" ;;
-        "nightfox-nightfox")     color="25, 35, 48" ;;
-        "nightfox-nordfox")      color="46, 52, 64" ;;
-        "nightfox-terafox")      color="21, 37, 40" ;;
+    "nightfox-carbonfox") color="22, 22, 22" ;;
+    "nightfox-nightfox") color="25, 35, 48" ;;
+    "nightfox-nordfox") color="46, 52, 64" ;;
+    "nightfox-terafox") color="21, 37, 40" ;;
 
-        "osaka-jade")            color="13, 23, 19" ;;
-        "osaka-osaka")           color="0, 20, 25"  ;;
-        "osaka-solarized")       color="0, 43, 54"  ;;
-        "osaka-light")           color="253, 245, 226" ;;
+    "osaka-jade") color="13, 23, 19" ;;
+    "osaka-osaka") color="0, 20, 25" ;;
+    "osaka-solarized") color="0, 43, 54" ;;
+    "osaka-light") color="253, 245, 226" ;;
 
-        "rosepine")              color="25, 23, 36" ;;
-        "rosepine-moon")         color="35, 33, 54" ;;
-        "rosepine-dawn")         color="250, 244, 237" ;;
+    "rosepine") color="25, 23, 36" ;;
+    "rosepine-moon") color="35, 33, 54" ;;
+    "rosepine-dawn") color="250, 244, 237" ;;
 
-        "tokyonight-moon")       color="34, 36, 54" ;;
-        "tokyonight-night")      color="26, 27, 38" ;;
+    "tokyonight-moon") color="34, 36, 54" ;;
+    "tokyonight-night") color="26, 27, 38" ;;
     esac
 
     chromium --no-startup-window --set-theme-color="$color"
@@ -192,7 +193,8 @@ apply_theme() {
     if [[ $folder_name == "rosepine-rosepine" ]]; then
         folder_name="rosepine"
     fi
-    local theme_capital; theme_capital=$(capitalize "$chosen")
+    local theme_capital
+    theme_capital=$(capitalize "$chosen")
     local color="${PAPIRUS_COLORS[$theme_capital]}"
     local theme_path="$VIBRANIUM/themes/$folder_name"
 
@@ -203,7 +205,7 @@ apply_theme() {
 
     if is_current_theme "$folder_name"; then
         error "Already on $theme_capital"
-		notify-send -r 1 -t 1500 "Vibranium" "Already on $theme_capital"
+        notify-send -r 1 -t 1500 "Vibranium" "Already on $theme_capital"
         exit 1
     fi
 
@@ -214,6 +216,9 @@ apply_theme() {
     ln -sf "$theme_path" "$LINK_TARGET"
 
     local gtk_theme="${GTK_MAP[$chosen]:-$chosen}"
+	if [[ "$gtk_theme" == "Nightfox-Nightfox" ]]; then
+		gtk_theme="Nightfox"
+	fi
 
     log "Applying GTK 4 settings"
     sed -i -e "/gtk-theme-name/s/=.*/=$gtk_theme/" "$XDG_CONFIG_HOME"/gtk-{3,4}.0/settings.ini
@@ -240,7 +245,7 @@ apply_theme() {
         log "Setting dark icon theme"
     fi
     gsettings set org.gnome.desktop.interface icon-theme "$icon_theme"
-    papirus-folders --theme "$papirus_theme" --color "${color:-blue}" &>/dev/null &
+    papirus-folders --theme "$papirus_theme" --color "${color:-blue}" &> /dev/null &
     # papirus_pid=$!
     apply_chromium_colors &
 }
@@ -255,7 +260,7 @@ get_wallpaper() {
         mkdir -p "$state_dir"
         find "$LINK_TARGET/backgrounds/" -type f,l | sort | head -n1
         return 0
-    else 
+    else
         if [[ -f "$state_file" ]]; then
             cat "$state_file"
         else
@@ -265,37 +270,63 @@ get_wallpaper() {
     fi
 }
 
-while true; do
-    FAMILY="$(pick_family)" || exit 1
-    [ -z "$FAMILY" ] && exit 1
+if [[ -n "$1" ]]; then
+    INPUT_THEME="$(to_theme_name "$1")"
+    FAMILY="${INPUT_THEME%%-*}"
+    VARIANT="${INPUT_THEME#*-}"
 
-    if [[ ! ${FAMILIES[$FAMILY]+_} ]]; then
-        error "Invalid theme family selected."
+    if [[ -z "${FAMILIES[$FAMILY]+_}" ]]; then
+        error "Family '$FAMILY' not found."
         exit 1
     fi
 
-    if [[ -n "${STANDALONE_THEMES[$FAMILY]}" ]]; then
-        CHOSEN="${STANDALONE_THEMES[$FAMILY]}"   # slug
-        break
-    else
-        VARIANT_DISPLAY="$(pick_variant "$FAMILY")"
-        if [[ -z "$VARIANT_DISPLAY" ]]; then
-            # Пользователь нажал ESC на втором меню — возвращаемся к выбору семьи
-            continue
+    VARIANT_FOUND=false
+    for v in ${FAMILIES[$FAMILY]}; do
+        if [[ "${v,,}" == "${VARIANT,,}" ]]; then
+            VARIANT_FOUND=true
+            break
+        fi
+    done
+
+    if ! $VARIANT_FOUND; then
+        error "Variant '$VARIANT' not found in family '$FAMILY'."
+        exit 1
+    fi
+
+    CHOSEN="${FAMILY}-${VARIANT}"
+
+	case "$CHOSEN" in
+		"Rosepine-Rosepine")
+			CHOSEN="Rosepine"
+			;;
+	esac
+else
+    while true; do
+        FAMILY="$(pick_family)" || exit 1
+        [ -z "$FAMILY" ] && exit 1
+
+        if [[ -n "${STANDALONE_THEMES[$FAMILY]}" ]]; then
+            CHOSEN="${STANDALONE_THEMES[$FAMILY]}"
+            break
         fi
 
+        VARIANT_DISPLAY="$(pick_variant "$FAMILY")"
+        [[ -z "$VARIANT_DISPLAY" ]] && continue
+
         VARIANT="$(to_theme_name "$VARIANT_DISPLAY")"
-        if ! echo "${FAMILIES[$FAMILY]}" | grep -qw "$VARIANT"; then
-            error "Invalid variant selected for $FAMILY."
-            exit 1
-        fi
         CHOSEN="${FAMILY}-${VARIANT}"
         if [[ $FAMILY == "Rosepine" && $VARIANT == "Rosepine" ]]; then
             CHOSEN="Rosepine"
         fi
         break
-    fi
-done
+    done
+fi
+
+folder_name="${CHOSEN,,}"
+if [ ! -d "$VIBRANIUM/themes/$folder_name" ]; then
+    error "Theme '$CHOSEN' does not exist in $VIBRANIUM/themes."
+    exit 1
+fi
 
 log "Applying GTK theme"
 apply_theme "$CHOSEN"
@@ -358,13 +389,14 @@ log "Updating custom svg icons"
 vibranium-theme-update-svgs
 
 log "Updating GTK icon cache"
-warn "Note that some icons still might have previous colors."; warn "If that's the case then restart or refresh an app"
-#waitpid $papirus_pid; 
-gtk-update-icon-cache -tfq "$XDG_DATA_HOME"/icons/Papirus-{Dark,Light} &
+warn "Note that some icons still might have previous colors."
+warn "If that's the case then restart or refresh an app"
+#waitpid $papirus_pid;
+gtk-update-icon-cache -tfq "$XDG_DATA_HOME"/icons/Papirus-{Dark,Light} &>/dev/null &
 
 if pidof thunar > /dev/null; then
     log "Reloading thunar"
     hyprctl -q dispatch sendshortcut CTRL, R, class:[Tt]hunar
 fi
 
-vibranium-utils-lockscreen-cache &
+vibranium-utils-lockscreen-cache &>/dev/null &

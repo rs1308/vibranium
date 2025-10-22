@@ -39,58 +39,44 @@ factory_reset() {
 		"decoration:shadow:enabled:true"
 	)
 
-    reset_settings "FACTORY RESET" "VIBRANIUM_" "All settings have been reset to defaults!"
+    local stages=("confirm" "confirm x2" "confirm x3")
+    local prompt input
 
+    for stage in "${stages[@]}"; do
+        prompt="FACTORY RESET ($stage)"
+        input="$(printf "%s" "$prompt" | rofi_cmd "Factory reset" "ESC to cancel")"
+        [ -z "$input" ] && return 1
+        [ "$input" != "$prompt" ] && return 1
+    done
+
+	sed -i '/^VIBRANIUM/d' "$XDG_CONFIG_HOME/vibranium/settings"
 	sed -i "/border-radius/s/:.*/:\t0px;/g" "$XDG_CONFIG_HOME/rofi/config.rasi"
 	sed -i -e '/corner_radius/s/=.*/= 0/' \
 		   -e '/progress_bar_height/s/=.*/= 15/' \
 		   -e '/progress_bar_corner_radius/s/=.*/= 0/' \
 		   "$XDG_CONFIG_HOME/dunst/dunstrc"
 
-	vibranium-cmd-refresh-dunst
-
 	for opt in "${looknfeel_opts[@]}"; do
 		vibranium-cmd-edit-wm-config "$opt" \
 			"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/look-and-feel.conf"
 	done
 
-	rm "$XDG_CONFIG_HOME/vibranium/theme/current"
-	ln -sf "$VIBRANIUM/themes/nightfox-nightfox" \
-		"$XDG_CONFIG_HOME/vibranium/theme/current"
+	vibranium-theme-set "Nightfox"
 
-	touch "$XDG_CONFIG_HOME/alacritty/alacritty.toml"
-
-	vibranium-core-set-wallpaper \
-		$(find .config/vibranium/theme/current/backgrounds -type f,l | sort | head -n1)
-
-	discord_folders=("Vencord" "vesktop")
-	for folder in "${discord_folders[@]}"; do
-		if [[ -f "$XDG_CONFIG_HOME/${folder}/themes/vibranium.theme.css" ]]; then
-			rm -f "$XDG_CONFIG_HOME/${folder}/themes/vibranium.theme.css"
-			ln -s "$XDG_CONFIG_HOME/vibranium/theme/current/discord.css" \
-				"$XDG_CONFIG_HOME/${folder}/themes/vibranium.theme.css"
-		fi
-	done
-
-	hyprctl -q reload config-only
-
-	rm "$VIBRANIUM_STATE"/{wallpaper,power-profile,blur.restore}
+	rm -rf "$VIBRANIUM_STATE"/{wallpaper,power-profile,blur.restore}
+	printf "suspended" > "$VIBRANIUM_STATE/night-light"
 
 	if [ ! "$(vibranium-utils-power-profile-get)" = "balanced" ]; then
 		vibranium-core-power-profile-set balanced
 	fi
 
-	printf "suspended" > "$VIBRANIUM_STATE/night-light"
-	vibranium-cmd-refresh-waybar-module worker
-
-	if ! grep -E '^\s*//.*"hyprland/language"' "$XDG_CONFIG_HOME/waybar/config.jsonc"; then
+	if ! grep -qE '^\s*//.*"hyprland/language"' "$XDG_CONFIG_HOME/waybar/config.jsonc"; then
 		sed -i 's|^\(\s*\)\("\s*hyprland/language".*\)|\1// \2|' \
 			"$XDG_CONFIG_HOME/waybar/config.jsonc"
 	fi
 
-	vibranium-cmd-set-waybar-position -q top; systemctl --user restart waybar
-	chromium --no-startup-window --set-theme-color="25, 35, 48"
-	vibranium-theme-update-svgs
+	vibranium-cmd-set-waybar-position -q top
+	notify-send -r 1 "Vibranium" "Settings have been reset to factory defaults"
 }
 
 while true; do
