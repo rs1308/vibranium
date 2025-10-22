@@ -67,20 +67,22 @@ install_packages() {
 				"lib32-mesa"
 				"rocm-smi-lib"
 				"vulkan-radeon"
-				"lib32-vulkan-radeon"
 				"libvdpau-va-gl"
+				"rocm-opencl-runtime"
+				"lib32-vulkan-radeon"
 			)
 			;;
 		*UHD*|*Iris*|*Arc*)
 			printf "%s[VIBRANIUM]%s Detected Intel GPU - adding drivers to install queue\n" "$YELLOW" "$RESET"
 			packages+=(
 				"mesa"
-				"lib32-mesa"
 				"libvpl"
-				"vulkan-intel"
-				"lib32-vulkan-intel"
-				"libvdpau-va-gl"
+				"lib32-mesa"
 				"vpl-gpu-rt"
+				"vulkan-intel"
+				"libvdpau-va-gl"
+				"lib32-vulkan-intel"
+				"intel-compute-runtime"
 			)
 			;;
 	esac

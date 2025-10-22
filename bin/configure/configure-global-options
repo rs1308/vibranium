@@ -265,8 +265,7 @@ while true; do
 				case "$blur_lockscreen_chosen" in
 					"Blur background"*)
 						toggle_bool VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_BACKGROUND
-						vibranium-utils-update-lockscreen
-						vibranium-cmd-launch-cmd vibranium-utils-lockscreen-cache
+						vibranium-utils-update-lockscreen &
 						continue
 						;;
 					"Blur strength"*)
@@ -280,8 +279,7 @@ while true; do
 							else
 								option-validate VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_STRENGTH
 								sed -i "/VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_STRENGTH/s/=.*/=\"${blur_strength_chosen}\"/" "$VIBRANIUM_USER_SETTINGS"
-								vibranium-utils-update-lockscreen
-								vibranium-cmd-launch-cmd vibranium-utils-lockscreen-cache
+								vibranium-utils-update-lockscreen &
 								break
 							fi
 						done
@@ -297,7 +295,7 @@ while true; do
 							else
 								option-validate VIBRANIUM_GLOBAL_DIM_LOCKSCREEN_STRENGTH
 								sed -i "/VIBRANIUM_GLOBAL_DIM_LOCKSCREEN_STRENGTH/s/=.*/=\"${dim_strength_chosen}\"/" "$VIBRANIUM_USER_SETTINGS"
-								vibranium-utils-lockscreen-cache &
+								vibranium-utils-update-lockscreen &
 								break
 							fi
 						done
