@@ -6,7 +6,6 @@ SUDOERS_CONF="/etc/sudoers"
 FAILLOCK_CONF="/etc/security/faillock.conf"
 SYSTEM_AUTH_CONF="/etc/pam.d/system-auth"
 LOGIND_CONF="/etc/systemd/logind.conf"
-ZRAM_GENERATOR_CONF="/etc/systemd/zram-generator.conf"
 
 sudo cp -r ./extras/udev/rules.d/*  /etc/udev/rules.d
 sudo cp -r ./extras/pacman.d/hooks  /etc/pacman.d
@@ -41,13 +40,4 @@ echo -e 'deny = 5\nnodelay' | sudo tee -a "$FAILLOCK_CONF" >/dev/null
 
 sudo grep -q '^auth.*pam_unix\.so.*try_first_pass nullok nodelay' "$SYSTEM_AUTH_CONF" ||
 sudo sed -Ei '/^auth.*pam_unix\.so.*try_first_pass nullok/ s/\bnullok\b/& nodelay/' "$SYSTEM_AUTH_CONF"
-
-echo -e "[zram0]\nzram-size = ram\ncompression-algorithm = lzo-rle zstd(level=3) (type=idle)" \
-	| sudo tee "$ZRAM_GENERATOR_CONF"
-
-echo -e "# Vibranium: disable hardware watchdog\nblacklist sp5100_tco\nblacklist iTCO_wdt\n" \
-	| sudo tee /etc/modprobe.d/blacklist.conf
-
-echo -e "# Vibranium: load ntsync driver for better gaming\n# compatibility with Wine.\n# More info: https://www.phoronix.com/news/Linux-6.14-NTSYNC-Driver-Ready\nntsync" \
-	| sudo tee /etc/modules-load.d/ntsync.conf
 

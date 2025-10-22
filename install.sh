@@ -19,7 +19,7 @@ GREEN=$'\e[0;32m'
 GRAY=$'\e[90m'
 RESET=$'\e[0m'
 
-export SUDO_PROMPT; SUDO_PROMPT="$(printf '\n%s[VIBRANIUM]%s Password for %s: ' "$RED" "$RESET" "$USER")"
+export SUDO_PROMPT; SUDO_PROMPT="$(printf '%s[VIBRANIUM]%s Password for %s: ' "$RED" "$RESET" "$USER")"
 
 if [[ "$(id -u)" == 0 ]]; then
 	echo "${RED}[ERROR]${RESET} Do not run this as root!"
@@ -27,7 +27,8 @@ if [[ "$(id -u)" == 0 ]]; then
 fi
 
 if ! command -v yay >/dev/null; then
-	printf "%s[VIBRANIUM]%s Installing %syay%s" "${YELLOW}" "${RESET}" "${GRAY}" "${RESET}"
+	printf "%s[VIBRANIUM]%s Installing %syay%s. %sYou might be asked for sudo several times%s\n" \
+		"$YELLOW" "$RESET" "$GRAY" "$RESET" "$GRAY" "$RESET"
 	if ! command -v git >/dev/null; then
 		sudo pacman -S git --noconfirm
 	fi
@@ -195,6 +196,18 @@ cat ./logo.txt
 
 printf "%s[VIBRANIUM]%s Setting up system files\n" "${YELLOW}" "${RESET}"
 ./install/edit_system_files.sh
+
+printf "%s[VIBRANIUM]%s Setting up kernel modules\n" "${YELLOW}" "${RESET}"
+./install/setup_kernel_modules.sh
+
+printf "%s[VIBRANIUM]%s Setting up sysctl options\n" "${YELLOW}" "${RESET}"
+./install/setup_sysctl.sh
+
+printf "%s[VIBRANIUM]%s Setting up swap\n" "${YELLOW}" "${RESET}"
+./install/setup_zram.sh
+
+printf "%s[VIBRANIUM]%s Setting up tmpfiles.d\n" "${YELLOW}" "${RESET}"
+./install/setup_tmpfiles.d.sh
 
 printf "%s[VIBRANIUM]%s Refreshing repositories\n" "${YELLOW}" "${RESET}"
 sudo pacman -Suy --noconfirm &>/dev/null
