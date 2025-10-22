@@ -2,11 +2,11 @@
 
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 
-if command -v pass >/dev/null; then
-	ACTIONS=("Password manager")
-fi
+ACTIONS=("Apply tweaks" "Video downscaler")
 
-ACTIONS+=("Video downscaler" "Apply custom tweaks")
+if command -v pass >/dev/null; then
+	ACTIONS+=("Password manager")
+fi
 
 if systemd-inhibit | grep "Prevent system suspend is active" > /dev/null; then
 	ACTIONS+=("<b><i><u>Disable sleep inhibition</u></i></b>")
@@ -18,10 +18,8 @@ ACTIONS+=("Reload Vibranium configuration")
 
 read -r PID NAME <<< "$(hyprctl -j activewindow | jq -r '[.pid,.initialTitle]|@tsv')"
 if [[ -n "$PID" && "$(ps -o state= -p "$PID" | tr -d '[:space:]')" != T ]]; then
-	ACTIONS+=("===============================")
 	ACTIONS+=("Freeze <span foreground='${P_YELLOW}'><b><i><u>${NAME}</u></i></b></span>")
 elif [[ -n "$NAME" ]]; then
-	ACTIONS+=("===============================")
 	ACTIONS+=("Unfreeze <span foreground='${P_YELLOW}'><b><i><u>${NAME}</u></i></b></span>")
 fi
 
@@ -29,8 +27,21 @@ while true; do
     CHOSEN="$(printf "%s\n" "${ACTIONS[@]}" | rofi_cmd "Utilities" "ESC to go back")"
 
     case "$CHOSEN" in
-		"Apply custom tweaks")
-			vibranium-menu-tweaks
+		"Apply tweaks")
+			while true; do
+				tweaks_opts=("System" "Apps")
+				tweaks_chosen="$(printf "%s\n" "${tweaks_opts[@]}" | rofi_cmd "Tweaks" "ESC to go back")"
+				[[ -z $tweaks_chosen ]] && break
+				
+				case "$tweaks_chosen" in
+					"Apps")
+						vibranium-menu-tweaks
+						;;
+					"System")
+						vibranium-menu-tweaks-system
+						;;
+				esac
+			done
 			;;
 		"Reload Vibranium configuration")
 			vibranium-utils-reload

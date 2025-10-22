@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+# TODO: polkit policy
+
+FILE="/etc/sysctl.d/99-coredump.conf"
+
+if [ -f "$FILE" ]; then
+	if pkexec bash -c '
+		rm /etc/sysctl.d/99-coredump.conf
+		sysctl --system
+	'; then
+		notify-send -r 1 "Vibranium" "systemd-coredump disabled\nNo reboot required"
+	else
+		notify-send -r 4 -t 3000 -u critical "Vibranium" "Operation aborted"
+		vibranium-cmd-kill-rofi
+		exit 1
+	fi
+else
+	if pkexec bash -c '
+		printf "kernel.core_pattern=|/bin/false\n" > /etc/sysctl.d/99-coredump.conf
+		sysctl --system
+	'; then
+		notify-send -r 1 "Vibranium" "systemd-coredump enabled\nNo reboot required"
+	else
+		notify-send -r 4 -t 3000 -u critical "Vibranium" "Operation aborted"
+		vibranium-cmd-kill-rofi
+		exit 1
+	fi
+fi

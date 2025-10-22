@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+source "$VIBRANIUM_PATH/vibranium-core-lib"
+
+if [ -f /etc/sysctl.d/99-coredump.conf ]; then
+	OPTIONS=("Disable systemd coredump")
+else
+	OPTIONS=("Enable systemd coredump")
+fi
+
+OPTIONS+=("What is this?")
+
+while true; do
+	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "System tweaks" "ESC to go back")"
+	[[ -z $CHOSEN ]] && break
+
+	case "$CHOSEN" in
+		*"coredump")
+			if vibranium-tweaks-coredump; then
+				vibranium-cmd-kill-rofi
+				exit 0
+			fi
+			;;
+		"What is this?")
+			while true; do
+				what_is_this_opts=("Coredump")
+				what_is_this_chosen="$(printf "${what_is_this_opts[@]}" | rofi_cmd "What is" "ESC to go back")"
+				[[ -z $what_is_this_chosen ]] && break
+
+				case "$what_is_this_chosen" in
+					"Coredump")
+						msg="<b>systemd-coredump</b> collects memory dumps from crashed processes."
+						msg+="\n\nUseful for debugging and crash analysis, but generating dumps can use high CPU,"
+						msg+="\ndrain laptop battery, and take disk space."
+						msg+="\n\nDisable it for better performance and responsiveness."
+						notify-send -r 1 -t 15000 -a "Vibranium" "Vibranium" "$msg"
+						;;
+					*)
+						continue
+						;;
+				esac
+			done
+			;;
+	esac
+done
