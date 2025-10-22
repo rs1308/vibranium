@@ -87,7 +87,7 @@ else
     mapfile -t chosen < <(printf "%s\n" "${total_packages[@]}" | fzf "${fzf_args[@]}")
 
     if [ ${#chosen[@]} -eq 0 ]; then
-        _operation_aborted
+        _operation_aborted ""
     fi
 fi
 
@@ -115,7 +115,7 @@ while true; do
     case "$answer" in
     [Yy][Ee][Ss] | [Yy] | "")
         if ! sudo -v; then
-            _operation_aborted
+            _operation_aborted ""
         fi
 
         printf '\e[?25l' # Hide cursor
@@ -123,12 +123,40 @@ while true; do
 		for package in "${filtered[@]}"; do
 		    if ! yay -Si "$package" &>/dev/null; then
 		        printf "%s[VIBRANIUM]%s %s does not exists!\n" "$RED" "$RESET" "$package"
-		        _operation_aborted
+		        _operation_aborted ""
 		    fi
 		done
 
-        yay -S --noconfirm "${filtered[@]}" &>/dev/null &
-        spinner $! "${YELLOW}[VIBRANIUM]${RESET} Installing packages" ""
+        if [ ${#filtered[@]} -gt 1 ]; then
+            for pkg in "${filtered[@]}"; do
+                if ! pacman -Si "$pkg" >/dev/null 2>&1; then
+                    aur_flag=" (AUR)"
+                else
+                    aur_flag=""
+                fi
+
+                printf "\r\033[K%s[VIBRANIUM]%s Installing %s%s%s%s " \
+                    "$YELLOW" "$RESET" "$GRAY" "$pkg" "$aur_flag" "$RESET"
+
+                start_time=$(date +%s)
+                yay -S --noconfirm "$pkg" >/dev/null 2>&1 &
+                pid=$!
+
+                while kill -0 "$pid" 2>/dev/null; do
+                    sleep 1
+                    elapsed=$(( $(date +%s) - start_time ))
+                    if (( elapsed > 10 )); then
+                        printf "\r\033[K%s[VIBRANIUM]%s Installing %s%s [%ds]%s" \
+                            "$YELLOW" "$RESET" "$GRAY" "$pkg$aur_flag" "$elapsed" "$RESET"
+                    fi
+                done
+
+                wait "$pid"
+            done
+        else
+            yay -S --noconfirm "${filtered[@]}" &>/dev/null &
+            spinner $! "${YELLOW}[VIBRANIUM]${RESET} Installing packages" ""
+        fi
 
         services=()
         provides_systemd_service=()
@@ -188,7 +216,7 @@ while true; do
         done
 
         if [[ ${#provides_systemd_service[@]} -eq 0 ]]; then
-            _installation_complete
+			printf "\n"; _installation_complete
         fi
 
         has_socket=false
@@ -250,7 +278,7 @@ while true; do
         _installation_complete
         ;;
     [Nn][Oo] | [Nn])
-        _operation_aborted
+        _operation_aborted ""
         ;;
     *)                      # Wrong input
         printf '\e[A\r\e[K' # Go up, to start, clear line
