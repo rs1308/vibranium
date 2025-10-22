@@ -4,6 +4,15 @@
 
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 
+QUIET=false
+user_args=()
+for a in "$@"; do
+    case "${a,,}" in
+        -q|--quiet) QUIET=true ;;
+        *) user_args+=("$a") ;;
+    esac
+done
+
 if ! missing_str="$(vibranium-utils-is-installed power-profiles-daemon:powerprofilesctl)"; then
     read -r -a missing <<< "$missing_str"
     notify-send -r 4 -t 5000 -u critical "$(basename "$0")" "Missing cli utilities: ${missing[*]}"
@@ -14,6 +23,10 @@ profiles=("power-saver" "balanced" "performance")
 current="$(vibranium-utils-power-profile-get)"
 
 notify() {
+    if [ "$QUIET" = true ]; then
+        return 0
+    fi
+
     local profile="$1"
     local icon=""
     local label=""
@@ -45,15 +58,14 @@ notify() {
     else
         notify-send -r 2 -t 1500 "Vibranium" "Power profile set to <span foreground='${P_ACCENT}'>${label,,}</span>"
     fi
-
-    check_bool VIBRANIUM_BAR_POWER_PROFILE_MODULE_ENABLE false
-    if [ "$VIBRANIUM_BAR_POWER_PROFILE_MODULE_ENABLE" = true ]; then
-        log "Updating waybar module"
-        vibranium-cmd-refresh-waybar-module power-profile
-    fi
 }
 
-arg="${1,,}"
+raw_input="${user_args[0]:-}"
+if [ ${#user_args[@]} -gt 0 ]; then
+    arg="${raw_input,,}"
+else
+    arg=""
+fi
 
 if [[ " ${profiles[*]} " == *" $arg "* ]]; then
     target_profile="$arg"
@@ -77,7 +89,7 @@ else
             next_index=$(((current_index + 1) % ${#profiles[@]}))  # default: cycle up
             ;;
         *)
-            error "Invalid input: '$1'"
+            error "Invalid input: '$raw_input'"
             exit 1
             ;;
     esac
@@ -88,6 +100,12 @@ fi
 powerprofilesctl set "$target_profile" &
 echo "$target_profile" > "${VIBRANIUM_STATE}/power-profile"
 notify "$target_profile"
+
+check_bool VIBRANIUM_BAR_POWER_PROFILE_MODULE_ENABLE false
+if [ "$VIBRANIUM_BAR_POWER_PROFILE_MODULE_ENABLE" = true ]; then
+	log "Updating waybar module"
+	vibranium-cmd-refresh-waybar-module power-profile
+fi
 
 BLUR_ENABLED="$(hyprctl -j getoption decoration:blur:enabled | jq -r '.int')"
 
@@ -104,4 +122,3 @@ else
         rm "$VIBRANIUM_STATE/blur.state"
     fi
 fi
-

@@ -67,7 +67,7 @@ factory_reset() {
 	printf "suspended" > "$VIBRANIUM_STATE/night-light"
 
 	if [ ! "$(vibranium-utils-power-profile-get)" = "balanced" ]; then
-		vibranium-core-power-profile-set balanced
+		vibranium-core-power-profile-set -q balanced
 	fi
 
 	if ! grep -qE '^\s*//.*"hyprland/language"' "$XDG_CONFIG_HOME/waybar/config.jsonc"; then
