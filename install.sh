@@ -85,6 +85,14 @@ install_packages() {
 				"intel-compute-runtime"
 			)
 			;;
+		*"Nvidia"*)
+			printf "%s[VIBRANIUM]%s NVIDIA GPU detected. No automatic support is provided\n" "$RED" "$RESET"
+			printf "%s[VIBRANIUM]%s Please install NVIDIA drivers manually (PRs are welcome)\n" "$RED" "$RESET"
+			;;
+		*)
+			printf "%s[VIBRANIUM]%s No supported GPU detected. Please install your GPU drivers manually\n" "$RED" "$RESET"
+			printf "%s[VIBRANIUM]%s Think this is a mistake? Open an issue!\n" "$RED" "$RESET"
+			printf "%s[VIBRANIUM]%s This will not affect the installation\n" "$YELLOW" "$RESET"
 	esac
 
 	mapfile -t packages < <(printf "%s\n" "${packages[@]}" | sort -u)
