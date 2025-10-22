@@ -46,4 +46,8 @@ echo -e "[zram0]\nzram-size = ram\ncompression-algorithm = lzo-rle zstd(level=3)
 	| sudo tee "$ZRAM_GENERATOR_CONF"
 
 echo -e "# Vibranium: disable hardware watchdog\nblacklist sp5100_tco\nblacklist iTCO_wdt\n" \
-	sudo tee /etc/modprobe.d/blacklist.conf
+	| sudo tee /etc/modprobe.d/blacklist.conf
+
+echo -e "# Vibranium: load ntsync driver for better gaming\n# compatibility with Wine.\n# More info: https://www.phoronix.com/news/Linux-6.14-NTSYNC-Driver-Ready\nntsync" \
+	| sudo tee /etc/modules-load.d/ntsync.conf
+
