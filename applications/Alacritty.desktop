@@ -3,3 +3,4 @@ Type=Application
 Exec=alacritty
 Icon=konsole
 Name=Terminal Emulator
+Keywords=Alacritty

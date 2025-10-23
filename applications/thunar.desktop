@@ -4,3 +4,4 @@ Name=File Manager
 Icon=org.xfce.thunar
 Exec=thunar %U
 MimeType=inode/directory;
+Keywords=Explorer;Thunar;xfce
