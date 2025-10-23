@@ -6,6 +6,7 @@ SUDOERS_CONF="/etc/sudoers"
 FAILLOCK_CONF="/etc/security/faillock.conf"
 SYSTEM_AUTH_CONF="/etc/pam.d/system-auth"
 LOGIND_CONF="/etc/systemd/logind.conf"
+LY_INI="/etc/ly/config.ini"
 
 sudo cp -r ./extras/udev/rules.d/*  /etc/udev/rules.d
 sudo cp -r ./extras/pacman.d/hooks  /etc/pacman.d
@@ -41,3 +42,4 @@ echo -e 'deny = 5\nnodelay' | sudo tee -a "$FAILLOCK_CONF" >/dev/null
 sudo grep -q '^auth.*pam_unix\.so.*try_first_pass nullok nodelay' "$SYSTEM_AUTH_CONF" ||
 sudo sed -Ei '/^auth.*pam_unix\.so.*try_first_pass nullok/ s/\bnullok\b/& nodelay/' "$SYSTEM_AUTH_CONF"
 
+sudo sed -i '/^session_log/s/=.*/= .cache\/display_manager.log/' "$LY_INI"
