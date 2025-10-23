@@ -171,8 +171,8 @@ VIBRANIUM_GLOBAL_CONFIRM_TO_KILL=true
 # Which type of power menu to use.
 # Available options: string 'overlay' 'menu'
 #
-# Default is 'overlay'
-VIBRANIUM_GLOBAL_POWER_MENU_STYLE="overlay"
+# Default is 'menu'
+VIBRANIUM_GLOBAL_POWER_MENU_STYLE="menu"
 
 #           VOLUME CONTROL OPTIONS             #
 # ============================================ #
