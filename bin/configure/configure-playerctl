@@ -5,7 +5,7 @@ source "$VIBRANIUM_PATH/configure/configure-lib"
 
 INDEX=0
 
-while true; do
+while :; do
 	source "$VIBRANIUM_USER_SETTINGS"
 	OPTIONS=(
 		"Fade in / out on Next / Previous : ${VIBRANIUM_PLAYERCTL_FADE_DURATION_ON_SWITCH//_/ }"
@@ -24,7 +24,7 @@ while true; do
 
 	case "$CHOSEN" in
 		*"Previous"*)
-			while true; do
+			while :; do
 				next_prev_options=("very slow" "slow" "normal" "fast" "very fast" "off")
 				next_prev_chosen="$(printf "%s\n" "${next_prev_options[@]}" | rofi_cmd "Next / Prev" "ESC to go back")"
 				[[ -z "$next_prev_chosen" ]] && break
@@ -40,7 +40,7 @@ while true; do
 			done
 			;;
 		*"Play"*)
-			while true; do
+			while :; do
 				play_pause_options=("very slow" "slow" "normal" "fast" "very fast" "off")
 				play_pause_chosen="$(printf "%s\n" "${play_pause_options[@]}" | rofi_cmd "Play / Pause" "ESC to go back")"
 				[[ -z "$play_pause_chosen" ]] && break

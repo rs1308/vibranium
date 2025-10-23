@@ -6,7 +6,7 @@ source "$VIBRANIUM_PATH/configure/configure-lib"
 OPTIONS=("Pacman" "Weather" "Color Picker" "Sleep inhibitor")
 INDEX=0
 
-while true; do
+while :; do
 	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Module settings" "ESC to go back" -selected-row "$INDEX")"
 	[ -z "$CHOSEN" ] && exit 0
 
@@ -20,7 +20,7 @@ while true; do
 	case "$CHOSEN" in
 		"Sleep inhibitor")
 			inhibitor_index=0
-			while true; do
+			while :; do
 				inhibitor_options=("coffee" "lock" "eye")
 				inhibitor_chosen="$(printf "%s\n" "${inhibitor_options[@]}" | rofi_cmd "Sleep inhibitor" "ESC to go back" -selected-row "$inhibitor_index")"
 				[[ -z "$inhibitor_chosen" ]] && break
@@ -43,7 +43,7 @@ while true; do
 			done
 			;;
 		"Pacman")
-			while true; do
+			while :; do
 				new_value="$(printf "Enter new value (int)" | rofi_cmd "Display if ≥ {int} updates" "ESC to go back" -theme-str 'window {width: 22%;}')"
 				[ -z "$new_value" ] && break
 
@@ -63,7 +63,7 @@ while true; do
 		"Color Picker")
 			color_picker_index=0
 
-			while true; do
+			while :; do
 				icon_options=("droplet" "palette" "eyedropper")
 				icon_chosen="$(printf "%s\n" "${icon_options[@]}" | rofi_cmd "Icon" "ESC to go back" -selected-row "$color_picker_index")"
 				[ -z "$icon_chosen" ] && break
@@ -84,7 +84,7 @@ while true; do
 			done
 			;;
 		"Weather")
-			while true; do
+			while :; do
 				new_value="$(printf "Enter new value (string)" | rofi_cmd "City" "ESC to go back")"
 				[ -z "$new_value" ] && break
 				[[ ! "$new_value" =~ ^[A-Za-z]+$ ]] && {

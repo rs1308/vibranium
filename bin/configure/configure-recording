@@ -8,7 +8,7 @@ LIMIT_FPS_MIN=24
 LIMIT_FPS_MAX="$(hyprctl -j monitors | jq -r '.[] | select(.focused == true) | .refreshRate' | awk '{print int($1)==$1 ? $1 : int($1)+1}')"
 
 
-while true; do
+while :; do
 	source "$VIBRANIUM_USER_SETTINGS"
 
 	[ "$VIBRANIUM_RECORDING_QUALITY" = "very_high" ] && {
@@ -37,7 +37,7 @@ while true; do
 
 	case "$CHOSEN" in
 		"Video FPS"*)
-			while true; do
+			while :; do
 				prompt="Video FPS to record at (int)"
 				input="$(printf "%s" "$prompt" | rofi_cmd "FPS" "ESC to go back")"
 				[ -z "$input" ] && break; [ "$input" = "$prompt" ] && continue
@@ -82,7 +82,7 @@ while true; do
 				toggle_bool "VIBRANIUM_RECORDING_CAPTURE_SOURCE"
 			;;
 		"Advanced")
-			while true; do
+			while :; do
 				source "$VIBRANIUM_USER_SETTINGS"
 				advanced_options=(
 					"Container type : $VIBRANIUM_RECORDING_CONTAINER_TYPE"
@@ -199,7 +199,7 @@ while true; do
 						fi
 						;;
 					"Flash screen"*)
-						while true; do
+						while :; do
 							flash_screen_options=("Flash screen : $VIBRANIUM_RECORDING_FLASH_SCREEN" "What is this?")
 							flash_screen_chosen="$(printf "%s\n" "${flash_screen_options[@]}" | rofi_cmd "Flash screen" "ESC to go back")"
 							[ -z "$flash_screen_chosen" ] && break
@@ -219,7 +219,7 @@ while true; do
 						done
 						;;
 					"In-Game"*)
-						while true; do
+						while :; do
 							source "$VIBRANIUM_USER_SETTINGS"
 							in_game_options=(
 								"Enabled        : $VIBRANIUM_RECORDING_HIGHER_FPS_IN_GAME"
@@ -234,7 +234,7 @@ while true; do
 									toggle_bool "VIBRANIUM_RECORDING_HIGHER_FPS_IN_GAME"
 									;;
 								"In-Game FPS"*)
-									while true; do
+									while :; do
 										source "$VIBRANIUM_USER_SETTINGS"
 										prompt="In-Game FPS (int)"
 										input="$(printf "%s\n" "$prompt" | rofi_cmd "In-Game FPS" "${VIBRANIUM_RECORDING_FPS}-${LIMIT_FPS_MAX}")"

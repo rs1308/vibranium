@@ -5,7 +5,7 @@ source "$VIBRANIUM_PATH/configure/configure-lib"
 
 INDEX=0
 
-while true; do
+while :; do
 	source "$VIBRANIUM_USER_SETTINGS"
 
 	power_menu_style="$([ "$VIBRANIUM_GLOBAL_POWER_MENU_STYLE" = "overlay" ] && echo overlay || echo menu)"
@@ -95,7 +95,7 @@ while true; do
 			configure-playerctl
 			;;
 		"Video downscale"*)
-			while true; do
+			while :; do
 				downscale_options=(
 					"Use GPU when possible : $VIBRANIUM_VIDEO_DOWNSCALE_USE_GPU"
 					"README"
@@ -127,7 +127,7 @@ while true; do
 			exit 0
 			;;
 		"Terminal"*)
-			while true; do
+			while :; do
 				alacritty_config="$XDG_CONFIG_HOME/alacritty/alacritty.toml"
 				prompt="Terminal transparency (float)"
 				input="$(printf "%s" "$prompt" | rofi_cmd "Terminal transparency" "0.0 - 1.0")"
@@ -176,7 +176,7 @@ while true; do
 			toggle_bool VIBRANIUM_GLOBAL_POWER_PROFILE_USE_OSD
 			;;
 		"Copy to clipboard"*)
-			while true; do
+			while :; do
 				copy_to_clipboard_options=("Copy to clipboard : $VIBRANIUM_GLOBAL_COPY_TO_CLIPBOARD" "What is this?")
 				copy_to_clipboard_chosen="$(printf "%s\n" "${copy_to_clipboard_options[@]}" | rofi_cmd "Copy to clipboard" "ESC to go back")"
 				[ -z "$copy_to_clipboard_chosen" ] && break
@@ -199,7 +199,7 @@ while true; do
 		"Now playing"*)
 
 			now_playing_index=0
-			while true; do
+			while :; do
 				source "$VIBRANIUM_USER_SETTINGS"
 				now_playing_options=(
 					"Now playing notification : $VIBRANIUM_GLOBAL_SHOW_NOW_PLAYING"
@@ -247,7 +247,7 @@ while true; do
 			done
 		;;
 		"Blur"*)
-			while true; do
+			while :; do
 				source "$VIBRANIUM_USER_SETTINGS"
 
 				if [[ $VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_BACKGROUND == false ]]; then
@@ -272,7 +272,7 @@ while true; do
 						continue
 						;;
 					"Blur strength"*)
-						while true; do
+						while :; do
 							blur_strength_options=("low" "mid" "hard")
 							blur_strength_chosen="$(printf "%s\n" "${blur_strength_options[@]}" | rofi_cmd "Blur strength" "ESC to go back")"
 							[[ -z $blur_strength_chosen ]] && break; [[ $blur_strength_chosen == "$VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_STRENGTH" ]] && break
@@ -288,7 +288,7 @@ while true; do
 						done
 						;;
 					"Dim strength"*)
-						while true; do
+						while :; do
 							dim_strength_options=("low" "mid" "hard")
 							dim_strength_chosen="$(printf "%s\n" "${dim_strength_options[@]}" | rofi_cmd "Dim strength" "ESC to go back")"
 							[[ -z $dim_strength_chosen ]] && break; [[ $dim_strength_chosen == "$VIBRANIUM_GLOBAL_DIM_LOCKSCREEN_STRENGTH" ]] && break
@@ -306,7 +306,7 @@ while true; do
 			done
 		;;
 		"Pause"*)
-			while true; do
+			while :; do
 				pause_on_lock_options=(
 					"Pause music on session lock : $VIBRANIUM_GLOBAL_PAUSE_MUSIC_ON_SESSION_LOCK"
 					"What is this?"
@@ -329,7 +329,7 @@ while true; do
 			done
 			;;
 		"Welcome"*)
-			while true; do
+			while :; do
 				welcome_back_options=("Welcome notification : $VIBRANIUM_GLOBAL_SHOW_WELCOME_BACK_NOTIFICATION" "What is this?")
 				welcome_back_chosen="$(printf "%s\n" "${welcome_back_options[@]}" | rofi_cmd "Welcome back" "ESC to go back")"
 				[ -z "$welcome_back_chosen" ] && break
@@ -349,7 +349,7 @@ while true; do
 			done
 			;;
 		"App"*)
-			while true; do
+			while :; do
 				source "$VIBRANIUM_USER_SETTINGS"
 				app_launcher_options=(
 					"Show app icons : $(vibranium-cmd-get-option VIBRANIUM_GLOBAL_APP_LAUNCHER_SHOW_ICONS)"
@@ -364,7 +364,7 @@ while true; do
 						continue
 						;;
 					"Auto"*)
-						while true; do
+						while :; do
 							auto_select_options=("Auto select : $(vibranium-cmd-get-option VIBRANIUM_GLOBAL_APP_LAUNCHER_AUTO_SELECT)" "What is this?")
 							auto_select_chosen="$(printf "%s\n" "${auto_select_options[@]}" | rofi_cmd "Auto select" "ESC to go back")"
 							[[ -z $auto_select_chosen ]] && break
@@ -389,7 +389,7 @@ while true; do
 			done
 			;;
 		"Notifications")
-			while true; do
+			while :; do
 				dunst_cfg="$XDG_CONFIG_HOME/dunst/dunstrc"
 				current_height="$(sed -n 's/.*progress_bar_height[[:space:]]*=[[:space:]]*\([0-9]\+\).*/\1/p' "$dunst_cfg")"
 				current_timeout="$(sed -n 's/.*timeout[[:space:]]*=[[:space:]]*\([0-9]\+\).*/\1/p' "$dunst_cfg")"
@@ -402,7 +402,7 @@ while true; do
 
 				case "$notification_chosen" in
 					"Progress"*)
-						while true; do
+						while :; do
 							prompt="Progress bar height (in px)"
 							input="$(printf "%s" "$prompt" | rofi_cmd "Height" "int (10px-25px)")"
 							[[ -z "$input" ]] && break; [[ "$prompt" == "$input" ]] && continue
@@ -423,7 +423,7 @@ while true; do
 						done
 						;;
 					"Notification timeout"*)
-						while true; do
+						while :; do
 							input="$(printf "Timeout (in seconds)" | rofi_cmd "Timeout" "ESC to go back")"
 							[[ -z "$input" ]] && break
 
@@ -440,7 +440,7 @@ while true; do
 			done
 			;;
 		"Respect"*)
-			while true; do
+			while :; do
 				respect_power_profile_options=(
 					"Respect power profile : $VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE"
 					"What is this?"
@@ -504,7 +504,7 @@ while true; do
 			done
 			;;
 		"OSD enabled"*)
-			while true; do
+			while :; do
 				source "$VIBRANIUM_USER_SETTINGS"
 				current_height="$(sed -n 's/.*min-height:[[:space:]]*\([0-9]\+\)px.*/\1/p' "$XDG_CONFIG_HOME/swayosd/style.css")"
 
@@ -533,7 +533,7 @@ while true; do
 						fi
 						;;
 					"Progress"*)
-						while true; do
+						while :; do
 							prompt="Progress bar height (in px)"
 							input="$(printf "%s" "$prompt" | rofi_cmd "Height" "int (8px-32px)")"
 							[[ -z "$input" ]] && break; [[ "$prompt" == "$input" ]] && continue
@@ -553,7 +553,7 @@ while true; do
 
 			;;
 		"Confirm"*)
-			while true; do
+			while :; do
 				confirm_to_kill_options=("Confirm to kill : $VIBRANIUM_GLOBAL_CONFIRM_TO_KILL" "What is this?")
 				confirm_to_kill_chosen="$(printf "%s\n" "${confirm_to_kill_options[@]}" | rofi_cmd "Confirm to kill" "ESC to go back")"
 				[ -z "$confirm_to_kill_chosen" ] && break
@@ -573,7 +573,7 @@ while true; do
 			done
 			;;
 		"Flash border"*)
-			while true; do
+			while :; do
 				source "$VIBRANIUM_USER_SETTINGS"
 				flash_border_options=(
 					"Flash border   : $VIBRANIUM_GLOBAL_FLASH_BORDER"
@@ -588,7 +588,7 @@ while true; do
 						break
 						;;
 					"Duration"*)
-						while true; do
+						while :; do
 							prompt="Flashing effect duration (in seconds)"
 							input="$(printf "%s\n" "$prompt" | rofi_cmd "Flash duration" "Duration (0.1s - 1.0s)")"
 							[ -z "$input" ] && break; [ "$input" = "$prompt" ] && continue
@@ -619,7 +619,7 @@ while true; do
 			done
 			;;
 		"Flash screen"*)
-			while true; do
+			while :; do
 				source "$VIBRANIUM_USER_SETTINGS"
 				flash_screen_options=(
 					"Flash screen   : $VIBRANIUM_GLOBAL_FLASH_SCREEN"
@@ -635,7 +635,7 @@ while true; do
 						break
 						;;
 					"Duration"*)
-						while true; do
+						while :; do
 							prompt="Flashing effect duration (in seconds)"
 							input="$(printf "%s\n" "$prompt" | rofi_cmd "Flash duration" "Duration (0.1s - 1.0s)")"
 							[ -z "$input" ] && break; [ "$input" = "$prompt" ] && continue

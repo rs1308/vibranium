@@ -15,7 +15,7 @@ if [ ! -f "$STATE_FILE" ]; then
 	fi
 fi
 
-while true; do
+while :; do
 	is_active="$(<"$STATE_FILE")"
 	is_active=$([ "$is_active" = "active" ] && echo yes || echo no)
 	temperature_current="$(grep -oP "(?<=temperature = ).*" "$XDG_CONFIG_HOME/hypr/hyprsunset.conf")"
@@ -42,7 +42,7 @@ while true; do
 			vibranium-cmd-refresh-waybar-module night-light
 			;;
 		"Temperature"*)
-			while true; do
+			while :; do
 				prompt="New temperature (int)"
 				temperature_chosen="$(printf "%s" "$prompt" | rofi_cmd "Night Light" "1000K-20000K")"
 				[ -z "$temperature_chosen" ] && break; [ "$temperature_chosen" = "$prompt" ] &&  continue

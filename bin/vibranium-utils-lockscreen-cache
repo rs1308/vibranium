@@ -150,7 +150,7 @@ handle_power_pause() {
             local was_paused=true
 
             # Loop until conditions change: either respect_power=false or profile != power-saver.
-            while true; do
+            while :; do
 				if [[ "$(vibranium-cmd-get-option VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE)" == false ]]; then
                     break
                 fi

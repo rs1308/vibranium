@@ -5,7 +5,7 @@ source "$VIBRANIUM_PATH/configure/configure-lib"
 
 INDEX=0
 
-while true; do
+while :; do
 	source "$VIBRANIUM_USER_SETTINGS"
 	OPTIONS=(
 		# See comment below
@@ -31,7 +31,7 @@ while true; do
 		# I think at the moment we can convert non hex to hex on the fly in ../vibranium-bar-color-picker,
 		# but it's just an idea for now
 		"Color format"*)
-			# while true; do
+			# while :; do
 			# 	color_format_options=("hex" "rgb" "hsl" "hsv" "cmyk")
 			# 	color_format_chosen="$(printf "%s\n" "${color_format_options[@]}" | rofi_cmd "Color format" "ESC to go back")"
 			# 	[ -z "$color_format_chosen" ] && break
@@ -47,7 +47,7 @@ while true; do
 			notify-send -r 1 "This option will be added soon"
 			;;
 		"Lower sensitivity"*)
-			while true; do
+			while :; do
 				source "$VIBRANIUM_USER_SETTINGS"
 
 				lower_sensitivity_options=(
@@ -74,7 +74,7 @@ while true; do
 					"By how"*)
 						prompt="Reducing level (float)"
 
-						while true; do
+						while :; do
 							input="$(printf "%s" "$prompt" | rofi_cmd "Lower sensitivity" "0.1-1.0")"
 							[ -z "$input" ] && break; [ "$input" = "$prompt" ] && continue
 

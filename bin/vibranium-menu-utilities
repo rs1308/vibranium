@@ -23,12 +23,12 @@ elif [[ -n "$NAME" ]]; then
 	ACTIONS+=("Unfreeze <span foreground='${P_YELLOW}'><b><i>${NAME}</i></b></span>")
 fi
 
-while true; do
+while :; do
     CHOSEN="$(printf "%s\n" "${ACTIONS[@]}" | rofi_cmd "Utilities" "ESC to go back")"
 
     case "$CHOSEN" in
 		"Apply tweaks")
-			while true; do
+			while :; do
 				tweaks_opts=("System" "Apps")
 				tweaks_chosen="$(printf "%s\n" "${tweaks_opts[@]}" | rofi_cmd "Tweaks" "ESC to go back")"
 				[[ -z $tweaks_chosen ]] && break

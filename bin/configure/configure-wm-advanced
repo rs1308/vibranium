@@ -68,7 +68,7 @@ mapfile -t LINES < <(
 			esac
 		;;
 		"Direct Scanout"*)
-			while true; do
+			while :; do
 				ds_opts=("Direct Scanout : $current_direct_scanout" "What is this?")
 				ds_chosen="$(printf "%s\n" "${ds_opts[@]}" | rofi_cmd "Direct Scanout" "ESC to go back")"
 				[[ -z "$ds_chosen" ]] && break
@@ -96,7 +96,7 @@ mapfile -t LINES < <(
 			done
 		;;
 		"Variable Refresh Rate"*)
-			while true; do
+			while :; do
 				vrr_opts=("Enable" "Disable" "Fullscreen only" "What is this?")
 				vrr_chosen="$(printf "%s\n" "${vrr_opts[@]}" | rofi_cmd "VRR" "ESC to go back")"
 				[[ -z "$vrr_chosen" ]] && break

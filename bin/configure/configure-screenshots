@@ -15,7 +15,7 @@ change_jpg_quality() {
     option-validate "$setting_name"
     eval "current_value=\$$setting_name"
     
-    while true; do
+    while :; do
         prompt="Enter new value (int)"
         new_value="$(printf "%s" "$prompt" | rofi_cmd "JPEG quality" "${min}-100")"
         [ -z "$new_value" ] && break
@@ -37,7 +37,7 @@ change_jpg_quality() {
     done
 }
 
-while true; do
+while :; do
     source "$VIBRANIUM_USER_SETTINGS"
     OPTIONS=("File format    : ${VIBRANIUM_SCREENSHOT_FILE_TYPE^^}")
 
@@ -87,7 +87,7 @@ while true; do
 			# Create an option in user settings if it does not already exist.
 			# Only then perfom action
             option-validate "VIBRANIUM_SCREENSHOT_FILE_TYPE"
-            while true; do
+            while :; do
                 file_types=("PNG" "JPG" "JPEG" "PPM")
                 chosen_file_type="$(printf "%s\n" "${file_types[@]}" | rofi_cmd "File format" "ESC to go back")"
                 [ -z "$chosen_file_type" ] && break
@@ -102,7 +102,7 @@ while true; do
             done
             ;;
         "JPG quality"*)
-			while true; do
+			while :; do
 				source "$VIBRANIUM_USER_SETTINGS"
 				jpg_quality_options=(
 					"Default quality    : $VIBRANIUM_SCREENSHOT_JPEG_QUALITY"
@@ -113,7 +113,7 @@ while true; do
 
 				case "$jpg_quality_chosen" in
 					"Default quality"*)
-						while true; do
+						while :; do
 							prompt="Default JPG quality (int)"
 							input="$(printf "%s\n" "$prompt" | rofi_cmd "JPG Quality" "1-100(%)")"
 							[ -z "$input" ] && break; [ "$input" = "$prompt" ] && continue
@@ -128,7 +128,7 @@ while true; do
 						done
 						;;
 					"Fullscreen quality"*)
-						while true; do
+						while :; do
 							fullscreen_quality_options=("Fullscreen quality : $VIBRANIUM_SCREENSHOT_JPEG_QUALITY_FULLSCREEN" "What is this?")
 							fullscreen_quality_chosen="$(printf "%s\n" "${fullscreen_quality_options[@]}" | rofi_cmd "Fullscreen quality" "${VIBRANIUM_SCREENSHOT_JPEG_QUALITY}-100(%)")"
 							[ -z "$fullscreen_quality_chosen" ] && break
@@ -163,7 +163,7 @@ while true; do
 			done
 			;;
 		"Flash screen"*)
-			while true; do
+			while :; do
 				flash_screen_options=("Flash screen : $VIBRANIUM_SCREENSHOT_FLASH_SCREEN" "What is this?")
 				flash_screen_chosen="$(printf "%s\n" "${flash_screen_options[@]}" | rofi_cmd "Flash screen" "ESC to go back")"
 				[ -z "$flash_screen_chosen" ] && break

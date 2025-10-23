@@ -25,7 +25,7 @@ toggle_keyboard_layout_module() {
 
 INDEX=0
 
-while true; do
+while :; do
 	source "$VIBRANIUM_USER_SETTINGS"
 
 	if check_keyboard_layout_module; then

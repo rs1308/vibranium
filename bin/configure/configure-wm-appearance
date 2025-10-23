@@ -12,7 +12,7 @@ edit_int() {
 	local key="$2" # hyprland config key
 	local input prompt
 
-	while true; do
+	while :; do
 		prompt="$name (int)"
 		input="$(printf "%s" "$prompt" | rofi_cmd "$name" "ESC to go back")"
 
@@ -29,7 +29,7 @@ edit_int() {
 	done
 }
 
-while true; do
+while :; do
 	mapfile -t lines < <(
 		hyprctl --batch -j \
 			"getoption decoration:rounding;         \
@@ -94,7 +94,7 @@ while true; do
 
 	case "$CHOSEN" in
 		"Inactive window opacity"*)
-			while true; do
+			while :; do
 				prompt="Inactive window opacity (int / float)"
 				input="$(printf "%s" "$prompt" | rofi_cmd "Inactive opacity" "0.5 - 1")"
 				[[ -z $input ]] && break; [[ "$prompt" == "$input" ]] && continue
@@ -115,7 +115,7 @@ while true; do
 			done
 			;;
 		"Active window opacity"*)
-			while true; do
+			while :; do
 				prompt="Active window opacity (int / float)"
 				input="$(printf "%s" "$prompt" | rofi_cmd "Active opacity" "0.5 - 1")"
 				[[ -z $input ]] && break; [[ "$prompt" == "$input" ]] && continue
@@ -162,7 +162,7 @@ while true; do
 			hyprctl -q reload config-only
 			;;
 		"Border roundness"*)
-			while true; do
+			while :; do
 				prompt="Border rounding (int)"
 				input="$(printf "%s\n" "$prompt" | rofi_cmd "Border rounding" "0-16px")"
 
@@ -198,7 +198,7 @@ while true; do
 			continue
 			;;
 		"Blur enabled"*)
-			while true; do
+			while :; do
 				mapfile -t blur_opts < <(
 					hyprctl --batch -j \
 						"getoption decoration:blur:passes; \
@@ -264,7 +264,7 @@ while true; do
 						vibranium-cmd-toggle-blur
 						;;
 					"Saturation"*)
-						while true; do
+						while :; do
 							prompt="Blur saturation (float)"
 							input="$(printf "%s" "$prompt" | rofi_cmd "Blur saturation"  "0.0 - 1.0")"
 							[[ -z $input ]] && break; [[ "$prompt" == "$input" ]] && continue
@@ -280,7 +280,7 @@ while true; do
 						done
 					;;
 					"Brightness"*)
-						while true; do
+						while :; do
 							prompt="Blur brightness (float)"
 							input="$(printf "%s" "$prompt" | rofi_cmd "Blur brightness"  "0.0 - 2.0")"
 							[[ -z $input ]] && break; [[ "$prompt" == "$input" ]] && continue
@@ -296,7 +296,7 @@ while true; do
 						done
 					;;
 					"Contrast"*)
-						while true; do
+						while :; do
 							prompt="Blur contrast (float)"
 							input="$(printf "%s"  "$prompt" | rofi_cmd "Blur contrast"  "0.0 - 2.0")"
 							[[ -z $input ]] && break; [[ "$prompt" == "$input" ]] && continue
@@ -312,7 +312,7 @@ while true; do
 						done
 						;;
 					"Radius"*)
-						while true; do
+						while :; do
 							prompt="Blur radius (int)"
 							input="$(printf "%s" "$prompt" | rofi_cmd "Blur radius"  "ESC to go back")"
 							[[ -z $input ]] && break; [[ "$prompt" == "$input" ]] && continue
@@ -330,7 +330,7 @@ while true; do
 						done
 						;;
 					"Strength"*)
-						while true; do
+						while :; do
 							prompt="Blur strength (int)"
 							input="$(printf "%s" "$prompt" | rofi_cmd "Blur strength"  "ESC to go back")"
 							[[ -z $input ]] && break; [[ "$prompt" == "$input" ]] && continue

@@ -79,7 +79,7 @@ factory_reset() {
 	notify-send -r 1 "Vibranium" "Settings have been reset to factory defaults"
 }
 
-while true; do
+while :; do
     OPTIONS=(
         "Reset audio settings"
         "Reset global settings"

@@ -5,7 +5,7 @@ source "$VIBRANIUM_PATH/configure/configure-lib"
 
 INDEX=0
 
-while true; do
+while :; do
 	source "$VIBRANIUM_USER_SETTINGS"
 
 	if [ "$VIBRANIUM_GLOBAL_USE_OSD" = false ]; then
@@ -58,7 +58,7 @@ while true; do
 			exit 0
 			;;
 		"Allow"*)
-			while true; do
+			while :; do
 				source "$VIBRANIUM_USER_SETTINGS"
 				allow_above_hundred_options=(
 					"Allow above 100% : $VIBRANIUM_VOLUME_ALLOW_ABOVE_HUNDRED"
@@ -106,7 +106,7 @@ while true; do
 			toggle_bool "VIBRANIUM_VOLUME_USE_OSD"
 			;;
 		"Audio"*)
-			while true; do
+			while :; do
 				source "$VIBRANIUM_USER_SETTINGS"
 				audio_feedback_options=(
 					"<b>Audio  feedback : $VIBRANIUM_VOLUME_USE_AUDIO_FEEDBACK</b>"
@@ -133,7 +133,7 @@ while true; do
 						toggle_bool "VIBRANIUM_VOLUME_USE_AUDIO_FEEDBACK"
 						;;
 					"Variant"*)
-						while true; do
+						while :; do
 							audio_variant_options=("variant 1" "variant 2" "variant 3" "variant 4")
 							audio_variant_chosen="$(printf "%s\n" "${audio_variant_options[@]}" | rofi_cmd "Audio variant" "ESC to go back")"
 							[[ -z "$audio_variant_chosen" ]] && break
@@ -152,7 +152,7 @@ while true; do
 			;;
 		"Adjustment"*)
 			option-validate "VIBRANIUM_VOLUME_ADJUSTMENT_STEP"
-			while true; do
+			while :; do
 				prompt="Volume adjustment step (int)"
 				current_value="$VIBRANIUM_VOLUME_ADJUSTMENT_STEP"
 				input="$(printf "%s\n" "$prompt" | rofi_cmd "Volume:" "1-25")"

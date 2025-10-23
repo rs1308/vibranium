@@ -5,7 +5,7 @@ source "$VIBRANIUM_PATH/vibranium-core-lib"
 OPTIONS=("Package Management" "Vibranium Settings" "Utilities" "Help")
 INDEX=0
 
-while true; do
+while :; do
 	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Vibranium" "ESC to exit" -selected-row "$INDEX")"
     [ -z "$CHOSEN" ] && break
 
@@ -19,7 +19,7 @@ while true; do
     case "$CHOSEN" in
         "Vibranium Settings")
 			index=0
-            while true; do
+            while :; do
                 vibranium_opts=("Configure Waybar" "Configure Vibranium")
                 vibranium_chosen="$(printf "%s\n" "${vibranium_opts[@]}" | rofi_cmd "${CHOSEN[0]}" "ESC to go back" -selected-row "$index")"
                 [ -z "$vibranium_chosen" ] && break

@@ -120,7 +120,7 @@ get_options() {
 
 CURRENT_PATH=""
 
-while true; do
+while :; do
     if [[ -z "$CURRENT_PATH" ]]; then
         TITLE="Install"          # Root menu title
         KEY="_ROOT_"             # Root menu key

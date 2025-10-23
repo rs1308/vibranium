@@ -22,7 +22,7 @@ _update_timeout() {
     ' "$file" > "$file.tmp" && mv "$file.tmp" "$file"
 }
 
-while true; do
+while :; do
 	readarray -t timeouts < <(
 		awk '
 			/^\s*listener\s*{/{f=1; next}
@@ -57,7 +57,7 @@ while true; do
 
 	case "$CHOSEN" in
 		"Lock"*)
-			while true; do
+			while :; do
 				prompt="Lock timeout (int)"
 				input="$(printf "%s\n" "$prompt" | rofi_cmd "Lock timeout" "in minutes")"
 				[ -z "$input" ] && break; [ "$input" = "$prompt" ] && continue
@@ -73,7 +73,7 @@ while true; do
 			done
 			;;
 		"Sleep"*)
-			while true; do
+			while :; do
 				prompt="Sleep timeout (int)"
 				input="$(printf "%s\n" "$prompt" | rofi_cmd "Sleep timeout" "in minutes")"
 				[ -z "$input" ] && break; [ "$input" = "$prompt" ] && continue

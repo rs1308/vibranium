@@ -5,7 +5,7 @@ source "$VIBRANIUM_PATH/configure/configure-lib"
 
 INDEX=0
 
-while true; do
+while :; do
 	source "$VIBRANIUM_USER_SETTINGS"
 
 	BAR_POSITION="$(grep position "$XDG_CONFIG_HOME/waybar/config.jsonc" | awk -F'"' '{print $4}')"

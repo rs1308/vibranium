@@ -37,7 +37,7 @@ _installation_complete() {
 }
 
 trap '_operation_aborted quit' SIGHUP
-trap '_operation_aborted' SIGINT
+trap 'exit 1' SIGINT
 
 if [[ "$1" =~ ^(-h|--help)$ ]]; then
     echo -e "${GREEN}$(basename "$0") ${GRAY}<pkgs>${RESET} - install passed packages"
@@ -45,7 +45,7 @@ if [[ "$1" =~ ^(-h|--help)$ ]]; then
     exit 0
 fi
 
-printf "\n%s%s%s\n" "$YELLOW" "$(cat "$VIBRANIUM/logo.txt")" "$RESET"
+printf "\n%s%s%s\n\n" "$YELLOW" "$(cat "$VIBRANIUM/logo.txt")" "$RESET"
 printf '\e[?25l' # Hide cursor
 
 # Source: omarchy
@@ -109,7 +109,7 @@ fi
 printf '\e[?25h' # show cursor
 prompt=$'\e[0;33m[VIBRANIUM]\e[0m You are about to install the following packages: \e[0;33m'"${chosen[*]}"$'\e[0m. Proceed? (Y/n): \e[0m'
 
-while true; do
+while :; do
     printf "%s" "$prompt"
     read -r answer
     case "$answer" in
@@ -246,7 +246,7 @@ while true; do
         done
 
         prompt2=$'\e[0;33m[VIBRANIUM]\e[0m Do you wish to enable and start them now? (Y/n): '
-        while true; do
+        while :; do
             printf '\e[?25h' # show cursor
             printf "%s" "$prompt2"
             read -r answer
