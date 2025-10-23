@@ -186,7 +186,7 @@ while :; do
 			while :; do
 				prompt="Hide cursor after (int, in seconds)"
 				input="$(printf "%s" "$prompt" | rofi_cmd "Inactivity timeout" "0 to disable")"
-				[[ -z "$prompt" ]] && break
+				[[ -z "$input" ]] && break
 				[[ "$prompt" == "$input" ]] && continue
 
 				if [[ ! "$input" =~ ^[0-9]+$ ]]; then
