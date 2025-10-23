@@ -127,10 +127,10 @@ source "/home/${USER}/.config/vibranium/theme/current/vibranium-lib-theme" 2>/de
 case "$1" in
     add)
         if [[ -n "$target_dev" && "$include_devpath" -eq 1 ]]; then
-            msg="<span foreground='${P_PURPLE}'><b>•</b></span> <span foreground='${P_ACCENT}'><b>${ID_MODEL}</b></span> connected as <span foreground='${P_YELLOW}'><b>${target_dev}</b></span>"
+            msg="<span foreground='${P_ACCENT}'><b>${ID_MODEL}</b></span> connected as <span foreground='${P_YELLOW}'><b>${target_dev}</b></span>"
             echo "$(date) action=add model=${ID_MODEL} dev=${target_dev} disk=${disk} efi=$has_efi parts=$part_count" >> /tmp/usb-udev.log
         else
-            msg="<span foreground='${P_PURPLE}'><b>•</b></span> <span foreground='${P_ACCENT}'><b>${ID_MODEL}</b></span> connected"
+            msg="<span foreground='${P_ACCENT}'><b>${ID_MODEL}</b></span> connected"
             echo "$(date) action=add model=${ID_MODEL} disk=${disk} efi=$has_efi parts=$part_count (no devpath shown)" >> /tmp/usb-udev.log
         fi
         runuser -l "$USER" -c "notify-send -r 5 'Vibranium' \"${msg}\""
@@ -138,10 +138,10 @@ case "$1" in
     remove)
         # For remove: if DEVNAME was EFI -> we already ignored earlier. Use same logic to show dev if desired.
         if [[ -n "$target_dev" && "$include_devpath" -eq 1 ]]; then
-            msg="<span foreground='${P_PURPLE}'><b>•</b></span> <span foreground='${P_ACCENT}'><b>${ID_MODEL}</b></span> <span foreground='${P_RED}'><b>disconnected</b></span>" 
+            msg="<span foreground='${P_ACCENT}'><b>${ID_MODEL}</b></span> <span foreground='${P_RED}'><b>disconnected</b></span>" 
             echo "$(date) action=remove model=${ID_MODEL} dev=${target_dev} disk=${disk} efi=$has_efi parts=$part_count" >> /tmp/usb-udev.log
         else
-            msg="<span foreground='${P_PURPLE}'><b>•</b></span> <span foreground='${P_ACCENT}'><b>${ID_MODEL}</b></span> <span foreground='${P_RED}'><b>disconnected</b></span>"
+            msg="<span foreground='${P_ACCENT}'><b>${ID_MODEL}</b></span> <span foreground='${P_RED}'><b>disconnected</b></span>"
             echo "$(date) action=remove model=${ID_MODEL} disk=${disk} efi=$has_efi parts=$part_count (no devpath shown)" >> /tmp/usb-udev.log
         fi
         runuser -l "$USER" -c "notify-send -r 5 'Vibranium' \"${msg}\""
