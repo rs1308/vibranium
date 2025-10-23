@@ -134,9 +134,12 @@ vibranium-cmd-refresh-waybar-module worker
 
 if [[ $VIBRANIUM_GLOBAL_COPY_TO_CLIPBOARD == true ]]; then
     printf "file://%s" "$output_file" | wl-copy --type text/uri-list
-    notify-send -r 1 "Vibranium" "Processing complete. <span foreground='${P_ACCENT}'>File copied to clipboard</span>"
+	msg="Processing complete. "
+	msg+="File <span foreground='${P_YELLOW}'><b>saved</b></span> and "
+	msg+="<span foreground='${P_YELLOW}'><b>copied to clipboard</b></span>"
+    notify-send -r 1 "Vibranium" "$msg"
 else
-    notify-send -r 1 "Vibranium" "Processing complete. File saved to <span foreground='${P_ACCENT}'>${output_dir}</span>>"
+    notify-send -r 1 "Vibranium" "Processing complete. File saved to <span foreground='${P_YELLOW}'>${output_dir}</span>>"
 fi
 
 log "File saved to: ${YELLOW}'$output_file'${RESET}"

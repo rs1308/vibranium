@@ -45,7 +45,7 @@ if [[ "$1" =~ ^(-h|--help)$ ]]; then
     exit 0
 fi
 
-printf "\n%s%s\n" "$YELLOW" "$(cat "$VIBRANIUM/logo.txt")" "$RESET"
+printf "\n%s%s%s\n" "$YELLOW" "$(cat "$VIBRANIUM/logo.txt")" "$RESET"
 printf '\e[?25l' # Hide cursor
 
 # Source: omarchy
@@ -167,8 +167,10 @@ while true; do
             units=$(pacman -Ql "$pkg" | awk '/\/systemd\/.*\.(service|socket)$/ && $2 !~ /@/ {print $2}')
             [[ -z $units ]] && continue
 
-            user_socket= user_service=
-            sys_socket= sys_service=
+            user_socket=
+			user_service=
+            sys_socket=
+			sys_service=
 
             while read -r unit; do
                 case "$unit" in
@@ -252,7 +254,7 @@ while true; do
             [Yy][Ee][Ss] | [Yy] | "")
                 printf '\e[?25l' # Hide cursor
                 if [[ ${#user_units[@]} -gt 0 ]]; then
-					echo -e "${GREEN}[VIBRANIUM]${RESET} Enabled ${YELLOW}${user_units[@]}${RESET}"
+					echo -e "${GREEN}[VIBRANIUM]${RESET} Enabled ${YELLOW}${user_units[*]}${RESET}"
                     systemctl -q --user --now enable "${user_units[@]}" &
                 fi
 
@@ -260,7 +262,7 @@ while true; do
                     # Since we're already in a terminal window
                     # there is no point of using polkit window,
                     # so use sudo
-					echo -e "${GREEN}[VIBRANIUM]${RESET} Enabled ${YELLOW}${services[@]}${RESET}"
+					echo -e "${GREEN}[VIBRANIUM]${RESET} Enabled ${YELLOW}${services[*]}${RESET}"
                     sudo systemctl -q enable --now "${services[@]}" &
                 fi
                 break
