@@ -79,8 +79,8 @@ while true; do
 						fi
 						;;
 					"What is this?")
-						msg="\n<span foreground='${P_GREEN}'><b>•</b></span> <span foreground='${P_PURPLE}'>"
-						msg+="Allow volume levels above 100%</span>\n\n"
+						msg="\n<span foreground='${P_ACCENT}'><b>•</b></span> "
+						msg+="<b>Allow volume levels above 100%</b>\n\n"
 						msg+="When enabled, maximum volume can reach 150%"
 						notify-send -r 3 -t 7000 "What is this?" "$msg"
 						;;
@@ -126,7 +126,7 @@ while true; do
 				[[ -z "$audio_feedback_chosen" ]] && break
 
 				case "$audio_feedback_chosen" in
-					*"()")
+					*"()"*)
 						continue
 						;;
 					*"Audio"*) 

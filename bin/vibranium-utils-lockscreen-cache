@@ -173,11 +173,9 @@ handle_power_pause() {
 # Initial power pause check before starting processing.
 handle_power_pause
 
-if [[ "$single_file" == false ]]; then
-	# Update Waybar module to indicate worker is active.
-	touch "$XDG_RUNTIME_DIR/worker.active"
-	vibranium-cmd-refresh-waybar-module worker
-fi
+# Update Waybar module to indicate worker is active.
+touch "$XDG_RUNTIME_DIR/worker.active"
+vibranium-cmd-refresh-waybar-module worker
 
 for file in "${backgrounds[@]}"; do
     for type in "${!filters[@]}"; do

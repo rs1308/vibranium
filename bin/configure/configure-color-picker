@@ -90,8 +90,8 @@ while true; do
 						done
 						;;
 					"What"*)
-						msg="\n<span foreground='${P_GREEN}'><b>•</b></span> "
-						msg+="<span foreground='${P_PURPLE}'><b>Whether to lower the mouse sensitivity when picking a color</b></span>\n\n"
+						msg="\n<span foreground='${P_ACCENT}'><b>•</b></span> "
+						msg+="<b>Whether to lower the mouse sensitivity when picking a color</b>\n\n"
 						msg+="This can be useful when you need to select the color of a specific pixel"
 						notify-send -r 3 -t 15000 "What is this?" "$msg"
 				esac

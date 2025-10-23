@@ -79,7 +79,7 @@ while true; do
     case "$CHOSEN" in
 		*"()"*)
 			msg="This option is <span foreground='${P_RED}'><b>locked</b></span> because "
-			msg+="animations <span foreground='${P_RED}'><b>disabled</b></span>"
+			msg+="animations is <span foreground='${P_RED}'><b>disabled</b></span>"
 			notify-send -r 1 "Vibranium" "$msg"
 			continue
 			;;
