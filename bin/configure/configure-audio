@@ -129,7 +129,7 @@ while true; do
 					*"()")
 						continue
 						;;
-					"Audio"*) 
+					*"Audio"*) 
 						toggle_bool "VIBRANIUM_VOLUME_USE_AUDIO_FEEDBACK"
 						;;
 					"Variant"*)
