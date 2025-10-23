@@ -26,11 +26,6 @@ fzf_args=(
     --color 'pointer:blue,marker:white'
 )
 
-if ! sudo -v; then
-	echo -e "${RED}[VIBRANIUM]${RESET} Operation aborted"
-    exit 1
-fi
-
 # you don't wanna delete important system packages, do you?
 # so keep -Qqe to show only explicitly installed packages
 mapfile -t chosen < <(pacman -Qqe | fzf "${fzf_args[@]}")
@@ -40,18 +35,41 @@ if [ ${#chosen[@]} -eq 0 ]; then
     exit 1
 fi
 
-read -p $'\e[0;33m[VIBRANIUM]\e[0m You are about to remove the following packages: \e[0;33m'"${chosen[*]}"$'\e[0m. Proceed? (Y/n): ' answer
+prompt2=$'\e[0;33m[VIBRANIUM]\e[0m You are about to remove the following packages: \e[0;33m'"${chosen[*]}"$'\e[0m. Proceed? (Y/n): '
 
-case "$answer" in
-    [Yy]es | y | "")
-        sudo pacman -Rnsc --noconfirm "${chosen[@]}" &> /dev/null &
-        spinner $! "${YELLOW}[VIBRANIUM]${RESET} Removing ${chosen[*]}" ""
-		echo -e "${GREEN}VIBRANIUM]${RESET} Operation completed successfully"
-        read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
-        exit 0
-        ;;
-    [Nn]o | n)
-		echo -e "${RED}[VIBRANIUM]${RESET} Operation aborted"
-        exit 1
-        ;;
-esac
+while true; do
+    printf '\e[?25h'  # show cursor
+    printf "%s" "$prompt2"
+    read -r answer
+    case "$answer" in
+        [Yy][Ee][Ss] | [Yy] | "")
+            if ! sudo -v; then
+                echo -e "${RED}[VIBRANIUM]${RESET} Operation aborted"
+                exit 1
+            fi
+
+			printf '\e[?25l'  # hide cursor
+			if [ ${#chosen[@]} -gt 1 ]; then
+				for pkg in "${chosen[@]}"; do
+					sudo pacman -Rnsc --noconfirm "$pkg" &> /dev/null &
+					spinner $! "${YELLOW}[VIBRANIUM]${RESET} Removing $pkg" ""
+				done
+			else
+				echo -e "${YELLOW}[VIBRANIUM]${RESET} Removing ${YELLOW}${chosen[*]}${RESET}"
+				sudo pacman -Rnsc --noconfirm "${chosen[@]}" &> /dev/null
+			fi
+
+            echo -e "${GREEN}[VIBRANIUM]${RESET} Operation completed successfully"
+            read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
+            exit 0
+            ;;
+        [Nn][Oo] | [Nn])
+            printf '\e[?25l'  # hide cursor
+            echo -e "${RED}[VIBRANIUM]${RESET} Operation aborted"
+            exit 1
+            ;;
+        *)  # Wrong input
+            printf '\e[A\r\e[K'  # move up, clear line
+            ;;
+    esac
+done
