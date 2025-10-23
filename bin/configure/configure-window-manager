@@ -50,17 +50,20 @@ while true; do
 		     getoption input:touchpad:tap-to-click;
 			 getoption input:touchpad:natural_scroll" \
 		| jq -r '
-			if (.option | test("rounding|border_size")) then
-				.int
-			elif (.option | test("gaps_in|gaps_out")) then
-				(.custom | split(" ")[0])
-			elif (.option | test("sensitivity|scroll_factor")) then
-				(.float | tostring | tonumber | (. * 10 | round / 10))
-			elif (.option | test("accel_profile")) then
-				.str
-			else
-				if .int == 1 then "true" else "false" end
-			end
+		  .option as $o |
+		  if   ($o | test("rounding|border_size")) then
+			.int
+		  elif ($o | test("gaps_in|gaps_out")) then
+			(.custom | split(" ")[0])
+		  elif ($o | test("scroll_factor")) then
+			(.float * 10 | round / 10)
+		  elif ($o | test("sensitivity")) then
+			(.float * 100 | round / 100)
+		  elif ($o | test("accel_profile")) then
+			.str
+		  else
+			if .int == 1 then "true" else "false" end
+		  end
 		'
 	)
 
