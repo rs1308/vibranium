@@ -5,6 +5,9 @@ cat <<EOF > "$HOME/.config/vibranium/environment"
 # Place your environment variables here.
 # The text below is just an example. Feel free to delete or change it
 
+export SUDO_PROMPT
+SUDO_PROMPT="$(tput setaf 1)$(tput bold)[sudo]$(tput sgr0) Password for $USER: "
+
 # Set your default editor
 # This could be nvim, nano, emacs, kate or whatever you want
 export EDITOR="nvim"
@@ -23,5 +26,4 @@ export MANPAGER="\$EDITOR +Man!"
 # If you actively use mangohud, you can specify its entire configuration in a single variable,
 # instead of a special file in the root folder of each game:
 # export MANGOHUD_CONFIG="fps_only,alpha=0.3,background_alpha=0,text_color=ffffff,font_size=18"
-
 EOF
