@@ -107,7 +107,7 @@ while true; do
 				fi
 
 				vibranium-cmd-edit-wm-config "decoration:inactive_opacity:$input" \
-					"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
+					"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/look-and-feel.conf"
 				break
 			done
 			;;
@@ -128,7 +128,7 @@ while true; do
 				fi
 
 				vibranium-cmd-edit-wm-config "decoration:active_opacity:$input" \
-					"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
+					"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/look-and-feel.conf"
 				break
 			done
 			;;
