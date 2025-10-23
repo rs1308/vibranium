@@ -25,7 +25,7 @@ configuration {
 	icon-theme          : "Papirus";
 	drun-display-format : "{name}";
 	matching            : "prefix";
-	drun-match-fields   : "name";
+	drun-match-fields   : "name,keywords,categories";
 	monitor             : "-1";
 	scroll-method       : 1;
 }
