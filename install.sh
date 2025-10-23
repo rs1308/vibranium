@@ -194,6 +194,7 @@ create_directories() {
 }
 
 post_install() {
+	cp ./config/mimeapps.list "$HOME/.config"
 	touch "$HOME/.local/state/vibranium/first-boot"
 	echo "suspended" > \
 		"$HOME/.local/state/vibranium/night-light"

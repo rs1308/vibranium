@@ -1,0 +1,19 @@
+[Default Applications]
+application/epub+zip=org.pwmt.zathura.desktop
+application/pdf=org.pwmt.zathura.desktop
+application/x-xz=org.gnome.FileRoller.desktop
+image/jpeg=imv-dir.desktop
+image/png=imv-dir.desktop
+image/gif=mpv.desktop
+image/svg+xml=imv.desktop;org.inkscape.Inkscape.desktop
+video/avi=mpv.desktop;
+video/mp4=mpv.desktop;
+video/mp4v-es=mpv.desktop;
+video/mpeg=mpv.desktop;
+video/ogg=mpv.desktop;
+video/webm=mpv.desktop;
+video/x-avi=mpv.desktop;
+video/x-m4v=mpv.desktop;
+video/x-matroska=mpv.desktop;
+video/x-mpeg2=mpv.desktop;
+video/x-msvideo=mpv.desktop;
