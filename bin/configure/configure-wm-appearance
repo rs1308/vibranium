@@ -69,8 +69,8 @@ while true; do
 		current_inactive_opacity="${lines[9]}"
 
 	OPTIONS=(
-		"Active window opacity   : ${current_active_opacity}"
 		"Inactive window opacity : ${current_inactive_opacity}"
+		"Active window opacity   : ${current_active_opacity}"
 		"Dim inactive window     : ${current_dim}"
 		"Drop window shadow      : ${current_shadow}"
 		"Animations enabled      : ${current_animations}"

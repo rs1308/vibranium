@@ -10,7 +10,7 @@ _hyprland() {
 	local hypr_index=0
 
 	while true; do
-		hyprland_opts=("Input" "Appearance" "Edit configs")
+		hyprland_opts=("Input" "Appearance" "Edit configs" "<b>Advanced</b>")
 		hyprland_chosen="$(printf "%s\n" "${hyprland_opts[@]}" | rofi_cmd "Hyprland" "ESC to go back" -selected-row "$hypr_index")"
 		[[ -z $hyprland_chosen ]] && break
 
@@ -24,6 +24,9 @@ _hyprland() {
 		case "$hyprland_chosen" in
 			"Appearance")
 				configure-wm-appearance
+				;;
+			*"Advanced"*)
+				configure-wm-advanced
 				;;
 			"Input")
 				configure-wm-input
