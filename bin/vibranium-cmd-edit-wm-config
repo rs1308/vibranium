@@ -13,34 +13,30 @@ from typing import List, Tuple, Optional
 
 def parse_path(path: str) -> Tuple[List[str], Optional[str], Optional[int]]:
     """
-    Parse path like 'section:subsection:option:value:-2'
+    Parse path like 'section:subsection:option:value@-2'
     Returns: (path_parts, value, index)
     """
-    # Check for index suffix like :-1, :-2
+    parts = path.split(':')
     index = None
     value = None
-    if ':-' in path:
-        path, index_str = path.rsplit(':-', 1)
+
+    if parts and '@' in parts[-1]:
+        last_part, index_str = parts[-1].rsplit('@', 1)
         try:
             index = int(index_str)
+            parts[-1] = last_part
         except ValueError:
-            pass
-    
-    parts = path.split(':')
-    
-    # Last part might be value (for write mode)
+            pass  # Treat as part of the value if not integer
+
     return parts, value, index
 
 
-def find_section_bounds(lines: List[str], path: List[str], start_line: int = 0, occurrence: int = 1) -> Optional[Tuple[int, int, int]]:
+def find_all_section_bounds(lines: List[str], path: List[str], start_line: int = 0) -> List[Tuple[int, int, int]]:
     """
-    Find the bounds of a section in the file.
-    Returns: (section_start_line, section_end_line, indent_level) or None
-    occurrence: which occurrence to find (1-indexed)
+    Find all bounds of matching sections in the file.
+    Returns: list of (section_start_line, section_end_line, indent_level)
     """
-    current_occurrence = 0
-    depth = 0
-    search_depth = len(path)
+    results = []
     current_path = []
     indent_stack = [0]
     
@@ -73,19 +69,17 @@ def find_section_bounds(lines: List[str], path: List[str], start_line: int = 0, 
             indent_stack.append(indent)
             
             # Check if this matches our search path
-            if current_path == path[:len(current_path)] and len(current_path) == search_depth:
-                current_occurrence += 1
-                if current_occurrence == occurrence:
-                    # Find the closing brace
-                    brace_depth = 1
-                    j = i + 1
-                    while j < len(lines) and brace_depth > 0:
-                        if '{' in lines[j]:
-                            brace_depth += lines[j].count('{')
-                        if '}' in lines[j]:
-                            brace_depth -= lines[j].count('}')
-                        j += 1
-                    return (i, j - 1, indent)
+            if current_path == path:
+                # Find the closing brace
+                brace_depth = 1
+                j = i + 1
+                while j < len(lines) and brace_depth > 0:
+                    brace_depth += lines[j].count('{') - lines[j].count('}')
+                    j += 1
+                results.append((i, j - 1, indent))
+                # Skip to after the section
+                i = j
+                continue
             
             i += 1
             continue
@@ -93,7 +87,28 @@ def find_section_bounds(lines: List[str], path: List[str], start_line: int = 0, 
         # Regular option line
         i += 1
     
-    return None
+    return results
+
+
+def find_section_bounds(lines: List[str], path: List[str], start_line: int = 0, occurrence: int = 1) -> Optional[Tuple[int, int, int]]:
+    """
+    Find the bounds of a section in the file.
+    Returns: (section_start_line, section_end_line, indent_level) or None
+    occurrence: which occurrence to find (1-indexed positive, or negative for from end)
+    """
+    all_bounds = find_all_section_bounds(lines, path, start_line)
+    if not all_bounds:
+        return None
+    
+    if occurrence > 0:
+        idx = occurrence - 1
+    else:
+        idx = occurrence  # negative index from end
+    
+    try:
+        return all_bounds[idx]
+    except IndexError:
+        return None
 
 
 def find_option_in_section(lines: List[str], section_start: int, section_end: int, option_name: str) -> Optional[int]:
@@ -221,7 +236,7 @@ def write_value(lines: List[str], path: List[str], value: str, file_path: str, o
     current_line = 0
     
     for depth, section_name in enumerate(section_path):
-        section_bounds = find_section_bounds(lines, section_path[:depth+1], start_line=current_line, occurrence=occurrence if depth == len(section_path) - 1 else 1)
+        section_bounds = find_section_bounds(lines, section_path[:depth+1], start_line=current_line, occurrence=1 if depth < len(section_path) - 1 else occurrence)
         
         if section_bounds:
             # Section exists
@@ -303,7 +318,7 @@ def write_value(lines: List[str], path: List[str], value: str, file_path: str, o
 def main():
     parser = argparse.ArgumentParser(description='Parse and edit configuration files')
     parser.add_argument('-r', '--read', action='store_true', help='Read mode')
-    parser.add_argument('path', help='Path to option (section:subsection:option[:value])')
+    parser.add_argument('path', help='Path to option (section:subsection:option[:value][@-occurrence])')
     parser.add_argument('file', help='Configuration file path')
     
     args = parser.parse_args()
@@ -321,7 +336,7 @@ def main():
     
     # Parse the path
     path_and_value, _, index = parse_path(args.path)
-    occurrence = int(index) if index is not None else 1
+    occurrence = index if index is not None else 1
     
     if args.read:
         # Read mode

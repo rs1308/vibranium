@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# This needs to be refactored. Such a mess
+# TODO: categorize (e.g. input / apperance)
+
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 source "$VIBRANIUM_PATH/configure/configure-lib"
 
@@ -40,16 +43,25 @@ while true; do
 			 getoption general:border_size; \
 			 getoption decoration:blur:enabled; \
 			 getoption decoration:dim_inactive; \
-			 getoption decoration:shadow:enabled" \
+			 getoption decoration:shadow:enabled; \
+			 getoption input:sensitivity; \
+			 getoption input:accel_profile; \
+		     getoption input:touchpad:scroll_factor;
+		     getoption input:touchpad:tap-to-click;
+			 getoption input:touchpad:natural_scroll" \
 		| jq -r '
-			  if (.option | test("rounding|border_size")) then
+			if (.option | test("rounding|border_size")) then
 				.int
 			elif (.option | test("gaps_in|gaps_out")) then
 				(.custom | split(" ")[0])
-			  else
+			elif (.option | test("sensitivity|scroll_factor")) then
+				(.float | tostring | tonumber | (. * 10 | round / 10))
+			elif (.option | test("accel_profile")) then
+				.str
+			else
 				if .int == 1 then "true" else "false" end
-			  end
-			'
+			end
+		'
 	)
 
 	smart_gaps_enabled="$([ -f "$SMART_GAPS_CONFIG" ] && echo "true" || echo "false")"
@@ -61,12 +73,22 @@ while true; do
 	current_blur="${lines[5]}"
 	current_dim="${lines[6]}"
 	current_shadow="${lines[7]}"
+	current_sensitivity="${lines[8]}"
+	current_accel_profile="$([[ "${lines[9]}" == "adaptive" ]] && echo true || echo false)"
+	current_scroll_factor="${lines[10]}"
+	current_tap_to_click="${lines[11]}"
+	current_natural_scroll="${lines[12]}"
 
 	OPTIONS=(
 		"Dim inactive window : ${current_dim}"
 		"Drop window shadow  : ${current_shadow}"
 		"Animations enabled  : ${current_animations}"
-		"Border rounding     : ${current_rounding}px"
+		"Mouse acceleration  : ${current_accel_profile}"
+		"Mouse sensitivity   : ${current_sensitivity}"
+		"Natural scrolling   : ${current_natural_scroll}"
+		"Border roundness    : ${current_rounding}px"
+		"Scrolling speed     : ${current_scroll_factor}"
+		"Tap to click        : ${current_tap_to_click}"
 	)
 
 	if [ "$VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE" = "true" ] && [ "$(<$VIBRANIUM_STATE/power-profile)" = "power-saver" ]; then
@@ -94,6 +116,80 @@ while true; do
     done
 
 	case "$CHOSEN" in
+		"Natural scrolling"*)
+			case "$current_natural_scroll" in
+				true)
+					vibranium-cmd-edit-wm-config input:touchpad:natural_scroll:false \
+						"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
+					;;
+				false)
+					vibranium-cmd-edit-wm-config input:touchpad:natural_scroll:true \
+						"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
+					;;
+			esac
+			;;
+		"Tap to click"*)
+			case "$current_tap_to_click" in
+				true)
+					vibranium-cmd-edit-wm-config input:touchpad:tap-to-click:false \
+						"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
+					;;
+				false)
+					vibranium-cmd-edit-wm-config input:touchpad:tap-to-click:true \
+						"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
+					;;
+			esac
+			;;
+		"Scrolling speed"*)
+			while true; do
+				prompt="Scrolling speed (int / float)"
+				input="$(printf "%s" "$prompt" | rofi_cmd "Scrolling speed" "0.0 - 1.0")"
+				[[ -z $input ]] && break
+				if [[ "$prompt" == "$input" ]]; then
+					continue
+				fi
+
+				if [[ ! $input =~ ^(0(\.[0-9]+)?|1(\.0+)?)$ ]]; then
+					notify-send -r 1 -t 2000 "Vibranium" "A number between 0 and 1"
+					continue
+				fi
+
+				vibranium-cmd-edit-wm-config input:touchpad:scroll_factor:$input \
+					"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
+				break
+			done
+			;;
+		"Mouse acceleration"*)
+			case "${current_accel_profile}" in
+				false)
+					vibranium-cmd-edit-wm-config input:accel_profile:adaptive \
+						"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
+					;;
+				true)
+					vibranium-cmd-edit-wm-config input:accel_profile:flat \
+						"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
+					;;
+			esac
+			;;
+		"Mouse sensitivity"*)
+			while true; do
+				prompt="Sensitivity (int / float)" 
+				input="$(printf "%s\n" "$prompt" | rofi_cmd "Sensitivity" "ESC to go back")"
+				[[ -z $input ]] && break
+
+				if [[ "$input" == "$prompt" ]]; then
+					continue
+				fi
+
+				if [[ "$input" =~ ^-?(0(\.[0-9]+)?|1(\.0+)?)$ ]]; then
+					vibranium-cmd-edit-wm-config "input:sensitivity:$input" \
+						"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
+					break
+				else
+					notify-send -r 1 -t 2000 "Vibranium" "A number between -1 and 1"
+				fi
+			done
+			;;
 		"Smart gaps"*)
 			vibranium-cmd-toggle-smart-gaps
 			;;
@@ -154,7 +250,7 @@ while true; do
 			fi
 			hyprctl -q reload config-only
 			;;
-		"Border rounding"*)
+		"Border roundness"*)
 			while true; do
 				prompt="Border rounding (int)"
 				input="$(printf "%s\n" "$prompt" | rofi_cmd "Border rounding" "0-16px")"

@@ -68,7 +68,7 @@ while true; do
 	)
 
 	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Global options" "ESC to go back" \
-		-selected-row "$INDEX" -theme-str 'listview{lines: 30;}')"
+		-selected-row "$INDEX")"
 	[ -z "$CHOSEN" ] && break
 	
     for i in "${!OPTIONS[@]}"; do

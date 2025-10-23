@@ -108,7 +108,8 @@ rofi_cmd() {
 		-theme "$XDG_CONFIG_HOME/rofi/config.rasi" \
 		-theme-str 'configuration {show-icons: false;} entry {placeholder: "'"${placeholder}"'";}' \
 		-theme-str 'window {width: '"${width}px"';}' \
-		-theme-str 'listview {lines: '"${lines}"';}' "$@" 2>/dev/null
+		-theme-str 'listview {lines: '"${lines}"';}' \
+		-matching-negate-char '' "$@" 2>/dev/null
 }
 
 # A spinner utility function.
