@@ -76,7 +76,10 @@ while true; do
 		"Animations enabled      : ${current_animations}"
 		"Border roundness        : ${current_roundness}px"
 		"Blur enabled            : ${current_blur}"
+		"Border size             : ${current_border_size}"
 		"Smart gaps              : ${smart_gaps_enabled}"
+		"Outer gaps              : ${current_gaps_out}"
+		"Inner gaps              : ${current_gaps_in}"
 	)
 
 	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Appearance" "ESC to go back" -selected-row "$INDEX")"
@@ -263,11 +266,11 @@ while true; do
 					"Saturation"*)
 						while true; do
 							prompt="Blur saturation (float)"
-							input="$(printf "$prompt" | rofi_cmd "Blur saturation"  "0.0 - 1.0")"
+							input="$(printf "%s" "$prompt" | rofi_cmd "Blur saturation"  "0.0 - 1.0")"
 							[[ -z $input ]] && break; [[ "$prompt" == "$input" ]] && continue
 
 							if awk -v x="$input" 'BEGIN{exit !(x ~ /^[0-9]*\.?[0-9]+$/ && x>=0 && x<=1)}'; then
-								vibranium-cmd-edit-wm-config decoration:blur:vibrancy:$input "$HYPR_CONFIG"
+								vibranium-cmd-edit-wm-config "decoration:blur:vibrancy:$input" "$HYPR_CONFIG"
 								break
 							else
 								notify-send -r 2 -u critical -t 1500 "Vibranium" \
@@ -279,11 +282,11 @@ while true; do
 					"Brightness"*)
 						while true; do
 							prompt="Blur brightness (float)"
-							input="$(printf "$prompt" | rofi_cmd "Blur brightness"  "0.0 - 2.0")"
+							input="$(printf "%s" "$prompt" | rofi_cmd "Blur brightness"  "0.0 - 2.0")"
 							[[ -z $input ]] && break; [[ "$prompt" == "$input" ]] && continue
 
 							if awk -v x="$input" 'BEGIN{exit !(x ~ /^[0-9]*\.?[0-9]+$/ && x>=0 && x<=2)}'; then
-								vibranium-cmd-edit-wm-config decoration:blur:brightness:$input "$HYPR_CONFIG"
+								vibranium-cmd-edit-wm-config "decoration:blur:brightness:$input" "$HYPR_CONFIG"
 								break
 							else
 								notify-send -r 2 -u critical -t 1500 "Vibranium" \
@@ -295,11 +298,11 @@ while true; do
 					"Contrast"*)
 						while true; do
 							prompt="Blur contrast (float)"
-							input="$(printf "$prompt" | rofi_cmd "Blur contrast"  "0.0 - 2.0")"
+							input="$(printf "%s"  "$prompt" | rofi_cmd "Blur contrast"  "0.0 - 2.0")"
 							[[ -z $input ]] && break; [[ "$prompt" == "$input" ]] && continue
 
 							if awk -v x="$input" 'BEGIN{exit !(x ~ /^[0-9]*\.?[0-9]+$/ && x>=0 && x<=2)}'; then
-								vibranium-cmd-edit-wm-config decoration:blur:contrast:$input "$HYPR_CONFIG"
+								vibranium-cmd-edit-wm-config "decoration:blur:contrast:$input" "$HYPR_CONFIG"
 								break
 							else
 								notify-send -r 2 -u critical -t 1500 "Vibranium" \
@@ -311,13 +314,13 @@ while true; do
 					"Radius"*)
 						while true; do
 							prompt="Blur radius (int)"
-							input="$(printf "$prompt" | rofi_cmd "Blur radius"  "ESC to go back")"
+							input="$(printf "%s" "$prompt" | rofi_cmd "Blur radius"  "ESC to go back")"
 							[[ -z $input ]] && break; [[ "$prompt" == "$input" ]] && continue
 
 							if [[ ! $input =~ ^[0-9]+$ ]]; then
 								continue
 							else
-								vibranium-cmd-edit-wm-config decoration:blur:size:$input "$HYPR_CONFIG"
+								vibranium-cmd-edit-wm-config "decoration:blur:size:$input" "$HYPR_CONFIG"
 
 								if (( input > 10 )); then
 									notify-send -r 1 "Vibranium" "Please note that large values may affect overall performance"
@@ -329,13 +332,13 @@ while true; do
 					"Strength"*)
 						while true; do
 							prompt="Blur strength (int)"
-							input="$(printf "$prompt" | rofi_cmd "Blur strength"  "ESC to go back")"
+							input="$(printf "%s" "$prompt" | rofi_cmd "Blur strength"  "ESC to go back")"
 							[[ -z $input ]] && break; [[ "$prompt" == "$input" ]] && continue
 
 							if [[ ! $input =~ ^[0-9]+$ ]]; then
 								continue
 							else
-								vibranium-cmd-edit-wm-config decoration:blur:passes:$input "$HYPR_CONFIG"
+								vibranium-cmd-edit-wm-config "decoration:blur:passes:$input" "$HYPR_CONFIG"
 
 								if (( input > 10 )); then
 									notify-send -r 1 "Vibranium" "Please note that large values may affect overall performance"
