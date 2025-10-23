@@ -46,7 +46,7 @@ case "$answer" in
     [Yy]es | y | "")
         sudo pacman -Rnsc --noconfirm "${chosen[@]}" &> /dev/null &
         spinner $! "${YELLOW}[VIBRANIUM]${RESET} Removing ${chosen[*]}" ""
-		echo -e "${YELLOW}[VIBRANIUM]${RESET} Operation completed successfully"
+		echo -e "${GREEN}VIBRANIUM]${RESET} Operation completed successfully"
         read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
         exit 0
         ;;
