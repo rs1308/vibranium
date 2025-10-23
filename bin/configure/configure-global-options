@@ -109,12 +109,12 @@ while true; do
 						break
 						;;
 					"README")
-						msg="\n<span foreground='${P_GREEN}'><b>•</b></span> <span foreground='${P_PURPLE}'><b>"
-						msg+="Whether to use GPU encoders when processing a video</b></span>\n\n"
+						msg="\n<span foreground='${P_ACCENT}'><b>•</b></span> "
+						msg+="<b>Whether to use GPU encoders when processing a video</b>\n\n"
 						msg+="<span foreground='${P_RED}'>Please ensure that you have installed all necessary GPU drivers</span>\n\n"
 						msg+="Keep in mind that, although using a GPU for video processing may be faster and more power efficient, "
-						msg+="the result is usually slightly worse than with CPU.\n\nIf your goal is to significantly reduce file size "
-						msg+="while losing as little detail as possible, a CPU is better suited for the task."
+						msg+="the result is usually slightly worse than with CPU\n\nIf your goal is to significantly reduce file size "
+						msg+="while losing as little detail as possible, a CPU is better suited for the task"
 						notify-send -r 3 -t 20000 "Vibranium" "$msg"
 						continue
 						;;
@@ -187,8 +187,8 @@ while true; do
 						break
 						;;
 					"What"*)
-						msg="\n<span foreground='${P_GREEN}'><b>•</b></span> <span foreground='${P_PURPLE}'><b>"
-						msg+="Whether to automatically copy to clipboard when working with files</b></span>\n\n"
+						msg="\n<span foreground='${P_ACCENT}'><b>•</b></span> "
+						msg+="<b>Whether to automatically copy to clipboard when working with files</b>\n\n"
 						msg+="This could be a <span foreground='${P_YELLOW}'><b>screenshot</b></span>, a recorded or downscaled "
 						msg+="<span foreground='${P_YELLOW}'><b>video</b></span>, or any\nother type of file operation"
 						notify-send -r 3 -t 15000 "What is this?" "$msg"
@@ -236,8 +236,8 @@ while true; do
 						continue
 						;;
 					"What"*)
-						msg="\n<span foreground='${P_GREEN}'><b>•</b></span> <span foreground='${P_PURPLE}'><b>"
-						msg+="Whether to show 'Now Playing' notification after session unlock</b></span>\n\n"
+						msg="\n<span foreground='${P_ACCENT}'><b>•</b></span> <b>"
+						msg+="Whether to show 'Now Playing' notification after session unlock</b>\n\n"
 						msg+="Note that when '<span foreground='${P_YELLOW}'><b>Include album art</b></span>' is "
 						msg+="'<span foreground='${P_GREEN}'><b>true</b></span>' and a web-based player is used, it\n"
 						msg+="takes some time to download an album art from the internet in order to display"
@@ -340,9 +340,9 @@ while true; do
 						break
 					;;
 					"What"*)
-						msg="\n<span foreground='${P_GREEN}'><b>•</b></span> <span foreground='${P_PURPLE}'><b>Whether to show the "
-						msg+="'<span foreground='${P_YELLOW}'>Welcome back, ${USER}!</span>' "
-						msg+="notification when unlocking session</b></span>\n\n"
+						msg="\n<span foreground='${P_ACCENT}'><b>•</b></span> "
+						msg+="<b>Whether to show the '<span foreground='${P_YELLOW}'>Welcome back, ${USER}!</span>' "
+						msg+="notification when unlocking session</b>\n\n"
 						notify-send -r 3 -t 15000 "What is this?" "$msg"
 						continue
 				esac
@@ -375,9 +375,9 @@ while true; do
 									break
 									;;
 								"What"*)
-										msg="\n<span foreground='${P_GREEN}'><b>•</b></span> <span foreground='${P_PURPLE}'><b>Whether to automatically select the last remaining entry</b></span>\n\n"
+										msg="\n<span foreground='${P_ACCENT}'><b>•</b></span> <b>Whether to automatically select the last remaining entry</b>\n\n"
 										msg+="When only one entry remains in the menu after filtering, automatically launch it.\n"
-										msg+="This can significantly speed up application launch and menu navigation, but may seem inconvenient at first.\n\n"
+										msg+="This can significantly speed up application launch and menu navigation, but may seem inconvenient at first\n\n"
 										# msg+="<span foreground='${P_GREEN}'><b>•</b></span> <span foreground='${P_RED}'><b>This does not affect the clipboard menu</b></span>"
 										notify-send -r 3 -t 15000 "What is this?" "$msg"
 										continue
@@ -390,12 +390,13 @@ while true; do
 			;;
 		"Notifications")
 			while true; do
-				if [[ -n $current_height ]]; then
-					unset current_height
-				fi
-
-				current_height="$(sed -n 's/.*progress_bar_height[[:space:]]*=[[:space:]]*\([0-9]\+\).*/\1/p' "$XDG_CONFIG_HOME/dunst/dunstrc")"
-				notification_options=("Progress bar height : ${current_height}px")
+				dunst_cfg="$XDG_CONFIG_HOME/dunst/dunstrc"
+				current_height="$(sed -n 's/.*progress_bar_height[[:space:]]*=[[:space:]]*\([0-9]\+\).*/\1/p' "$dunst_cfg")"
+				current_timeout="$(sed -n 's/.*timeout[[:space:]]*=[[:space:]]*\([0-9]\+\).*/\1/p' "$dunst_cfg")"
+				notification_options=(
+					"Notification timeout : ${current_timeout}s"
+					"Progress bar height  : ${current_height}px"
+				)
 				notification_chosen="$(printf "%s\n" "${notification_options[@]}" | rofi_cmd "Notifications" "")"
 				[[ -z "$notification_chosen" ]] && break
 
@@ -404,26 +405,35 @@ while true; do
 						while true; do
 							prompt="Progress bar height (in px)"
 							input="$(printf "%s" "$prompt" | rofi_cmd "Height" "int (10px-25px)")"
-							[[ -z "$input" ]] && break
-							[[ "$prompt" == "$input" ]] && continue
-							[[ ! "$input" =~ ^[0-9]+$ ]] && continue
+							[[ -z "$input" ]] && break; [[ "$prompt" == "$input" ]] && continue
+
+							if [[ ! "$input" =~ ^[0-9]+$ ]]; then 
+								notify-send -r 2 -t 2000 -u critical "Vibranium" \
+									"Only integers allowed"; continue
+							fi
 		
 							if (( input < 10 || input > 25 )); then
-								notify-send -r 2 -t 1500 -u critical "Vibranium" "A value between 10px and 25px"
-								continue
+								notify-send -r 2 -t 1500 -u critical "Vibranium"\
+									"A value between 10px and 25px"; continue
 							fi
 							
-							if [ ! -f "$XDG_CONFIG_HOME/dunst/dunstrc" ]; then
-								mkdir -p "$XDG_CONFIG_HOME/dunst"
-								printf "[global]\nprogress_bar_height = %s" "$input" >\
-									"$XDG_CONFIG_HOME/dunst/dunstrc"
-							elif ! grep progress_bar_height &> /dev/null; then
-								printf "\nprogress_bar_height = %s" "$input" >>\
-									"$XDG_CONFIG_HOME/dunst/dunstrc"
-							else
-								sed -i -E "s/(progress_bar_height[[:space:]]*=[[:space:]]*)[0-9]+/\1${input}/" "$XDG_CONFIG_HOME/dunst/dunstrc"
+							sed -iE "s/\(progress_bar_height[[:space:]]*=[[:space:]]*\)[0-9]\+/\1${input}/" \
+								"$XDG_CONFIG_HOME/dunst/dunstrc"; vibranium-cmd-refresh-dunst
+							break
+						done
+						;;
+					"Notification timeout"*)
+						while true; do
+							input="$(printf "Timeout (in seconds)" | rofi_cmd "Timeout" "ESC to go back")"
+							[[ -z "$input" ]] && break
+
+							if [[ ! "$input" =~ ^[0-9]+$ ]]; then 
+								notify-send -r 2 -t 2000 -u critical "Vibranium" \
+									"Only integers allowed"; continue
 							fi
-							vibranium-cmd-refresh-dunst
+
+							sed -iE "s/\(timeout[[:space:]]*=[[:space:]]*\)[0-9]\+/\1${input}/" \
+								"$XDG_CONFIG_HOME/dunst/dunstrc"; vibranium-cmd-refresh-dunst
 							break
 						done
 				esac
@@ -483,7 +493,7 @@ while true; do
 						break
 					;;
 					"What"*)
-						msg="\n<span foreground='${P_GREEN}'><b>•</b></span> <span foreground='${P_PURPLE}'><b>Whether to respect the active power profile when processing compute tasks</b></span>\n\n"
+						msg="\n<span foreground='${P_ACCENT}'><b>•</b></span> <b>Whether to respect the active power profile when processing compute tasks</b>\n\n"
 						msg+="When enabled, power and GPU hungry processes like cache generation, blur,\ncompute tasks, etc will be suspended on "
 						msg+="'<span foreground='${P_GREEN}'>power-saver</span>' power profile"
 						# msg+="When enabled, background processes like lockscreen background pre-caching are suspended until the power profile switches to " 
@@ -554,9 +564,9 @@ while true; do
 						break
 					;;
 					"What"*)
-						msg="\n<span foreground='${P_GREEN}'><b>•</b></span> <span foreground='${P_PURPLE}'><b>Whether to confirm action when triggering the kill window shortcut</b></span>\n"
-						msg+="<span foreground='${P_GREEN}'><b>•</b></span> <span foreground='${P_YELLOW}'><b>Setting it to true helps prevent accidental force window kills</b></span>\n\n"
-						msg+="      When the <span foreground='${P_RED}'><b>force window kill shortcut is triggered</b></span>, this\n      option asks you to press it again to confirm the action"
+						msg="\n<span foreground='${P_ACCENT}'><b>•</b></span> <b>Whether to confirm action when triggering the kill window shortcut</b>\n"
+						msg+="<span foreground='${P_ACCENT}'><b>•</b></span> <b>Setting it to true helps prevent accidental force window kills</b>\n\n"
+						msg+="      When the <span foreground='${P_RED}'><b>force window kill</b></span> shortcut is triggered, this\n      option asks you to press it again to confirm the action"
 						notify-send -r 3 -t 15000 "What is this?" "$msg"
 						continue
 				esac
