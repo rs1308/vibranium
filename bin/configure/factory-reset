@@ -89,7 +89,7 @@ while true; do
 		"Reset appearance settings"
 		"Reset color picker settings"
         "Reset screen recording settings"
-		"<b><i><u>FACTORY RESET</u></i></b>"
+		"<b><i>FACTORY RESET</i></b>"
     )
     CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Factory reset" "ESC to go back")"
     [ -z "$CHOSEN" ] && break

@@ -9,7 +9,7 @@ if command -v pass >/dev/null; then
 fi
 
 if systemd-inhibit | grep "Prevent system suspend is active" > /dev/null; then
-	ACTIONS+=("<b><i><u>Disable sleep inhibition</u></i></b>")
+	ACTIONS+=("<b><i>Disable sleep inhibition</i></b>")
 else
 	ACTIONS+=("Enable sleep inhibition")
 fi
@@ -18,9 +18,9 @@ ACTIONS+=("Reload Vibranium configuration")
 
 read -r PID NAME <<< "$(hyprctl -j activewindow | jq -r '[.pid,.initialTitle]|@tsv')"
 if [[ -n "$PID" && "$(ps -o state= -p "$PID" | tr -d '[:space:]')" != T ]]; then
-	ACTIONS+=("Freeze <span foreground='${P_YELLOW}'><b><i><u>${NAME}</u></i></b></span>")
+	ACTIONS+=("Freeze <span foreground='${P_YELLOW}'><b><i>${NAME}</i></b></span>")
 elif [[ -n "$NAME" ]]; then
-	ACTIONS+=("Unfreeze <span foreground='${P_YELLOW}'><b><i><u>${NAME}</u></i></b></span>")
+	ACTIONS+=("Unfreeze <span foreground='${P_YELLOW}'><b><i>${NAME}</i></b></span>")
 fi
 
 while true; do

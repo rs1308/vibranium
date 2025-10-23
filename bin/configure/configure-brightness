@@ -13,7 +13,7 @@ while true; do
 	step="$VIBRANIUM_BRIGHTNESS_STEP"
 
 	if [ "$VIBRANIUM_GLOBAL_USE_OSD" = false ]; then
-		use_osd="() $use_osd"
+		use_osd="$use_osd <span foreground='${P_RED}'>()</span>"
 	fi
 
 	OPTIONS=(
@@ -33,7 +33,7 @@ while true; do
 
 	case "$CHOSEN" in
 		"Include DDC"*) toggle_bool "VIBRANIUM_BRIGHTNESS_USE_DDC_CONTROL" ;;
-		"OSD"*)
+		"OSD"*"()"*)
 			# The VIBRANIUM_GLOBAL_USE_OSD option takes precedence over all other options that use the OSD.
 			# Therefore, if VIBRANIUM_GLOBAL_USE_OSD is set to false at the global level,
 			# no other option that uses the OSD will be active, even if its value is true.

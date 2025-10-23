@@ -49,11 +49,22 @@ while true; do
 
     OPTIONS+=(
         "Save to disk   : $VIBRANIUM_SCREENSHOT_SAVE_TO_DISK"
-        "Flash screen   : $VIBRANIUM_SCREENSHOT_FLASH_SCREEN"
-        "Flash border   : $VIBRANIUM_SCREENSHOT_FLASH_BORDER"
         "Notification   : $VIBRANIUM_SCREENSHOT_SHOW_NOTIFICATION"
-        "Include cursor : $VIBRANIUM_SCREENSHOT_INCLUDE_CURSOR"
     )
+
+	if [ "$(hyprctl -j getoption animations:enabled | jq '.int')" = "0" ]; then
+		OPTIONS+=(
+			"Flash screen   : $VIBRANIUM_SCREENSHOT_FLASH_SCREEN <span foreground='${P_RED}'>()</span>"
+			"Flash border   : $VIBRANIUM_SCREENSHOT_FLASH_BORDER <span foreground='${P_RED}'>()</span>"
+		)
+	else
+		OPTIONS+=(
+			"Flash screen   : $VIBRANIUM_SCREENSHOT_FLASH_SCREEN"
+			"Flash border   : $VIBRANIUM_SCREENSHOT_FLASH_BORDER"
+		)
+	fi
+
+	OPTIONS+=("Include cursor : $VIBRANIUM_SCREENSHOT_INCLUDE_CURSOR")
 
     CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Screenshots" "ESC to go back" -selected-row "$INDEX")"
     [ -z "$CHOSEN" ] && break
@@ -66,6 +77,12 @@ while true; do
     done
 
     case "$CHOSEN" in
+		*"()"*)
+			msg="This option is <span foreground='${P_RED}'><b>locked</b></span> because "
+			msg+="animations <span foreground='${P_RED}'><b>disabled</b></span>"
+			notify-send -r 1 "Vibranium" "$msg"
+			continue
+			;;
         "File format"*)
 			# Create an option in user settings if it does not already exist.
 			# Only then perfom action

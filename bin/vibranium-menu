@@ -2,34 +2,38 @@
 
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 
-ACTIONS=("Package Management" "Vibranium Settings" "Utilities" "Help")
-
-if pidof gpu-screen-recorder &> /dev/null; then
-	ACTIONS+=("<b><i><u>Stop screen recording</u></i></b>")
-fi
-
-if systemd-inhibit | grep "Prevent system suspend is active" > /dev/null; then
-	ACTIONS+=("<b><i><u>Disable sleep inhibition</u></i></b>")
-fi
+OPTIONS=("Package Management" "Vibranium Settings" "Utilities" "Help")
+INDEX=0
 
 while true; do
-    CHOSEN="$(printf "%s\n" "${ACTIONS[@]}" | rofi_cmd "Vibranium" "search")"
+	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Vibranium" "ESC to exit" -selected-row "$INDEX")"
     [ -z "$CHOSEN" ] && break
+
+    for i in "${!OPTIONS[@]}"; do
+        if [ "${OPTIONS[$i]}" == "$CHOSEN" ]; then
+            INDEX="$i"
+            break
+        fi
+    done
 
     case "$CHOSEN" in
         "Vibranium Settings")
+			index=0
             while true; do
                 vibranium_opts=("Configure Waybar" "Configure Vibranium")
-                vibranium_chosen="$(printf "%s\n" "${vibranium_opts[@]}" | rofi_cmd "${CHOSEN[0]}" "ESC to go back")"
+                vibranium_chosen="$(printf "%s\n" "${vibranium_opts[@]}" | rofi_cmd "${CHOSEN[0]}" "ESC to go back" -selected-row "$index")"
                 [ -z "$vibranium_chosen" ] && break
 
+				for i in "${!vibranium_opts[@]}"; do
+					if [ "${vibranium_opts[$i]}" == "$vibranium_chosen" ]; then
+						index="$i"
+						break
+					fi
+				done
+
                 case "$vibranium_chosen" in
-                    "Configure Waybar")
-						"$VIBRANIUM_PATH/configure/waybar-main-menu"
-						;;
-                    "Configure Vibranium")
-						"$VIBRANIUM_PATH/configure/vibranium-main-menu"
-                        ;;
+                    "Configure Waybar")    "$VIBRANIUM_PATH/configure/waybar-main-menu"    ;;
+                    "Configure Vibranium") "$VIBRANIUM_PATH/configure/vibranium-main-menu" ;;
                 esac
             done
             ;;
@@ -41,14 +45,6 @@ while true; do
             ;;
         "Utilities")
             vibranium-menu-utilities
-            ;;
-        *"Stop screen recording"*)
-            vibranium-core-recording
-			exit 0
-            ;;
-        *"Disable sleep inhibition"*)
-            vibranium-cmd-inhibit-toggle
-			exit 0
             ;;
         *)
             continue

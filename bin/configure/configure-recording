@@ -87,14 +87,33 @@ while true; do
 				advanced_options=(
 					"Container type : $VIBRANIUM_RECORDING_CONTAINER_TYPE"
 					"Recording mode : $VIBRANIUM_RECORDING_FRAMERATE_MODE"
+				)
+
+				if [ "$(hyprctl -j getoption animations:enabled | jq '.int')" = "0" ]; then
+					advanced_options+=(
+						"Flash screen   : $VIBRANIUM_RECORDING_FLASH_SCREEN <span foreground='${P_RED}'>()</span>"
+					)
+				else
+					advanced_options+=(
+						"Flash screen   : $VIBRANIUM_RECORDING_FLASH_SCREEN"
+					)
+				fi
+
+				advanced_options+=(
 					"Video codec    : $VIBRANIUM_RECORDING_VIDEO_CODEC"
-					"Flash screen   : $VIBRANIUM_RECORDING_FLASH_SCREEN"
 					"In-Game FPS    : $VIBRANIUM_RECORDING_FPS_IN_GAME"
 				)
+
 				advanced_chosen="$(printf "%s\n" "${advanced_options[@]}" | rofi_cmd "Advanced" "ESC to go back")"
 				[ -z "$advanced_chosen" ] && break
 
 				case "$advanced_chosen" in
+					*"()"*)
+						msg="This option is <span foreground='${P_RED}'><b>locked</b></span> because "
+						msg+="animations <span foreground='${P_RED}'><b>disabled</b></span>"
+						notify-send -r 1 "Vibranium" "$msg"
+						continue
+						;;
 					"Container type"*)
 						container_type_options=("mp4" "mkv" "webm")
 						container_type_chosen="$(printf "%s\n" "${container_type_options[@]}" | rofi_cmd "Container type" "ESC to go back")"

@@ -358,7 +358,7 @@ vibranium-core-set-wallpaper "$(get_wallpaper "$CHOSEN")"
 log "Updating Waybar"
 systemctl --user --force restart waybar
 
-if [[ "$(vibranium-cmd-get-option VIBRANIUM_GLOBAL_USE_OSD)" == true ]]; then
+if [[ $VIBRANIUM_GLOBAL_USE_OSD == true ]]; then
     systemctl --user --force restart swayosd
 fi
 

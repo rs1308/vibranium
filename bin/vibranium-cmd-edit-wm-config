@@ -62,7 +62,7 @@ def find_all_section_bounds(lines: List[str], path: List[str], start_line: int =
             continue
         
         # Check for section opening
-        section_match = re.match(r'^(\w+)\s*\{', stripped)
+        section_match = re.match(r'^([\w-]+)\s*\{', stripped)
         if section_match:
             section_name = section_match.group(1)
             current_path.append(section_name)
@@ -125,7 +125,7 @@ def find_option_in_section(lines: List[str], section_start: int, section_end: in
             continue
         
         # Check if this is our option
-        option_match = re.match(r'^(\w+)\s*=', stripped)
+        option_match = re.match(r'^([\w-]+)\s*=', stripped)
         if option_match and option_match.group(1) == option_name:
             return i
     
@@ -168,7 +168,7 @@ def read_value(lines: List[str], path: List[str], file_path: str, occurrence: in
             stripped = line.lstrip()
             if stripped.startswith('#') or not stripped:
                 continue
-            option_match = re.match(r'^(\w+)\s*=\s*(.+)', stripped)
+            option_match = re.match(r'^([\w-]+)\s*=\s*(.+)', stripped)
             if option_match and option_match.group(1) == option_name:
                 return option_match.group(2).strip()
         sys.exit(1)
@@ -216,7 +216,7 @@ def write_value(lines: List[str], path: List[str], value: str, file_path: str, o
             stripped = line.lstrip()
             if stripped.startswith('#') or not stripped:
                 continue
-            option_match = re.match(r'^(\w+)\s*=', stripped)
+            option_match = re.match(r'^([\w-]+)\s*=', stripped)
             if option_match and option_match.group(1) == option_name:
                 # Update existing option
                 indent = len(line) - len(stripped)

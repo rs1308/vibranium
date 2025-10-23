@@ -6,6 +6,52 @@ export PATH="$PATH:$VIBRANIUM_PATH/configure"
 OPTIONS=("Idle" "Audio" "General" "Set font" "Hyprland" "Set theme" "Recording" "Brightness" "Screenshots" "Night Light" "Color Picker" "Factory Reset")
 INDEX=0
 
+_hyprland() {
+	local hypr_index=0
+
+	while true; do
+		hyprland_opts=("Input" "Appearance" "Edit configs")
+		hyprland_chosen="$(printf "%s\n" "${hyprland_opts[@]}" | rofi_cmd "Hyprland" "ESC to go back" -selected-row "$hypr_index")"
+		[[ -z $hyprland_chosen ]] && break
+
+		for i in "${!hyprland_opts[@]}"; do
+			if [ "${hyprland_opts[$i]}" == "$hyprland_chosen" ]; then
+				hypr_index="$i"
+				break
+			fi
+		done
+
+		case "$hyprland_chosen" in
+			"Appearance")
+				configure-wm-appearance
+				;;
+			"Input")
+				configure-wm-input
+				;;
+			"Edit configs")
+				while true; do
+					edit_configs_opts=(
+						"Input devices"
+						"Window rules"
+						"Keybindings"
+						"Monitors"
+					)
+					edit_configs_chosen="$(printf "%s\n" "${edit_configs_opts[@]}" | rofi_cmd "Edit" "ESC to go back")"
+					[[ -z $edit_configs_chosen ]] && break
+
+					case "$edit_configs_chosen" in
+						"Input devices") vibranium-cmd-launch-terminal "$EDITOR" "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf" ;;
+						"Window rules")  vibranium-cmd-launch-terminal "$EDITOR" "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/window-rules.conf" ;;
+						"Keybindings")   vibranium-cmd-launch-terminal "$EDITOR" "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/binds.conf" ;;
+						"Monitors")      vibranium-cmd-launch-terminal "$EDITOR" "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/monitors.conf" ;;
+					esac
+					vibranium-cmd-kill-rofi
+				done
+			;;
+		esac
+	done
+}
+
 while true; do
 	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Vibranium" "ESC to go back" -selected-row "$INDEX"  -theme-str 'listview{lines: 15;}')"
 	[ -z "$CHOSEN" ] && break
@@ -43,15 +89,16 @@ while true; do
 			configure-color-picker
 			;;
 		"Set theme")
-			vibranium-theme-set
-			vibranium-cmd-kill-rofi
-			exit 0
+			if vibranium-theme-set; then
+				vibranium-cmd-kill-rofi
+				exit 0
+			fi
 			;;
 		"General")
 			configure-global-options
 			;;
 		"Hyprland")
-			configure-window-manager
+			_hyprland
 			;;
 		"Factory Reset")
 			factory-reset

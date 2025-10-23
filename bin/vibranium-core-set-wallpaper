@@ -87,4 +87,4 @@ STATE_FILE="$VIBRANIUM_STATE/wallpaper/$(vibranium-theme-get)"; mkdir -p "$VIBRA
 printf "%s" "$WALLPAPER_PATH" > "$STATE_FILE"
 
 # Update lockscreen background
-vibranium-utils-update-lockscreen "$WALLPAPER_PATH"
+vibranium-utils-update-lockscreen "$WALLPAPER_PATH" &

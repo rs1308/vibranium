@@ -30,7 +30,7 @@ _operation_aborted() {
 }
 
 _installation_complete() {
-    printf "%s[VIBRANIUM]%s Installation complete" "$YELLOW" "$RESET"
+    printf "%s[VIBRANIUM]%s Installation complete" "$GREEN" "$RESET"
     read -n1 -r -p $'\n\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
     printf '\e[?25h' # show cursor
     exit 0
@@ -119,7 +119,7 @@ while true; do
         fi
 
         printf '\e[?25l' # Hide cursor
-		printf "%s[VIBRANIUM]%s Validating selected packages\n" "$YELLOW" "$RESET"
+		printf "%s[VIBRANIUM]%s Validating packages\n" "$YELLOW" "$RESET"
 		for package in "${filtered[@]}"; do
 		    if ! yay -Si "$package" &>/dev/null; then
 		        printf "%s[VIBRANIUM]%s %s does not exists!\n" "$RED" "$RESET" "$package"
@@ -216,7 +216,7 @@ while true; do
         done
 
         if [[ ${#provides_systemd_service[@]} -eq 0 ]]; then
-			printf "\n"; _installation_complete
+			_installation_complete
         fi
 
         has_socket=false

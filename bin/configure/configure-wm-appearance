@@ -1,15 +1,11 @@
 #!/usr/bin/env bash
 
-# This needs to be refactored. Such a mess
-# TODO: categorize (e.g. input / apperance)
-
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 source "$VIBRANIUM_PATH/configure/configure-lib"
 
 INDEX=0
-
-HYPR_CONFIG="$XDG_CONFIG_HOME/hypr/hyprland.conf.d/look-and-feel.conf"
 SMART_GAPS_CONFIG="$XDG_CONFIG_HOME/hypr/hyprland.conf.d/smart-gaps.conf"
+HYPR_CONFIG="$XDG_CONFIG_HOME/hypr/hyprland.conf.d/look-and-feel.conf"
 
 edit_int() {
 	local name="$1" # prompt
@@ -36,82 +32,57 @@ edit_int() {
 while true; do
 	mapfile -t lines < <(
 		hyprctl --batch -j \
-			"getoption decoration:rounding; \
-			 getoption animations:enabled; \
-			 getoption general:gaps_in; \
-			 getoption general:gaps_out; \
-			 getoption general:border_size; \
-			 getoption decoration:blur:enabled; \
-			 getoption decoration:dim_inactive; \
-			 getoption decoration:shadow:enabled; \
-			 getoption input:sensitivity; \
-			 getoption input:accel_profile; \
-		     getoption input:touchpad:scroll_factor;
-		     getoption input:touchpad:tap-to-click;
-			 getoption input:touchpad:natural_scroll" \
+			"getoption decoration:rounding;         \
+             getoption animations:enabled;          \
+			 getoption general:gaps_in;             \
+			 getoption general:gaps_out;            \
+			 getoption general:border_size;         \
+			 getoption decoration:blur:enabled;     \
+			 getoption decoration:dim_inactive;     \
+			 getoption decoration:shadow:enabled;   \
+			 getoption decoration:active_opacity;   \
+			 getoption decoration:inactive_opacity" \
 		| jq -r '
 		  .option as $o |
 		  if   ($o | test("rounding|border_size")) then
 			.int
+          elif ($o | test(".*_opacity")) then
+			  (.float * 10 | round / 10)
 		  elif ($o | test("gaps_in|gaps_out")) then
 			(.custom | split(" ")[0])
-		  elif ($o | test("scroll_factor")) then
-			(.float * 10 | round / 10)
-		  elif ($o | test("sensitivity")) then
-			(.float * 100 | round / 100)
-		  elif ($o | test("accel_profile")) then
-			.str
 		  else
 			if .int == 1 then "true" else "false" end
 		  end
 		'
 	)
 
-	smart_gaps_enabled="$([ -f "$SMART_GAPS_CONFIG" ] && echo "true" || echo "false")"
-	current_rounding="${lines[0]}"
-	current_animations="${lines[1]}"
-	current_gaps_in="${lines[2]}"
-	current_gaps_out="${lines[3]}"
-	current_border="${lines[4]}"
-	current_blur="${lines[5]}"
-	current_dim="${lines[6]}"
-	current_shadow="${lines[7]}"
-	current_sensitivity="${lines[8]}"
-	current_accel_profile="$([[ "${lines[9]}" == "adaptive" ]] && echo true || echo false)"
-	current_scroll_factor="${lines[10]}"
-	current_tap_to_click="${lines[11]}"
-	current_natural_scroll="${lines[12]}"
+		smart_gaps_enabled=$([ -f "$SMART_GAPS_CONFIG" ] && echo true || echo false)
+		current_roundness="${lines[0]}"
+		current_animations="${lines[1]}"
+		current_gaps_in="${lines[2]}"
+		current_gaps_out="${lines[3]}"
+		current_border_size="${lines[4]}"
+		current_blur="${lines[5]}"
+		current_dim="${lines[6]}"
+		current_shadow="${lines[7]}"
+		current_active_opacity="${lines[8]}"
+		current_inactive_opacity="${lines[9]}"
 
 	OPTIONS=(
-		"Dim inactive window : ${current_dim}"
-		"Drop window shadow  : ${current_shadow}"
-		"Animations enabled  : ${current_animations}"
-		"Mouse acceleration  : ${current_accel_profile}"
-		"Mouse sensitivity   : ${current_sensitivity}"
-		"Natural scrolling   : ${current_natural_scroll}"
-		"Border roundness    : ${current_rounding}px"
-		"Scrolling speed     : ${current_scroll_factor}"
-		"Tap to click        : ${current_tap_to_click}"
+		"Active window opacity   : ${current_active_opacity}"
+		"Inactive window opacity : ${current_inactive_opacity}"
+		"Dim inactive window     : ${current_dim}"
+		"Drop window shadow      : ${current_shadow}"
+		"Animations enabled      : ${current_animations}"
+		"Border roundness        : ${current_roundness}px"
+		"Blur enabled            : ${current_blur}"
+		"Smart gaps              : ${smart_gaps_enabled}"
 	)
 
-	if [ "$VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE" = "true" ] && [ "$(<$VIBRANIUM_STATE/power-profile)" = "power-saver" ]; then
-		OPTIONS+=("Blur enabled        : ${current_blur} ()")
-	else
-		OPTIONS+=("Blur enabled        : ${current_blur}")
-	fi
+	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Appearance" "ESC to go back" -selected-row "$INDEX")"
+	[[ -z $CHOSEN ]] && break
 
-	OPTIONS+=(
-		"Border size         : ${current_border}"
-		"Outer gaps          : ${current_gaps_out}"
-		"Inner gaps          : ${current_gaps_in}"
-		"Smart gaps          : ${smart_gaps_enabled}"
-		"Advanced"
-	)
-
-	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Hyprland" "ESC to go back" -selected-row "$INDEX")"
-	[ -z "$CHOSEN" ] && break
-
-    for i in "${!OPTIONS[@]}"; do
+	for i in "${!OPTIONS[@]}"; do
         if [ "${OPTIONS[$i]}" = "$CHOSEN" ]; then
             INDEX="$i"
             break
@@ -119,114 +90,50 @@ while true; do
     done
 
 	case "$CHOSEN" in
-		"Natural scrolling"*)
-			case "$current_natural_scroll" in
-				true)
-					vibranium-cmd-edit-wm-config input:touchpad:natural_scroll:false \
-						"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
-					;;
-				false)
-					vibranium-cmd-edit-wm-config input:touchpad:natural_scroll:true \
-						"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
-					;;
-			esac
-			;;
-		"Tap to click"*)
-			case "$current_tap_to_click" in
-				true)
-					vibranium-cmd-edit-wm-config input:touchpad:tap-to-click:false \
-						"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
-					;;
-				false)
-					vibranium-cmd-edit-wm-config input:touchpad:tap-to-click:true \
-						"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
-					;;
-			esac
-			;;
-		"Scrolling speed"*)
+		"Inactive window opacity"*)
 			while true; do
-				prompt="Scrolling speed (int / float)"
-				input="$(printf "%s" "$prompt" | rofi_cmd "Scrolling speed" "0.0 - 1.0")"
-				[[ -z $input ]] && break
-				if [[ "$prompt" == "$input" ]]; then
+				prompt="Inactive window opacity (int / float)"
+				input="$(printf "%s" "$prompt" | rofi_cmd "Inactive opacity" "0.5 - 1")"
+				[[ -z $input ]] && break; [[ "$prompt" == "$input" ]] && continue
+
+				if [[ ! "$input" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
+					notify-send -r 1 -t 2000 "Vibranium" "Only integers or floats allowed"
 					continue
 				fi
 
-				if [[ ! $input =~ ^(0(\.[0-9]+)?|1(\.0+)?)$ ]]; then
-					notify-send -r 1 -t 2000 "Vibranium" "A number between 0 and 1"
+				if [[ ! "$input" =~ ^0(\.[5-9]+)?$|^1(\.0+)?$ ]]; then
+					notify-send -r 1 -t 2000 "Vibranium" "Value must be between 0.5 and 1"
 					continue
 				fi
 
-				vibranium-cmd-edit-wm-config input:touchpad:scroll_factor:$input \
+				vibranium-cmd-edit-wm-config "decoration:inactive_opacity:$input" \
 					"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
 				break
 			done
 			;;
-		"Mouse acceleration"*)
-			case "${current_accel_profile}" in
-				false)
-					vibranium-cmd-edit-wm-config input:accel_profile:adaptive \
-						"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
-					;;
-				true)
-					vibranium-cmd-edit-wm-config input:accel_profile:flat \
-						"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
-					;;
-			esac
-			;;
-		"Mouse sensitivity"*)
+		"Active window opacity"*)
 			while true; do
-				prompt="Sensitivity (int / float)" 
-				input="$(printf "%s\n" "$prompt" | rofi_cmd "Sensitivity" "ESC to go back")"
-				[[ -z $input ]] && break
+				prompt="Active window opacity (int / float)"
+				input="$(printf "%s" "$prompt" | rofi_cmd "Active opacity" "0.5 - 1")"
+				[[ -z $input ]] && break; [[ "$prompt" == "$input" ]] && continue
 
-				if [[ "$input" == "$prompt" ]]; then
+				if [[ ! "$input" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
+					notify-send -r 1 -t 2000 "Vibranium" "Only integers or floats allowed"
 					continue
 				fi
 
-				if [[ "$input" =~ ^-?(0(\.[0-9]+)?|1(\.0+)?)$ ]]; then
-					vibranium-cmd-edit-wm-config "input:sensitivity:$input" \
-						"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
-					break
-				else
-					notify-send -r 1 -t 2000 "Vibranium" "A number between -1 and 1"
+				if [[ ! "$input" =~ ^0(\.[5-9]+)?$|^1(\.0+)?$ ]]; then
+					notify-send -r 1 -t 2000 "Vibranium" "Value must be between 0.5 and 1"
+					continue
 				fi
+
+				vibranium-cmd-edit-wm-config "decoration:active_opacity:$input" \
+					"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
+				break
 			done
 			;;
 		"Smart gaps"*)
 			vibranium-cmd-toggle-smart-gaps
-			;;
-		"Advanced")
-			while true; do
-				advanced_options=(
-					"Configure input devices"
-					"Configure window rules"
-					"Configure monitors"
-					"Configure binds"
-				)
-				advanced_chosen="$(printf "%s\n" "${advanced_options[@]}" | rofi_cmd "Advanced options" "ESC to go back")"
-				[[ -z "$advanced_chosen" ]] && break
-
-				case "$advanced_chosen" in
-					"Configure input devices")
-						vibranium-cmd-launch-terminal "$EDITOR" "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
-						;;
-					"Configure window rules")
-						vibranium-cmd-launch-terminal "$EDITOR" "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/window-rules.conf"
-						;;
-					"Configure monitors")
-						vibranium-cmd-launch-terminal "$EDITOR" "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/monitors.conf"
-						;;
-					"Configure binds")
-						vibranium-cmd-launch-terminal "$EDITOR" "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/binds.conf"
-						;;
-					*)
-						continue
-				esac
-
-				vibranium-cmd-kill-rofi
-				exit 0
-			done
 			;;
 		"Inner gaps"*)
 			edit_int "Inner gaps" "general:gaps_in"
@@ -237,7 +144,7 @@ while true; do
 		"Border size"*)
 			edit_int "Border size" "general:border_size"
 			;;
-		"Drop"*)
+		"Drop window"*)
 			if [[ $current_shadow == true ]]; then
 				vibranium-cmd-edit-wm-config decoration:shadow:enabled:false "$HYPR_CONFIG"
 			else
@@ -245,7 +152,7 @@ while true; do
 			fi
 			hyprctl -q reload config-only
 			;;
-		"Dim"*)
+		"Dim inactive"*)
 			if [[ $current_dim == true ]]; then
 				vibranium-cmd-edit-wm-config decoration:dim_inactive:false "$HYPR_CONFIG"
 			else
@@ -289,24 +196,44 @@ while true; do
 			notify-send -r 1 -t 5000 "This option is locked" "$msg"
 			continue
 			;;
-		"Blur"*)
+		"Blur enabled"*)
 			while true; do
-				blur_strength="$(hyprctl -j getoption decoration:blur:passes | jq -r '.int')"
-				blur_radius="$(hyprctl -j getoption decoration:blur:size | jq -r '.int')"
-				blur_enabled="$([[ "$(hyprctl -j getoption decoration:blur:enabled | jq -r '.int')" == 1 ]] && echo true || echo false)"
-				blur_contrast="$(hyprctl -j getoption decoration:blur:contrast | jq -r '.float')"
-				blur_brightness="$(hyprctl -j getoption decoration:blur:brightness | jq -r '.float')"
-				blur_saturation="$(hyprctl -j getoption decoration:blur:vibrancy | jq -r '.float')"
+				mapfile -t blur_opts < <(
+					hyprctl --batch -j \
+						"getoption decoration:blur:passes; \
+						 getoption decoration:blur:size; \
+						 getoption decoration:blur:enabled; \
+						 getoption decoration:blur:contrast; \
+						 getoption decoration:blur:brightness; \
+						 getoption decoration:blur:vibrancy" \
+					| jq -r '
+					  .option as $o |
+					  if ($o | test("passes|size")) then
+						.int
+					  elif ($o | test("contrast|brightness|vibrancy")) then
+						.float
+					  else
+						if .int == 1 then "true" else "false" end
+					  end
+					'
+				)
 
-				blur_options=("Enabled    : $blur_enabled")
+				blur_strength="${blur_opts[0]}"
+				blur_radius="${blur_opts[1]}"
+				blur_enabled="${blur_opts[2]}"
+				blur_contrast="${blur_opts[3]}"
+				blur_brightness="${blur_opts[4]}"
+				blur_saturation="${blur_opts[5]}"
+
+				blur_options=("<b>Enabled    : $blur_enabled</b>")
 
 				if [[ $blur_enabled == false ]]; then
 					blur_options+=(
-						"Radius     : $blur_radius ()"
-						"Strength   : $blur_strength ()"
-						"Contrast   : $blur_contrast ()"
-						"Brightness : $blur_brightness ()"
-						"Saturation : $blur_saturation ()"
+						"<i>Radius</i>     : $blur_radius <span foreground='${P_RED}'>()</span>"
+						"<i>Strength</i>   : $blur_strength <span foreground='${P_RED}'>()</span>"
+						"<i>Contrast</i>   : $blur_contrast <span foreground='${P_RED}'>()</span>"
+						"<i>Brightness</i> : $blur_brightness <span foreground='${P_RED}'>()</span>"
+						"<i>Saturation</i> : $blur_saturation <span foreground='${P_RED}'>()</span>"
 					)
 				else
 					blur_options+=(
@@ -322,11 +249,18 @@ while true; do
 				[[ -z $blur_chosen ]] && break
 
 				case "$blur_chosen" in
-					*"()")
-						msg="<span foreground='${P_GREEN}'><b>•</b></span> <span foreground='${P_RED}'><b>"
-						msg+="This option is locked because blur is disabled globally</b></span>"
-						notify-send -r 1 "Vibranium" "$msg"
+					*"()"*)
+						notify-send -r 1 "Vibranium" \
+							"<b>This option is <span foreground='${P_RED}'>locked</span> because blur is disabled</b>"
 						continue
+						;;
+					*"Enabled"*)
+						if [[ $current_blur == true ]]; then
+							rm "$VIBRANIUM_STATE/blur.restore"
+						else
+							touch "$VIBRANIUM_STATE/blur.restore"
+						fi
+						vibranium-cmd-toggle-blur
 						;;
 					"Saturation"*)
 						while true; do
@@ -375,14 +309,6 @@ while true; do
 								continue
 							fi
 						done
-					;;
-					"Enabled"*)
-						if [[ $current_blur == true ]]; then
-							rm "$VIBRANIUM_STATE/blur.restore"
-						else
-							touch "$VIBRANIUM_STATE/blur.restore"
-						fi
-						vibranium-cmd-toggle-blur
 						;;
 					"Radius"*)
 						while true; do
@@ -423,3 +349,4 @@ while true; do
 			done
 	esac
 done
+

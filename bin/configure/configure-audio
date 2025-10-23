@@ -17,27 +17,27 @@ while true; do
 	OPTIONS=()
 
 	if [[ "$VIBRANIUM_VOLUME_USE_VISUAL_FEEDBACK" == true ]]; then
-		OPTIONS+=("Visual feedback  : <span foreground='${P_GREEN}'>$VIBRANIUM_VOLUME_USE_VISUAL_FEEDBACK</span>")
+		OPTIONS+=("Visual feedback  : $VIBRANIUM_VOLUME_USE_VISUAL_FEEDBACK")
 	else
-		OPTIONS+=("Visual feedback  : <span foreground='${P_RED}'>$VIBRANIUM_VOLUME_USE_VISUAL_FEEDBACK</span>")
+		OPTIONS+=("Visual feedback  : $VIBRANIUM_VOLUME_USE_VISUAL_FEEDBACK")
 	fi
 
 	if [[ "$VIBRANIUM_VOLUME_USE_AUDIO_FEEDBACK" == true ]]; then
-		OPTIONS+=("Audio  feedback  : <span foreground='${P_GREEN}'>$VIBRANIUM_VOLUME_USE_AUDIO_FEEDBACK</span>")
+		OPTIONS+=("Audio  feedback  : $VIBRANIUM_VOLUME_USE_AUDIO_FEEDBACK")
 	else
-		OPTIONS+=("Audio  feedback  : <span foreground='${P_RED}'>$VIBRANIUM_VOLUME_USE_AUDIO_FEEDBACK</span>")
+		OPTIONS+=("Audio  feedback  : $VIBRANIUM_VOLUME_USE_AUDIO_FEEDBACK")
 	fi
 
 	if [[ "$VIBRANIUM_GLOBAL_USE_OSD" == true ]]; then
-		OPTIONS+=("OSD    feedback  : <span foreground='${P_GREEN}'>$VIBRANIUM_VOLUME_USE_OSD</span>")
+		OPTIONS+=("OSD    feedback  : $VIBRANIUM_VOLUME_USE_OSD")
 	else
-		OPTIONS+=("OSD    feedback  : <span foreground='${P_GRAY}'>$VIBRANIUM_VOLUME_USE_OSD</span> <span foreground='${P_RED}'><b>()</b></span>")
+		OPTIONS+=("OSD    feedback  : $VIBRANIUM_VOLUME_USE_OSD <span foreground='${P_RED}'>()</span>")
 	fi
 
 	OPTIONS+=("Allow above 100% : $VIBRANIUM_VOLUME_ALLOW_ABOVE_HUNDRED")
 	OPTIONS+=(
-		"Adjustment step  : <span foreground='${P_ACCENT}'>$VIBRANIUM_VOLUME_ADJUSTMENT_STEP</span>"
-		"Open volume control app"
+		"Adjustment step  : $VIBRANIUM_VOLUME_ADJUSTMENT_STEP"
+		"<b>Open volume control app</b>"
 	)
 
 	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Audio" "ESC to go back" -selected-row "$INDEX")"
@@ -51,7 +51,7 @@ while true; do
     done
 
 	case "$CHOSEN" in
-		"Open volume control app")
+		*"Open volume control app"*)
 			notify-send -r 3 "Vibranium" "Press '<span foreground='${P_YELLOW}'><b>?</b></span>' to see available keyboard shortcuts"
 			vibranium-cmd-launch-terminal wiremix
 			vibranium-cmd-kill-rofi
@@ -109,16 +109,16 @@ while true; do
 			while true; do
 				source "$VIBRANIUM_USER_SETTINGS"
 				audio_feedback_options=(
-					"Audio  feedback : <b><i><span foreground='${P_ACCENT}'>$VIBRANIUM_VOLUME_USE_AUDIO_FEEDBACK</span></i></b>"
+					"<b>Audio  feedback : $VIBRANIUM_VOLUME_USE_AUDIO_FEEDBACK</b>"
 				)
 
 				if [[ "$VIBRANIUM_VOLUME_USE_AUDIO_FEEDBACK" == false ]]; then
 					audio_feedback_options+=(
-						"Variant         : <b><i><span foreground='${P_GRAY}'>${VIBRANIUM_VOLUME_AUDIO_FEEDBACK_VARIANT%?} ${VIBRANIUM_VOLUME_AUDIO_FEEDBACK_VARIANT: -1}</span></i></b> <span foreground='${P_RED}'>()</span>"
+						"Variant         : ${VIBRANIUM_VOLUME_AUDIO_FEEDBACK_VARIANT%?} ${VIBRANIUM_VOLUME_AUDIO_FEEDBACK_VARIANT: -1} <span foreground='${P_RED}'>()</span>"
 					)
 				else
 					audio_feedback_options+=(
-						"Variant         : <b><i><span foreground='${P_ACCENT}'>${VIBRANIUM_VOLUME_AUDIO_FEEDBACK_VARIANT%?} ${VIBRANIUM_VOLUME_AUDIO_FEEDBACK_VARIANT: -1}</span></i></b>"
+						"Variant         : ${VIBRANIUM_VOLUME_AUDIO_FEEDBACK_VARIANT%?} ${VIBRANIUM_VOLUME_AUDIO_FEEDBACK_VARIANT: -1}"
 					)
 				fi
 
@@ -133,17 +133,20 @@ while true; do
 						toggle_bool "VIBRANIUM_VOLUME_USE_AUDIO_FEEDBACK"
 						;;
 					"Variant"*)
-						audio_variant_options=("variant 1" "variant 2" "variant 3" "variant 4")
-						audio_variant_chosen="$(printf "%s\n" "${audio_variant_options[@]}" | rofi_cmd "Audio variant" "ESC to go back")"
-						[[ -z "$audio_variant_chosen" ]] && break
-						[[ "$audio_variant_chosen" == "$VIBRANIUM_VOLUME_AUDIO_FEEDBACK_VARIANT" ]] && break
+						while true; do
+							audio_variant_options=("variant 1" "variant 2" "variant 3" "variant 4")
+							audio_variant_chosen="$(printf "%s\n" "${audio_variant_options[@]}" | rofi_cmd "Audio variant" "ESC to go back")"
+							[[ -z "$audio_variant_chosen" ]] && break
+							[[ "$audio_variant_chosen" == "$VIBRANIUM_VOLUME_AUDIO_FEEDBACK_VARIANT" ]] && break
 
-						if [[ ! "${audio_variant_options[*]}" =~ "$audio_variant_chosen" ]]; then
-							continue
-						fi
+							if [[ ! "${audio_variant_options[*]}" =~ "$audio_variant_chosen" ]]; then
+								continue
+							fi
 
-						option-validate "VIBRANIUM_VOLUME_AUDIO_FEEDBACK_VARIANT"
-						sed -i "/^VIBRANIUM_VOLUME_AUDIO_FEEDBACK_VARIANT/s/=.*/=\"${audio_variant_chosen// /}\"/" "$VIBRANIUM_USER_SETTINGS"
+							option-validate "VIBRANIUM_VOLUME_AUDIO_FEEDBACK_VARIANT"
+							sed -i "/^VIBRANIUM_VOLUME_AUDIO_FEEDBACK_VARIANT/s/=.*/=\"${audio_variant_chosen// /}\"/" "$VIBRANIUM_USER_SETTINGS"
+							break
+						done
 				esac
 			done
 			;;
