@@ -97,7 +97,9 @@ rofi_cmd() {
 
 	if [[ $VIBRANIUM_GLOBAL_APP_LAUNCHER_AUTO_SELECT == true ]]; then
 		if (( lines > 1 )); then
-			opt_args+=(-auto-select true)
+			if [[ ! "${BASH_SOURCE[1]}" =~ clipboard ]]; then
+				opt_args+=(-auto-select true)
+			fi
 		fi
 	fi
 
