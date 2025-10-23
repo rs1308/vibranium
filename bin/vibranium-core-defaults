@@ -453,8 +453,8 @@ VIBRANIUM_BAR_SHOW_SHORTCUT_HINTS=true
 # selects 'Enable sleep inhibition' option in Vibranium Utils Menu (Ctrl + Alt + U | Vibranium menu > Utilities)
 # Available options: string 'coffee' 'lock' 'eye'
 #
-# Default is 'lock'
-VIBRANIUM_BAR_INHIBITOR_ICON="lock"
+# Default is 'eye'
+VIBRANIUM_BAR_INHIBITOR_ICON="eye"
 
 # Whether to enable color picker module.
 # Available options: bool
