@@ -30,7 +30,7 @@ _operation_aborted() {
 }
 
 _installation_complete() {
-    printf "%s[VIBRANIUM]%s Installation complete" "$GREEN" "$RESET"
+    printf "\n%s[VIBRANIUM]%s Installation complete" "$GREEN" "$RESET"
     read -n1 -r -p $'\n\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
     printf '\e[?25h' # show cursor
     exit 0
