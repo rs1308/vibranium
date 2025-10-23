@@ -39,11 +39,14 @@ notification() {
     esac
 
     check_bool VIBRANIUM_SCREENSHOT_SAVE_TO_DISK false
-    if [[ $VIBRANIUM_SCREENSHOT_SAVE_TO_DISK == true ]]; then
-        message="saved to disk and copied to clipboard"
-    else
-        message="copied to clipboard"
-    fi
+	if [[ $VIBRANIUM_SCREENSHOT_SAVE_TO_DISK == true ]]; then
+		message="saved to disk"
+	else
+		message="captured"
+	fi
+
+	[[ $VIBRANIUM_GLOBAL_COPY_TO_CLIPBOARD == true ]] \
+	&& message+="${message:+ and }copied to clipboard"
 
     notify-send -r 1 -t 1500 "Vibranium" "$target $message"
 }
