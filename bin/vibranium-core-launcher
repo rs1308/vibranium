@@ -56,6 +56,7 @@ process_input() {
                 vibranium-cmd-launch-cmd "$cmd" $args &
             else
 				# TODO: give the user the option to choose a search engine
+				[ "$VIBRANIUM_GLOBAL_APP_LAUNCHER_AUTO_SELECT" = true ] && exit 1
                 vibranium-cmd-launch-cmd xdg-open "https://www.google.com/search?q=${input}" &
             fi
             ;;
