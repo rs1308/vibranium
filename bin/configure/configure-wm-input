@@ -111,16 +111,18 @@ _touchpad_options() {
 while :; do
 	mapfile -t lines < <(
 		hyprctl --batch -j \
-			"getoption input:sensitivity;   \
-			 getoption input:accel_profile; \
-			 getoption input:repeat_rate;   \
-			 getoption input:repeat_delay;  \
-			 getoption input:scroll_factor; \
-			 getoption input:natural_scroll" \
+			"getoption input:sensitivity;    \
+			 getoption input:accel_profile;  \
+			 getoption input:repeat_rate;    \
+			 getoption input:repeat_delay;   \
+			 getoption input:scroll_factor;  \
+			 getoption input:natural_scroll; \
+			 getoption cursor:inactive_timeout; \
+			 getoption cursor:hide_on_key_press" \
 		| jq -r ' .option as $o |
 		if ($o | test("scroll_factor")) then
 			(.float * 10 | round / 10)
-		  elif ($o | test("sensitivity")) then
+		  elif ($o | test("sensitivity|inactive_timeout")) then
 			(.float * 100 | round / 100)
 		  elif ($o | test("accel_profile")) then
 			.str
@@ -139,11 +141,15 @@ while :; do
 	current_repeat_delay="${lines[3]}"
 	current_scroll_factor="${lines[4]}"
 	current_natural_scroll="${lines[5]}"
+	current_cursor_hide="${lines[6]}"
+	current_hide_key_press="${lines[7]}"
 
 	OPTIONS=(
 		"Keyboard repeat delay : ${current_repeat_delay}ms"
 		"Keyboard repeat rate  : ${current_repeat_rate}ms"
 		"Mouse acceleration    : ${current_accel_profile}"
+		"Hide cursor after     : ${current_cursor_hide}s"
+		"Hide on key press     : ${current_hide_key_press}"
 		"Natural scrolling     : ${current_natural_scroll}"
 		"Mouse sensitivity     : ${current_sensitivity}"
 		"Scrolling speed       : ${current_scroll_factor}"
@@ -164,6 +170,35 @@ while :; do
     done
 
 	case "$CHOSEN" in
+		"Hide on key press"*)
+			case "$current_natural_scroll" in
+				true)
+					vibranium-cmd-edit-wm-config cursor:hide_on_key_press:false \
+						"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
+					;;
+				false)
+					vibranium-cmd-edit-wm-config cursor:hide_on_key_press:true \
+						"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
+					
+			esac
+			;;
+		"Hide cursor after"*)
+			while :; do
+				prompt="Hide cursor after (int, in seconds)"
+				input="$(printf "%s" "$prompt" | rofi_cmd "Inactivity timeout" "0 to disable")"
+				[[ -z "$prompt" ]] && break
+				[[ "$prompt" == "$input" ]] && continue
+
+				if [[ ! "$input" =~ ^[0-9]+$ ]]; then
+					notify-send -r 1 "Vibranium" "Only integers allowed"
+					continue
+				fi
+
+				vibranium-cmd-edit-wm-config "cursor:inactive_timeout:${input}" \
+						"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
+				break
+			done
+			;;
 		"Natural scrolling"*)
 			case "$current_natural_scroll" in
 				true)
