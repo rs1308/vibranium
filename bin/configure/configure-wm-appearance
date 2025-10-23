@@ -145,19 +145,17 @@ while true; do
 			edit_int "Border size" "general:border_size"
 			;;
 		"Drop window"*)
-			if [[ $current_shadow == true ]]; then
-				vibranium-cmd-edit-wm-config decoration:shadow:enabled:false "$HYPR_CONFIG"
-			else
-				vibranium-cmd-edit-wm-config decoration:shadow:enabled:true "$HYPR_CONFIG"
-			fi
+			case "$current_shadow" in
+				true)  vibranium-cmd-edit-wm-config decoration:shadow:enabled:false "$HYPR_CONFIG" ;;
+				false) vibranium-cmd-edit-wm-config decoration:shadow:enabled:true  "$HYPR_CONFIG" ;;
+			esac
 			hyprctl -q reload config-only
 			;;
 		"Dim inactive"*)
-			if [[ $current_dim == true ]]; then
-				vibranium-cmd-edit-wm-config decoration:dim_inactive:false "$HYPR_CONFIG"
-			else
-				vibranium-cmd-edit-wm-config decoration:dim_inactive:true "$HYPR_CONFIG"
-			fi
+			case "$current_dim" in
+				true)  vibranium-cmd-edit-wm-config decoration:dim_inactive:false "$HYPR_CONFIG" ;;
+				false) vibranium-cmd-edit-wm-config decoration:dim_inactive:true  "$HYPR_CONFIG" ;;
+			esac
 			hyprctl -q reload config-only
 			;;
 		"Border roundness"*)
