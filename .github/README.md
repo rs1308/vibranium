@@ -1,5 +1,7 @@
 # Vibranium
 
+![install](./assets/install.png)
+
 Vibranium is an Arch Linux configuration focused on speed and high customizability.
 Thanks to the Hyprland window manager, Waybar bar, and highly customizable rofi launcher, Vibranium provides a beautiful overall look right out of the box.
 
