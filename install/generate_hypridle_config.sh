@@ -1,17 +1,26 @@
 #!/usr/bin/env bash
 
+case "$(</sys/class/dmi/id/chassis_type)" in
+    9|10|14)  # Laptop, Notebook, Sub-Notebook
+        LOCK_AFTER=120
+		SLEEP_AFTER=600
+        ;;
+    *)  # Desktop / Other
+        LOCK_AFTER=600
+		SLEEP_AFTER=900
+        ;;
+esa
+
 cat << EOF > "$HOME/.config/hypr/hypridle.conf"
 source = ~/.local/share/vibranium/defaults/hypr/hypridle.conf
 
 listener {
-	# 10 minutes
-	timeout = 600
+	timeout = $LOCK_AFTER
 	on-timeout = loginctl lock-session
 }
 
 listener {
-	# 15 minutes
-	timeout = 900
+	timeout = $SLEEP_AFTER
 	on-timeout = systemctl suspend
 }
 
