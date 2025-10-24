@@ -10,12 +10,6 @@ while :; do
 
 	power_menu_style="$([ "$VIBRANIUM_GLOBAL_POWER_MENU_STYLE" = "overlay" ] && echo overlay || echo menu)"
 	
-	if [ ! -f "$VIBRANIUM_STATE/wallpaper.enabled" ]; then
-		wallpaper_status="$(<"$VIBRANIUM_STATE/wallpaper.enabled")"
-	else
-		wallpaper_status="$([ "$(systemctl --user show hyprpaper -p UnitFileState --value)" = enabled ] && echo true || echo false)"
-	fi
-
 	if [[ $VIBRANIUM_GLOBAL_USE_OSD == false ]]; then
 		power_profile_osd="<span alpha='50%'>Power profile OSD       : $VIBRANIUM_GLOBAL_POWER_PROFILE_USE_OSD</span> <span foreground='${P_RED}'>()</span>"
 	else
@@ -49,7 +43,7 @@ while :; do
 	fi
 
 	OPTIONS+=(
-		"Show wallpaper          : $wallpaper_status"
+		"Show wallpaper          : $VIBRANIUM_GLOBAL_SHOW_WALLPAPER"
 		"Confirm to kill         : $VIBRANIUM_GLOBAL_CONFIRM_TO_KILL"
 		"Blur lockscreen         : $VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_BACKGROUND"
 		"Power menu style        : $power_menu_style"
@@ -80,16 +74,11 @@ while :; do
 
 	case "$CHOSEN" in
 		"Show wallpaper"*)
-			case "$wallpaper_status" in
-				true)
-					echo "false" > "$VIBRANIUM_STATE/wallpaper.enabled"
-					systemctl -q --user disable --now hyprpaper
-					;;
-				false)
-					echo "true" > "$VIBRANIUM_STATE/wallpaper.enabled"
-					systemctl -q --user enable --now hyprpaper
-					;;
+			case "$VIBRANIUM_GLOBAL_SHOW_WALLPAPER" in
+				true)  systemctl -q --user disable --now hyprpaper ;;
+				false) systemctl -q --user enable --now hyprpaper ;;
 			esac
+			toggle_bool "VIBRANIUM_GLOBAL_SHOW_WALLPAPER"
 			;;
 		"Playerctl options")
 			configure-playerctl
@@ -120,7 +109,7 @@ while :; do
 						;;
 				esac
 			done
-		;;
+			;;
 		"Edit env vars")
 			vibranium-cmd-launch-terminal "$EDITOR" "$XDG_CONFIG_HOME/vibranium/environment"
 			vibranium-cmd-kill-rofi
@@ -163,7 +152,7 @@ while :; do
 			msg="This option is <span foreground='${P_RED}'><b>locked</b></span> because "
 			msg+="<span foreground='${P_ACCENT}'><b>animations</b></span> "
 			msg+="<span foreground='${P_RED}'><b>disabled</b></span>"
-			notify-send -r 1 "Vibranium" "$msg"
+			notify-send -r 1 "This option is locked" "$msg"
 			continue
 			;;
 		*"Power profile"*"()"*)

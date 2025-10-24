@@ -19,6 +19,4 @@ sed -i "s|^\([[:space:]]*path = \).*|\1$CACHED_IMG|" "$HYPRLOCK_CONF"
 # If cached doesn't exists - generate immediately
 if [[ ! -f "$CACHED_IMG" ]]; then
 	vibranium-utils-lockscreen-cache "$CURRENT_WALLPAPER"
-	# And then generate the rest
-	vibranium-cmd-launch-cmd vibranium-utils-lockscreen-cache
 fi

@@ -26,10 +26,13 @@ if [[ $VIBRANIUM_BRIGHTNESS_USE_DDC_CONTROL == true ]]; then
 	fi
 fi
 
-if [ ! -f "$VIBRANIUM_STATE/wallpaper.enabled" ]; then
+if [ "$VIBRANIUM_GLOBAL_SHOW_WALLPAPER" = true ]; then
 	case "$(systemctl --user show hyprpaper -p UnitFileState --value)" in
-		enabled)   echo "true" > "$VIBRANIUM_STATE/wallpaper.enabled" ;;
-		ddisabled) echo "true" > "$VIBRANIUM_STATE/wallpaper.enabled" ;;
+		disabled) systemctl --user enable --now hyprpaper
+	esac
+else
+	case "$(systemctl --user show hyprpaper -p UnitFileState --value)" in
+		enable) systemctl --user disable --now hyprpaper
 	esac
 fi
 

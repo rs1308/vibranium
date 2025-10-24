@@ -210,11 +210,3 @@ rm "$XDG_RUNTIME_DIR/worker.active"
 vibranium-cmd-refresh-waybar-module worker
 
 vibranium-utils-update-lockscreen "$(sed -n 's/^preload = //p' "$XDG_CONFIG_HOME/hypr/hyprpaper.conf")"
-
-# if [[ "$single_file" == false ]]; then
-# 	if (( precached == 1 )); then
-# 		notify-send -r 2 -t 5000 "Vibranium" "Successfully precached $precached lockscreen image"
-# 	elif (( precached > 1 )); then
-# 		notify-send -r 2 -t 5000 "Vibranium" "Successfully precached $precached lockscreen images"
-# 	fi
-# fi

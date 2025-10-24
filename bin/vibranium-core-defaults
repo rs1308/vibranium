@@ -174,6 +174,12 @@ VIBRANIUM_GLOBAL_CONFIRM_TO_KILL=true
 # Default is 'menu'
 VIBRANIUM_GLOBAL_POWER_MENU_STYLE="menu"
 
+# Whether to show desktop & lockscreen background
+# Available options: bool
+#
+# Default is true
+VIBRANIUM_GLOBAL_SHOW_WALLPAPER=true
+
 #           VOLUME CONTROL OPTIONS             #
 # ============================================ #
 #                                              #

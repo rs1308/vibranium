@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 
-systemd_targets=("waybar" "swayosd" "cliphist" "hyprpaper" "hypridle" "gnome-polkit")
+source "$VIBRANIUM_PATH/vibranium-core-defaults"
+source "$XDG_CONFIG_HOME/vibranium/settings"
 
-systemctl --user restart "${systemd_targets[@]}"
+SYSTEMD_TARGETS=("waybar" "cliphist" "hypridle" "gnome-polkit")
+
+[ "$VIBRANIUM_GLOBAL_SHOW_WALLPAPER" = "true" ] && SYSTEMD_TARGETS+=("hyprpaper")
+[ "$VIBRANIUM_GLOBAL_USE_OSD" = "true" ] && SYSTEMD_TARGETS+=("swayosd")
+
+systemctl --user restart "${SYSTEMD_TARGETS[@]}"
 vibranium-cmd-refresh-dunst
 
 if [[ "$1" != "-q" ]]; then
