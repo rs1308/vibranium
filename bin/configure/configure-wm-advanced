@@ -56,7 +56,7 @@ mapfile -t LINES < <(
 			esac
 		;;
 		"Middle Click Paste"*)
-			case "$current_vfr" in
+			case "$current_middle_click" in
 				"true")  vibranium-cmd-edit-wm-config "misc:middle_click_paste:false" "$CONFIG" ;;
 				"false") vibranium-cmd-edit-wm-config "misc:middle_click_paste:true"  "$CONFIG" ;;
 			esac
