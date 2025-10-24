@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+set -e
+
+RED=$'\e[0;31m'
+RESET=$'\e[0m'
+GREEN=$'\e[0;32m'
+
+_error_handler() {
+    local exit_code=$?
+    local line_no=$1
+    echo -e "\n\e[31mError occurred at line $line_no. Exit code: $exit_code\e[0m"
+    echo "Git status at failure:"
+    git -C "$VIBRANIUM" status
+    echo "Attempting safe reset..."
+    git -C "$VIBRANIUM" reset --merge || true
+    exit "$exit_code"
+}
+
+_update() {
+	git -C "$VIBRANIUM" pull --autostash
+	git -C "$VIBRANIUM" diff --check || git -C "$VIBRANIUM" reset --merge
+
+	rm "$VIBRANIUM_STATE/update.available"
+	vibranium-cmd-refresh-waybar-module vibranium-update
+
+    echo -e "${GREEN}[VIBRANIUM]${RESET} Vibranium updated"
+    read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
+}
+
+trap '_error_handler $LINENO' ERR
+
+printf "\n\e[33m%s\e[0m\n\n" "$(<"$VIBRANIUM/logo.txt")"
+
+PROMPT=$'\e[0;33m[VIBRANIUM]\e[0m You are about to update Vibranium. Proceed? (Y/n): '
+while :; do
+    printf "%s" "$PROMPT"
+    read -r answer
+    case "$answer" in
+        [Yy]|"")
+			_update
+            exit 0
+            ;;
+        [Nn]|[Nn][Oo])
+            echo -e "${RED}[VIBRANIUM]${RESET} Operation aborted"
+            read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
+            exit 1
+            ;;
+        *)
+            continue
+            ;;
+    esac
+done
+

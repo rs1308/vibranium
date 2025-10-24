@@ -9,6 +9,7 @@ NIGHT_LIGHT_STATE="$(<"$VIBRANIUM_STATE/night-light")"
 show() { printf '{"text": "|"}'; exit; }
 
 [[ -f "$XDG_RUNTIME_DIR/worker.active" ]] && show
+[[ -f "$VIBRANIUM_STATE/update.available" ]] && show
 [[ $VIBRANIUM_BAR_COLOR_PICKER_MODULE_ENABLE == true ]] && show
 [[ $VIBRANIUM_BAR_POWER_PROFILE_MODULE_ENABLE == true ]] && {
 	[[ $(vibranium-utils-power-profile-get) != "balanced" ]] && show

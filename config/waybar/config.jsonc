@@ -29,7 +29,8 @@
 			"$XDG_DATA_HOME/vibranium/defaults/waybar/volume.jsonc",
 			"$XDG_DATA_HOME/vibranium/defaults/waybar/weather.jsonc",
 			"$XDG_DATA_HOME/vibranium/defaults/waybar/worker.jsonc",
-			"$XDG_DATA_HOME/vibranium/defaults/waybar/workspaces.jsonc"
+			"$XDG_DATA_HOME/vibranium/defaults/waybar/workspaces.jsonc",
+			"$XDG_DATA_HOME/vibranium/defaults/waybar/vibranium-update.jsonc"
 		],
  
 		// All custom modules provided here can and should be enabled or disabled directly
@@ -37,6 +38,7 @@
 		"modules-left": ["hyprland/workspaces"],
 		"modules-center": ["custom/weather","clock","custom/pacman"],
 		"modules-right": [
+			"custom/vibranium-update",
 			"custom/night-light",
 			"custom/worker",
 			"custom/recording-indicator",
