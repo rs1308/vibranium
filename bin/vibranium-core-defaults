@@ -578,8 +578,8 @@ VIBRANIUM_RECORDING_FPS_IN_GAME=60
 # Video recording quality level.
 # Available options: 'medium', 'high', 'very_high', 'ultra'
 #
-# Default is 'medium'
-VIBRANIUM_RECORDING_QUALITY="medium"
+# Default is 'high'
+VIBRANIUM_RECORDING_QUALITY="high"
 
 # Container format for the output file.
 # Available options: 'mp4', 'mkv', 'webm'
