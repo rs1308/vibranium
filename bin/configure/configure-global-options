@@ -79,6 +79,7 @@ while :; do
 				false) systemctl -q --user enable --now hyprpaper ;;
 			esac
 			toggle_bool "VIBRANIUM_GLOBAL_SHOW_WALLPAPER"
+			vibranium-utils-update-lockscreen
 			;;
 		"Playerctl options")
 			configure-playerctl

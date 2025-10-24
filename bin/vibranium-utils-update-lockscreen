@@ -6,6 +6,11 @@ source "$XDG_CONFIG_HOME/vibranium/settings"
 CURRENT_WALLPAPER="$(vibranium-utils-wallpaper-get)"
 HYPRLOCK_CONF="$XDG_CONFIG_HOME/hypr/hyprlock.conf"
 
+if [ "$VIBRANIUM_GLOBAL_SHOW_WALLPAPER" = "false" ]; then
+	sed -i "s|^\([[:space:]]*path = \).*|\1\ |" "$HYPRLOCK_CONF"
+	exit 0
+fi
+
 if [[ $VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_BACKGROUND == false ]]; then
 	TYPE="dimmed-${VIBRANIUM_GLOBAL_DIM_LOCKSCREEN_STRENGTH}"
 else
