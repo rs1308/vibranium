@@ -1,7 +1,5 @@
 # Vibranium
 
-![install](./assets/install.png)
-
 Vibranium is an Arch Linux configuration focused on speed and high customizability.
 Thanks to the Hyprland window manager, Waybar bar, and highly customizable rofi launcher, Vibranium provides a beautiful overall look right out of the box.
 
@@ -21,7 +19,7 @@ git clone https://github.com/shvedes/vibranium; cd vibranium
 
 ## Currenet State
 
-Vibranium is currently in alpha testing. Some features may break or not work at all. Breaking changes may occur at any time. If you want to install Vibranium for testing purposes, it is best to do so in a virtual machine. In this case, some functionality will be unavailable. 
+Vibranium is currently in beta testing. Some features may break or not work at all. Breaking changes may occur at any time. If you want to install Vibranium for testing purposes, it is best to do so in a virtual machine. In this case, some functionality will be unavailable. 
 
 ### Code Quality
 
@@ -29,6 +27,6 @@ The code is currently focused on functionality rather than structure. Refactorin
 
 ## Current TODO List
 
-- [ ] Implement tag-based versioning
+- [x] Implement tag-based versioning
 - [ ] Consider Omarchy(Ruby-On-Rails)-style migrations? There's no need to reinvent the wheel.
-- [ ] First beta release?
+- [x] First beta release?
