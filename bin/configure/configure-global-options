@@ -17,7 +17,7 @@ while :; do
 	fi
 
 	if [[ $VIBRANIUM_GLOBAL_USE_OSD == false ]]; then
-		power_profile_osd="Power profile OSD       : $VIBRANIUM_GLOBAL_POWER_PROFILE_USE_OSD <span foreground='${P_RED}'>()</span>"
+		power_profile_osd="<span alpha='50%'>Power profile OSD       : $VIBRANIUM_GLOBAL_POWER_PROFILE_USE_OSD</span> <span foreground='${P_RED}'>()</span>"
 	else
 		power_profile_osd="Power profile OSD       : $VIBRANIUM_GLOBAL_POWER_PROFILE_USE_OSD"
 	fi
@@ -38,8 +38,8 @@ while :; do
 
 	if [[ "$(hyprctl -j getoption animations:enabled | jq -r '.int')" == 0 ]]; then
 		OPTIONS+=(
-			"Flash border            : $VIBRANIUM_GLOBAL_FLASH_BORDER <span foreground='${P_RED}'>()</span>"
-			"Flash screen            : $VIBRANIUM_GLOBAL_FLASH_SCREEN <span foreground='${P_RED}'>()</span>"
+			"<span alpha='50%'>Flash border            : $VIBRANIUM_GLOBAL_FLASH_BORDER</span> <span foreground='${P_RED}'>()</span>"
+			"<span alpha='50%'>Flash screen            : $VIBRANIUM_GLOBAL_FLASH_SCREEN</span> <span foreground='${P_RED}'>()</span>"
 		)
 	else
 		OPTIONS+=(
@@ -159,18 +159,17 @@ while :; do
 
 			done
 			;;
-		"Flash"*"()"*)
+		*"Flash"*"()"*)
 			msg="This option is <span foreground='${P_RED}'><b>locked</b></span> because "
-			msg+="animations <span foreground='${P_RED}'><b>disabled</b></span>"
+			msg+="<span foreground='${P_ACCENT}'><b>animations</b></span> "
+			msg+="<span foreground='${P_RED}'><b>disabled</b></span>"
 			notify-send -r 1 "Vibranium" "$msg"
 			continue
 			;;
-		"Power profile"*"()"*)
-			msg="This option is <span foreground='${P_RED}'><b>locked</b></span> because "
-			msg+="<span foreground='${P_YELLOW}'>'OSD enabled'</span> is "
-			msg+="<span foreground='${P_RED}'><b>disabled</b></span> globally"
-			notify-send -r 1 "Vibranium" "$msg"
-			continue
+		*"Power profile"*"()"*)
+			msg="This option is <span foreground='${P_RED}'><b>locked</b></span> "
+			msg+="because OSD is <span foreground='${P_RED}'><b>disabled</b></span> "
+			notify-send -r 1 "This option is locked" "$msg"
 			;;
 		"Power profile"*)
 			toggle_bool VIBRANIUM_GLOBAL_POWER_PROFILE_USE_OSD
@@ -513,7 +512,7 @@ while :; do
 				)
 
 				if [[ "$VIBRANIUM_GLOBAL_USE_OSD" == false ]]; then
-					osd_options+=("Progress bar height : ${current_height}px ()")
+					osd_options+=("<span alpha='50%'>Progress bar height : ${current_height}px</span> <span foreground='${P_RED}'>()</span>")
 				else
 					osd_options+=("Progress bar height : ${current_height}px")
 				fi
@@ -522,8 +521,10 @@ while :; do
 				[[ -z "$osd_chosen" ]] && break
 
 				case "$osd_chosen" in
-					*"()")
-						continue
+					*"()"*)
+						msg="This option is <span foreground='${P_RED}'><b>locked</b></span> "
+						msg+="because OSD is <span foreground='${P_RED}'><b>disabled</b></span> "
+						notify-send -r 1 "This option is locked" "$msg"
 						;;
 					"OSD enabled"*)
 						if [[ "$(toggle_bool -v "VIBRANIUM_GLOBAL_USE_OSD")" == "false" ]]; then
