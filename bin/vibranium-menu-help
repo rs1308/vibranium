@@ -27,8 +27,7 @@ while :; do
 			LINK="https://wiki.archlinux.org/title/Pacman"
 			;;
 		"Vibranium wiki")
-			notify-send -r 1 "Vibranium" "Hold on, Vibranium is still in beta"
-			break
+			LINK="https://github.com/shvedes/vibranium/wiki"
 	esac
 
 	vibranium-cmd-launch-cmd chromium --app="$LINK"
