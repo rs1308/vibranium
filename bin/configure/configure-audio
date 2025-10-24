@@ -8,18 +8,10 @@ INDEX=0
 while :; do
 	source "$VIBRANIUM_USER_SETTINGS"
 
-	if [ "$VIBRANIUM_GLOBAL_USE_OSD" = false ]; then
-		osd="$VIBRANIUM_VOLUME_USE_OSD ()"
-	else
-		osd="$VIBRANIUM_VOLUME_USE_OSD"
-	fi
-
-	OPTIONS=()
-
 	if [[ "$VIBRANIUM_VOLUME_USE_VISUAL_FEEDBACK" == true ]]; then
-		OPTIONS+=("Visual feedback  : $VIBRANIUM_VOLUME_USE_VISUAL_FEEDBACK")
+		OPTIONS=("Visual feedback  : $VIBRANIUM_VOLUME_USE_VISUAL_FEEDBACK")
 	else
-		OPTIONS+=("Visual feedback  : $VIBRANIUM_VOLUME_USE_VISUAL_FEEDBACK")
+		OPTIONS=("Visual feedback  : $VIBRANIUM_VOLUME_USE_VISUAL_FEEDBACK")
 	fi
 
 	if [[ "$VIBRANIUM_VOLUME_USE_AUDIO_FEEDBACK" == true ]]; then
@@ -139,7 +131,7 @@ while :; do
 							[[ -z "$audio_variant_chosen" ]] && break
 							[[ "$audio_variant_chosen" == "$VIBRANIUM_VOLUME_AUDIO_FEEDBACK_VARIANT" ]] && break
 
-							if [[ ! "${audio_variant_options[*]}" =~ "$audio_variant_chosen" ]]; then
+							if [[ ! "${audio_variant_options[*]}" =~ $audio_variant_chosen ]]; then
 								continue
 							fi
 

@@ -6,7 +6,7 @@ INDEX=0
 CONFIG="$XDG_CONFIG_HOME/hypr/hypridle.conf"
 
 _update_timeout() {
-	local file="$HOME/.config/hypr/hypridle.conf"
+	local file="$CONFIG"
     local listener="$1"
     local new_timeout="$2"
 
@@ -31,7 +31,7 @@ while :; do
 				match($0, /timeout\s*=\s*([0-9]+)/, a)
 				print a[1]
 			}
-		' "$HOME/.config/hypr/hypridle.conf"
+		' "$CONFIG"
 	)
 
 	lock_timeout="${timeouts[0]}"

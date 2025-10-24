@@ -18,9 +18,9 @@ if command -v chromium >/dev/null; then
 	fi
 fi
 
-if [ -z "$OPTIONS" ]; then
-	notify-send -r 4 -t 5000 -u critical "Vibranium" "There is no tweaks available"
-	exit 1
+if [ "${#OPTIONS[@]}" -eq 0 ]; then
+    notify-send -r 4 -t 5000 -u critical "Vibranium" "There are no tweaks available"
+    exit 1
 fi
 
 CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "App tweaks" "ESC to go back")"

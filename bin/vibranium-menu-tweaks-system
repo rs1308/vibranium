@@ -24,7 +24,7 @@ while :; do
 		"What is this?")
 			while :; do
 				what_is_this_opts=("Coredump")
-				what_is_this_chosen="$(printf "${what_is_this_opts[@]}" | rofi_cmd "What is" "ESC to go back")"
+				what_is_this_chosen="$(printf "%s\n" "${what_is_this_opts[@]}" | rofi_cmd "What is" "ESC to go back")"
 				[[ -z $what_is_this_chosen ]] && break
 
 				case "$what_is_this_chosen" in

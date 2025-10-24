@@ -101,6 +101,7 @@ while :; do
 				truncate -s 0 "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/look-and-feel.conf"
 				sed -i '/border-radius/s/:.*/: 0px;/g' "$XDG_CONFIG_HOME/rofi/config.rasi"
 				sed -i '/corner_radius/s/=.*/= 0/' "$XDG_CONFIG_HOME/dunst/dunstrc"
+				vibranium-cmd-set-waybar-position -q top
 				vibranium-cmd-refresh-dunst
 				hyprctl -q reload config-only
 			"

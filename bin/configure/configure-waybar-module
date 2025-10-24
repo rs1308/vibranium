@@ -75,7 +75,7 @@ while :; do
 					fi
 				done
 
-				if [[ "${icon_options[*]}" =~ "$icon_chosen" ]]; then
+				if [[ "${icon_options[*]}" =~ $icon_chosen ]]; then
 					option-validate "VIBRANIUM_COLOR_PICKER_WAYBAR_ICON"
 					sed -i "/^VIBRANIUM_COLOR_PICKER_WAYBAR_ICON/s/=.*/=\"${icon_chosen}\"/" "$VIBRANIUM_USER_SETTINGS"
 					vibranium-cmd-refresh-waybar-module color-picker
@@ -100,7 +100,7 @@ while :; do
 				sed -i "s|^${opt_name}=.*|${opt_name}=\"${new_value}\"|" "$VIBRANIUM_USER_SETTINGS"
 				notify-send -r 1 "City updated!" "Monitoring weather in $new_value"
 
-				if [ $(vibranium-cmd-get-option VIBRANIUM_BAR_WEATHER_MODULE_ENABLE) = "true" ]; then
+				if [ "$(vibranium-cmd-get-option VIBRANIUM_BAR_WEATHER_MODULE_ENABLE)" = "true" ]; then
 					vibranium-cmd-refresh-waybar-module weather
 				fi
 				exit 0

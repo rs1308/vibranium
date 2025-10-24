@@ -31,6 +31,7 @@ _touchpad_options() {
 		local current_natural_scroll="${lines[2]}"
 		local current_disable_while_typing="${lines[3]}"
 		
+		local touchpad_chosen
 		local touchpad_options=(
 			"Disable while typing : ${current_disable_while_typing}"
 			"Natural scrolling    : ${current_natural_scroll}"
@@ -38,7 +39,7 @@ _touchpad_options() {
 			"Tap to click         : ${current_tap_to_click}"
 		)
 
-		local touchpad_chosen="$(printf "%s\n" "${touchpad_options[@]}" | rofi_cmd "Touchpad" "ESC to go back" -selected-row "$index")"
+		touchpad_chosen="$(printf "%s\n" "${touchpad_options[@]}" | rofi_cmd "Touchpad" "ESC to go back" -selected-row "$index")"
 		[[ -z $touchpad_chosen ]] && break
 
 		for i in "${!touchpad_options[@]}"; do
@@ -99,7 +100,7 @@ _touchpad_options() {
 						continue
 					fi
 
-					vibranium-cmd-edit-wm-config input:touchpad:scroll_factor:$input \
+					vibranium-cmd-edit-wm-config "input:touchpad:scroll_factor:$input" \
 						"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
 					break
 				done
@@ -128,7 +129,7 @@ while :; do
 			.str
 		elif ($o | test("repeat.*")) then
 			.int
-		  else
+		else
 			if .int == 1 then "true" else "false" end
 		  end
 		'
@@ -173,11 +174,11 @@ while :; do
 		"Hide on key press"*)
 			case "$current_natural_scroll" in
 				true)
-					vibranium-cmd-edit-wm-config cursor:hide_on_key_press:false \
+					vibranium-cmd-edit-wm-config "cursor:hide_on_key_press:false" \
 						"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
 					;;
 				false)
-					vibranium-cmd-edit-wm-config cursor:hide_on_key_press:true \
+					vibranium-cmd-edit-wm-config "cursor:hide_on_key_press:true" \
 						"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
 					
 			esac
@@ -194,7 +195,7 @@ while :; do
 					continue
 				fi
 
-				vibranium-cmd-edit-wm-config "cursor:inactive_timeout:${input}" \
+				vibranium-cmd-edit-wm-config "cursor:inactive_timeout:$input" \
 						"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
 				break
 			done
@@ -202,11 +203,11 @@ while :; do
 		"Natural scrolling"*)
 			case "$current_natural_scroll" in
 				true)
-					vibranium-cmd-edit-wm-config input:natural_scroll:false \
+					vibranium-cmd-edit-wm-config "input:natural_scroll:false" \
 						"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
 					;;
 				false)
-					vibranium-cmd-edit-wm-config input:natural_scroll:true \
+					vibranium-cmd-edit-wm-config "input:natural_scroll:true" \
 						"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
 					
 			esac
@@ -266,11 +267,11 @@ while :; do
 		"Mouse acceleration"*)
 			case "${current_accel_profile}" in
 				true)
-					vibranium-cmd-edit-wm-config input:accel_profile:flat \
+					vibranium-cmd-edit-wm-config "input:accel_profile:flat" \
 						"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
 					;;
 				false)
-					vibranium-cmd-edit-wm-config input:accel_profile:adaptive \
+					vibranium-cmd-edit-wm-config "input:accel_profile:adaptive" \
 						"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
 					;;
 			esac
