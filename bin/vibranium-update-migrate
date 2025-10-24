@@ -5,7 +5,7 @@
 STATE_DIR="$VIBRANIUM_STATE/migrations"
 
 mkdir -p "$STATE_DIR/skipped"
-for file in "$STATE_DIR"/migrations/*.sh; do
+for file in "$VIBRANIUM"/migrations/*.sh; do
     filename=$(basename "$file")
 
     if [[ ! -f "$STATE_DIR/$filename" && ! -f "$STATE_DIR/skipped/$filename" ]]; then
