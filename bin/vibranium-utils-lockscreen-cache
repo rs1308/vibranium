@@ -8,6 +8,10 @@
 
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 
+if [ "$VIBRANIUM_GLOBAL_SHOW_WALLPAPER" = "false" ]; then
+	exit 0
+fi
+
 # Enable GPU acceleration for ImageMagick if available (falls back to CPU).
 # For AMD GPUs, ensure rocm-opencl-sdk is installed.
 export MAGICK_THREAD_LIMIT
