@@ -75,7 +75,16 @@ while :; do
 		"Drop window shadow      : ${current_shadow}"
 		"Animations enabled      : ${current_animations}"
 		"Border roundness        : ${current_roundness}px"
-		"Blur enabled            : ${current_blur}"
+	)
+
+	respect="$VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE"
+	if [[ "$respect" = true && "$(vibranium-utils-power-profile-get)" == "power-saver" ]]; then
+		OPTIONS+=("<span alpha='50%'>Blur enabled            : ${current_blur}</span> <span foreground='${P_RED}'>()</span>")
+	else
+		OPTIONS+=("Blur enabled            : ${current_blur}")
+	fi
+
+	OPTIONS+=(
 		"Border size             : ${current_border_size}"
 		"Smart gaps              : ${current_smart_gaps}"
 		"Outer gaps              : ${current_gaps_out}"
@@ -93,6 +102,20 @@ while :; do
     done
 
 	case "$CHOSEN" in
+		"<"*)
+			msg="This option is <span foreground='${P_RED}'><b>locked</b></span> "
+			msg+="because the current <span foreground='${P_ACCENT}'><b>power profile</b></span> "
+			msg+="is <span foreground='${P_GREEN}'><b>powersave</b></span>\n\n"
+			msg+="<b>If you want to ignore this, go to the \n"
+			msg+="<span foreground='${P_YELLOW}'>Vibranium Menu</span> "
+			msg+="<span foreground='${P_ACCENT}'>→</span> "
+			msg+="<span foreground='${P_YELLOW}'>Configure Vibranium</span> "
+			msg+="<span foreground='${P_ACCENT}'>→</span> "
+			msg+="<span foreground='${P_YELLOW}'>General</span> "
+			msg+="<span foreground='${P_ACCENT}'>→</span> "
+			msg+="<span foreground='${P_YELLOW}'>Respect power profile</span></b>"
+			notify-send -r 1 -t 10000 "This option is locked" "$msg"
+			;;
 		"Inactive window opacity"*)
 			while :; do
 				prompt="Inactive window opacity (int / float)"
