@@ -4,11 +4,12 @@ source "$VIBRANIUM_PATH/vibranium-core-lib"
 source "$VIBRANIUM_PATH/configure/configure-lib"
 
 INDEX=0
+WAYBAR_CONFIG="$XDG_CONFIG_HOME/waybar/config.jsonc"
 
 while :; do
 	source "$VIBRANIUM_USER_SETTINGS"
 
-	BAR_POSITION="$(grep position "$XDG_CONFIG_HOME/waybar/config.jsonc" | awk -F'"' '{print $4}')"
+	BAR_POSITION="$(sed -n 's/.*"position"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$WAYBAR_CONFIG")"
 
 	if [[ "$BAR_POSITION" == "top" ]]; then
 		OPTIONS=("Move top bar to bottom")
