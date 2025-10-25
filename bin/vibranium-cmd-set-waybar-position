@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Move Waybar and Dunst to top or bottom.
 # Usage: ./script.sh [-q] top|bottom

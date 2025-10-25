@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 cd "$VIBRANIUM"
 cp ./config/systemd/user/vibranium-update.* "$HOME/.config/systemd/user"

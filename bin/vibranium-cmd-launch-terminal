@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # This simple script launches the default terminal with the command passed to it as an argument.
 # Currently, only Alacritty is supported, but other terminals will be supported as well.

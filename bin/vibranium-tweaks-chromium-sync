@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 TARGET="$XDG_CONFIG_HOME/chromium-flags.conf"
 

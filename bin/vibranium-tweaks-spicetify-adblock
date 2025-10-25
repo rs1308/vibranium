@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 ACTION="$1"
 EXT_DIR="$XDG_CONFIG_HOME/spicetify/Extensions"

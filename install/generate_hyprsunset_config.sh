@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 cat << EOF > "$HOME/.config/hypr/hyprsunset.conf"
 # Auto-generated file! All changes will be overwritten.

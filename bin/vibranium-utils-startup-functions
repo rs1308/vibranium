@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # A small piece of logic that runs when the session starts.
 # Nothing much is happening here right now, but in the future, 

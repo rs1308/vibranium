@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Power profile switcher. The code is pretty simple and clean, so I don't think it needs any explanation.
 

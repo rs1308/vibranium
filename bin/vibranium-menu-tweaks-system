@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 
@@ -29,11 +29,17 @@ while :; do
 
 				case "$what_is_this_chosen" in
 					"Coredump")
-						msg="<b>systemd-coredump</b> collects memory dumps from crashed processes."
-						msg+="\n\nUseful for debugging and crash analysis, but generating dumps can use high CPU,"
-						msg+="\ndrain laptop battery, and take disk space."
-						msg+="\n\nDisable it for better performance and responsiveness."
-						notify-send -r 1 -t 15000 -a "Vibranium" "Vibranium" "$msg"
+						msg="<span foreground='${P_ACCENT}'><b>systemd-coredump</b></span> collects "
+						msg+="<span foreground='${P_ACCENT}'><b>memory dumps</b></span> "
+						msg+="from <span foreground='${P_RED}'><b>crashed</b></span> processes\n\n"
+						msg+="Useful for debugging, but generating dumps can use \n"
+						msg+="<span foreground='${P_YELLOW}'>high CPU</span>, "
+						msg+="<span foreground='${P_RED}'><b>drain laptop battery</b></span>, "
+						msg+="and <span foreground='${P_YELLOW}'>take disk space</span>"
+						msg+="\n\nDisable it for better "
+						msg+="<span foreground='${P_GREEN}'><b>performance</b></span> "
+						msg+="and <span foreground='${P_GREEN}'><b>responsiveness</b></span>"
+						notify-send -r 1 -t 20000 "Vibranium" "$msg"
 						;;
 					*)
 						continue

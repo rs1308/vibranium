@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # If the state file exists, retrieve data from it. 
 # Each request to powerprofilectl takes ~100ms. Using the state file, we can reduce this to 1.5-2ms.

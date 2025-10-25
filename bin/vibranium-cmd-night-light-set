@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # This script controls the Night Light filter. 
 # We cannot completely enable and disable the hyprsunset service because two 

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # This script preprocesses and caches background images for Hyprlock, applying
 # blur or dim filters depending on user settings and power profile. It detects

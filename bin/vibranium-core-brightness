@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Overcomplicated script that manages brightness control using the standard brightnessctl 
 # as well as the DDC protocol for external monitors. The script uses state files to cache 

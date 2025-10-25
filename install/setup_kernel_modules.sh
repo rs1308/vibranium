@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 sudo tee /etc/modprobe.d/blacklist.conf >/dev/null <<EOF
 # Vibranium: disable hardware watchdog

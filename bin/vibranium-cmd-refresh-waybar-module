@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Usage: ./vibranium-cmd-refresh-waybar-module <module-name>
 # The script goes through all Waybar custom modules and searches for the string "signal":. If the string is found, the script sends a kill signal, which the module accepts.

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Toggle window blur in Hyprland.
 # Reads current blur state, flips true/false in config, then reloads Hyprland.

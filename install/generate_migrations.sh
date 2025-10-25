@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 STATE_DIR="$HOME/.local/state/vibranium/migrations"
 mkdir -p "$STATE_DIR"

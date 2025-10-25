@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Automatically detect and open a viable MPD client
 # Can be used in your favourite file manager; mime types; etc

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 sudo mkdir -p /etc/tmpfiles.d
 sudo tee /etc/tmpfiles.d/coredump.conf >/dev/null <<EOF

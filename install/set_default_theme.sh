@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 THEME_PATH="$HOME/.local/share/vibranium/themes/nightfox-nightfox"
 

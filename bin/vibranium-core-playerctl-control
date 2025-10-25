@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # This script can make Play/Pause and track switching smoother and more pleasant to the ear,
 # similar to the Play/Pause effect in Spotify on Windows.

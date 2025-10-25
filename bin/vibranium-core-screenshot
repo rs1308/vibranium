@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Overcomplicated (as usual) script for creating screenshots. 
 # All-in wrapper for grim & slurp with a bunch of user settings on top.

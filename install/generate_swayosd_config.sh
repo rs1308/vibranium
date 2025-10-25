@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 cat <<EOF > "$HOME/.config/swayosd/style.css"
 @import url("../vibranium/theme/current/swayosd.css");

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # This simple script launches the default terminal in the folder passed to it as the CWD (current working directory). 
 # Support for other terminals will be added in the future.

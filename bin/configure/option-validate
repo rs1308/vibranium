@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 VIBRANIUM_USER_SETTINGS="$XDG_CONFIG_HOME/vibranium/settings"
 
