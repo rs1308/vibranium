@@ -1,5 +1,0 @@
-export ELECTRON_OZONE_PLATFORM_HINT="auto"
-export SDV_VIDEODRIVER="wayland"
-export GDK_BACKEND="wayland,x11"
-export QT_QPA_PLATFORM="wayland;xcb"
-export CLUTTER_BACKEND="wayland"
