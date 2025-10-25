@@ -64,7 +64,7 @@ while :; do
 		"Respect power profile   : $VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE"
 		"Terminal transparency   : $terminal_opacity"
 		"Video downscale use GPU : $VIBRANIUM_VIDEO_DOWNSCALE_USE_GPU"
-		"<b>App launcher settings<b>"
+		"<b>App launcher settings</b>"
 		"<b>Playerctl options</b>"
 		"<b>Notifications</b>"
 		"<b>Edit env vars</b>"
