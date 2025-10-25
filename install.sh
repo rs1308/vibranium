@@ -194,6 +194,10 @@ create_directories() {
 }
 
 post_install() {
+	local ly_ini
+	ly_ini="/etc/ly/config.ini"
+
+	sudo sed -i '/^session_log/s/=.*/= .cache\/display_manager.log/' "$ly_ini"
 	cp ./config/mimeapps.list "$HOME/.config"
 	touch "$HOME/.local/state/vibranium/first-boot"
 	echo "suspended" > \
