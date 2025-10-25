@@ -21,6 +21,43 @@ if [[ $VIBRANIUM_IS_LAPTOP == false ]]; then
 	export MAGICK_OCL_DEVICE=GPU
 fi
 
+# PID and lock file paths
+pid_file="$XDG_RUNTIME_DIR/vibranium-lockscreen-cache.pid"
+lock_file="$XDG_RUNTIME_DIR/vibranium-lockscreen-cache.lock"
+
+cleanup() {
+    rm -f "$pid_file" "$lock_file"
+    if [[ "$single_file" == false ]]; then
+        rm -f "$XDG_RUNTIME_DIR/worker.active"
+        vibranium-cmd-refresh-waybar-module worker
+    fi
+    vibranium-utils-update-lockscreen
+	exit 
+}
+trap cleanup EXIT INT TERM
+
+# Acquire lock and check for existing instance
+exec 200>"$lock_file"
+if ! flock -n 200; then
+    echo "${GRAY}[$(date)] ${RED}Another instance is already running${RESET}"
+    exit 1
+fi
+
+# Check if old PID exists and is alive
+if [[ -f "$pid_file" ]]; then
+    old_pid=$(cat "$pid_file")
+    if kill -0 "$old_pid" 2>/dev/null; then
+        echo "${GRAY}[$(date)] ${RED}Another instance is already running${RESET}"
+        exit 1
+    else
+        echo "${GRAY}[$(date)] ${YELLOW}Stale PID file found. Removing${RESET}"
+        rm -f "$pid_file"
+    fi
+fi
+
+# Write current PID
+echo $$ > "$pid_file"
+
 # Load all background images from the current theme's backgrounds directory
 backgrounds=("$XDG_CONFIG_HOME/vibranium/theme/current/backgrounds/"*)
 backgrounds+=("$(sed -n 's/^preload = //p' "$XDG_CONFIG_HOME/hypr/hyprpaper.conf")")
@@ -48,7 +85,6 @@ else
 	esac
 fi
 
-precached=0
 needed=0
 
 # Parse command-line arguments.
@@ -119,8 +155,7 @@ process_file_forcibly() {
         echo "${GRAY}[$(date)] ${BLUE}Processing ($type): ${YELLOW}${cached}${RESET}"
 		# DO NOT QUOTE THIS
         magick "$file" $filter "$cached"
-		vibranium-utils-update-lockscreen "$(sed -n 's/^preload = //p' "$XDG_CONFIG_HOME/hypr/hyprpaper.conf")"
-        ((precached++))
+		vibranium-utils-update-lockscreen
     done
 }
 
@@ -153,6 +188,8 @@ handle_power_pause() {
 
             local was_paused=true
 
+            echo "${GRAY}[$(date)] ${YELLOW}Pausing due to power-saver${RESET}"
+
             # Loop until conditions change: either respect_power=false or profile != power-saver.
             while :; do
 				if [[ "$(vibranium-cmd-get-option VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE)" == false ]]; then
@@ -163,23 +200,20 @@ handle_power_pause() {
                 if [[ "$current_profile" != "power-saver" ]]; then
                     break
                 fi
-                sleep 3
+                sleep 1
             done
 
             if [[ "$was_paused" == true ]]; then
                 # notify-send -r 1 -t 5000 "Vibranium" "Background cache generation resumed"
                 unset was_paused
             fi
+            echo "${GRAY}[$(date)] ${GREEN}Resuming cache generation${RESET}"
         fi
     fi
 }
 
 # Initial power pause check before starting processing.
 handle_power_pause
-
-# Update Waybar module to indicate worker is active.
-touch "$XDG_RUNTIME_DIR/worker.active"
-vibranium-cmd-refresh-waybar-module worker
 
 for file in "${backgrounds[@]}"; do
     for type in "${!filters[@]}"; do
@@ -203,14 +237,14 @@ for file in "${backgrounds[@]}"; do
             echo "${GRAY}[$(date)] ${BLUE}Processing ($type): ${YELLOW}${cached}${RESET}"
 			# DO NOT QUOTE THIS
             magick "$file" $filter "$cached"
-
-            ((precached++))
         fi
     done
 done
 
 # Cleanup: Remove worker active file and refresh Waybar.
-rm "$XDG_RUNTIME_DIR/worker.active"
-vibranium-cmd-refresh-waybar-module worker
+if [[ "$single_file" == false ]]; then
+	rm "$XDG_RUNTIME_DIR/worker.active"
+	vibranium-cmd-refresh-waybar-module worker
+fi
 
-vibranium-utils-update-lockscreen "$(sed -n 's/^preload = //p' "$XDG_CONFIG_HOME/hypr/hyprpaper.conf")"
+vibranium-utils-update-lockscreen

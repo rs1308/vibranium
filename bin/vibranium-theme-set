@@ -409,4 +409,4 @@ if pidof thunar > /dev/null; then
     hyprctl -q dispatch sendshortcut CTRL, R, class:[Tt]hunar
 fi
 
-vibranium-utils-lockscreen-cache &>/dev/null &
+vibranium-utils-lockscreen-cache &

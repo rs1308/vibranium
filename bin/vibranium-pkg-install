@@ -8,6 +8,13 @@ export SUDO_PROMPT TMPDIR
 
 SUDO_PROMPT="$(printf '%s[VIBRANIUM]%s Password for %s: ' "$RED" "$RESET" "$USER")"
 TMPDIR="$XDG_RUNTIME_DIR"
+YAY_FLAGS=(
+    "--answerclean" "Y"
+    "--answerdiff" "N"
+    "--answeredit" "N"
+    "--removemake"
+    "--cleanafter"
+)
 
 if ! tty -s; then
     exec setsid vibranium-cmd-launch-terminal "$0" "$@"
@@ -139,7 +146,7 @@ while :; do
                     "$YELLOW" "$RESET" "$GRAY" "$pkg" "$aur_flag" "$RESET"
 
                 start_time=$(date +%s)
-                yay -S --noconfirm "$pkg" >/dev/null 2>&1 &
+                yes | yay -S "$pkg" >/dev/null 2>&1 &
                 pid=$!
 
                 while kill -0 "$pid" 2>/dev/null; do
@@ -155,7 +162,7 @@ while :; do
             done
 			printf "\n"
         else
-            yay -S --noconfirm "${filtered[@]}" &>/dev/null &
+			yes | yay -S "${YAY_FLAGS[@]}" "${filtered[@]}" >/dev/null 2>&1 &
             spinner $! "${YELLOW}[VIBRANIUM]${RESET} Installing packages" ""
         fi
 

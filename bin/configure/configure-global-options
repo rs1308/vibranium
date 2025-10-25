@@ -74,12 +74,22 @@ while :; do
 
 	case "$CHOSEN" in
 		"Show wallpaper"*)
-			case "$VIBRANIUM_GLOBAL_SHOW_WALLPAPER" in
-				true)  systemctl -q --user disable --now hyprpaper ;;
-				false) systemctl -q --user enable --now hyprpaper ;;
-			esac
 			toggle_bool "VIBRANIUM_GLOBAL_SHOW_WALLPAPER"
-			vibranium-utils-update-lockscreen
+			case "$VIBRANIUM_GLOBAL_SHOW_WALLPAPER" in
+				true)
+					systemctl -q --user disable --now hyprpaper
+					if [ -f "$XDG_RUNTIME_DIR/vibranium-lockscreen-cache.pid" ]; then
+						pid=$(<"$XDG_RUNTIME_DIR/vibranium-lockscreen-cache.pid")
+						if kill -0 "$pid" 2>/dev/null; then
+							kill -TERM "$pid"
+						fi
+					fi
+					;;
+				false)
+					systemctl -q --user enable --now hyprpaper
+					vibranium-utils-lockscreen-cache &
+					;;
+			esac
 			;;
 		"Playerctl options")
 			configure-playerctl
@@ -257,8 +267,16 @@ while :; do
 				case "$blur_lockscreen_chosen" in
 					"Blur background"*)
 						toggle_bool VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_BACKGROUND
-						vibranium-utils-update-lockscreen &
-						continue
+						if [ -f "$XDG_RUNTIME_DIR/vibranium-lockscreen-cache.pid" ]; then
+						    pid=$(<"$XDG_RUNTIME_DIR/vibranium-lockscreen-cache.pid")
+						    if kill -0 "$pid" 2>/dev/null; then
+						        kill -TERM "$pid"
+						    fi
+						fi
+						(
+							sleep 1
+							setsid vibranium-utils-lockscreen-cache
+						) &
 						;;
 					"Blur strength"*)
 						while :; do
@@ -271,7 +289,16 @@ while :; do
 							else
 								option-validate VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_STRENGTH
 								sed -i "/VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_STRENGTH/s/=.*/=\"${blur_strength_chosen}\"/" "$VIBRANIUM_USER_SETTINGS"
-								vibranium-utils-update-lockscreen &
+								if [ -f "$XDG_RUNTIME_DIR/vibranium-lockscreen-cache.pid" ]; then
+									pid=$(<"$XDG_RUNTIME_DIR/vibranium-lockscreen-cache.pid")
+									if kill -0 "$pid" 2>/dev/null; then
+										kill -TERM "$pid"
+									fi
+								fi
+								(
+									sleep 1
+									setsid vibranium-utils-lockscreen-cache
+								) &
 								break
 							fi
 						done
@@ -287,7 +314,16 @@ while :; do
 							else
 								option-validate VIBRANIUM_GLOBAL_DIM_LOCKSCREEN_STRENGTH
 								sed -i "/VIBRANIUM_GLOBAL_DIM_LOCKSCREEN_STRENGTH/s/=.*/=\"${dim_strength_chosen}\"/" "$VIBRANIUM_USER_SETTINGS"
-								vibranium-utils-update-lockscreen &
+								if [ -f "$XDG_RUNTIME_DIR/vibranium-lockscreen-cache.pid" ]; then
+									pid=$(<"$XDG_RUNTIME_DIR/vibranium-lockscreen-cache.pid")
+									if kill -0 "$pid" 2>/dev/null; then
+										kill -TERM "$pid"
+									fi
+								fi
+								(
+									sleep 1
+									setsid vibranium-utils-lockscreen-cache
+								) &
 								break
 							fi
 						done
