@@ -18,15 +18,23 @@ _error_handler() {
 }
 
 _update() {
-	git -C "$VIBRANIUM" pull --autostash
-	git -C "$VIBRANIUM" diff --check || git -C "$VIBRANIUM" reset --merge
+	local latest_tag
+
+	git -C "$VIBRANIUM" fetch --all --tags
+	latest_tag=$(git -C "$VIBRANIUM" tag -l --sort=-v:refname | head -n 1)
+
+	git -C "$VIBRANIUM" stash push -m "autostash before update to $latest_tag"
+	git -C "$VIBRANIUM" checkout "$latest_tag"
+	git -C "$VIBRANIUM" stash apply || {
+		echo -e "${YELLOW}[VIBRANIUM]${RESET} Warning: Stash apply failed due to conflicts. Resolve manually if needed." 
+	}
 
 	rm "$VIBRANIUM_STATE/update.available"
 	vibranium-cmd-refresh-waybar-module vibranium-update
 
 	vibranium-update-migrate
 
-    echo -e "${GREEN}[VIBRANIUM]${RESET} Vibranium updated"
+    echo -e "${GREEN}[VIBRANIUM]${RESET} Vibranium updated to $latest_tag"
     read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
 }
 
