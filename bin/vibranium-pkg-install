@@ -153,6 +153,7 @@ while :; do
 
                 wait "$pid"
             done
+			printf "\n"
         else
             yay -S --noconfirm "${filtered[@]}" &>/dev/null &
             spinner $! "${YELLOW}[VIBRANIUM]${RESET} Installing packages" ""
