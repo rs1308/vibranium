@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 cat <<EOF > "$HOME/.config/gtk-3.0/settings.ini"
 [Settings]

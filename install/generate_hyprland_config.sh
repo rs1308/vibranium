@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 cat << EOF > "$HOME/.config/hypr/hyprland.conf"
 # Load current theme

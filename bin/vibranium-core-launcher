@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # shellcheck disable=SC2086
 # Overcomplicated launcher based on rofi, which can:

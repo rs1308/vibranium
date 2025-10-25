@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 case "$(</sys/class/dmi/id/chassis_type)" in
     9|10|14)  # Laptop, Notebook, Sub-Notebook

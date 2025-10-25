@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # TODO: parse output from 'vibranium-cmd-keybindings --list' and display actual shortcuts, not hardcoded one
 

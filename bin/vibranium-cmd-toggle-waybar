@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This script hides the waybar using a custom kill signal (does not kill the process)
 

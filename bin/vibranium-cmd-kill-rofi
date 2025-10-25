@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This script kills all parent processes that generate rofi menus. 
 # This is useful for cases where the final entry should launch, for example, a window, or be the last in the chain of generated menus.

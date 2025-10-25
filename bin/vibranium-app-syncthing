@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if ! command -v syncthing > /dev/null; then
     notify-send -r 4 -u critical -t 5000 "Vibranium" "Syncthing is not installed!"

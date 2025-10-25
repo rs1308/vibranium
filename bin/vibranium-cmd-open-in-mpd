@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Open the file directly in the mpd client and start playing.
 # There is no interface for this function, and there are no plans to create one.

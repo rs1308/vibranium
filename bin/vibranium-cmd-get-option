@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # vibranium-cmd-get-option <OPTION_NAME>
 # This script reads global and user settings and outputs the value of the variable passed to it.

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 cat <<EOF > "$HOME/.config/user-dirs.dirs"
 XDG_DESKTOP_DIR="$HOME/"

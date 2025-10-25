@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 
@@ -13,6 +13,11 @@ if [[ -z $XDG_RUNTIME_DIR ]]; then
     echo "XDG_RUNTIME_DIR is not set" >&2
     exit 1
 fi
+
+while ! ping 8.8.8.8 -c 1 &>/dev/null; do
+	# No internet connection
+	sleep 1
+done
 
 # Validate config options
 check_bool VIBRANIUM_BAR_WEATHER_MODULE_ENABLE true

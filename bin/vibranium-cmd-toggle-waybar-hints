@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This script hides tooltips with key combinations in custom module tooltips without reloading Waybar itself,
 # using Kill signals that modules accept.

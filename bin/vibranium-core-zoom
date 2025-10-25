@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # A simple script that zooms the entire desktop. 
 # It is activated by a key combination or SUPER + mouse scroll.

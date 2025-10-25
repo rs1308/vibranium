@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Draw a separator when some modules or conditions are active.
 
 source "$VIBRANIUM_PATH/vibranium-core-defaults"

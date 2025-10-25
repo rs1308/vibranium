@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 HYRPPAPER_CONF="$XDG_CONFIG_HOME/hypr/hyprpaper.conf"
 

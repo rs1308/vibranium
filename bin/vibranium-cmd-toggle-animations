@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Toggle Hyprland animations on/off.
 # Ensures config block exists, reads current state, flips it, and reloads config.

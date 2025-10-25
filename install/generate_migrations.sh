@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 VIBRANIUM="$HOME/.local/share/vibranium"
 STATE_DIR="$HOME/.local/state/vibranium/migrations"

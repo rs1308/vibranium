@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # vibranium-core-force-kill
 # This script forcibly closes the active window if it is frozen, for example, 

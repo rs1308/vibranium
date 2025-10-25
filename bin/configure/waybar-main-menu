@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 source "$VIBRANIUM_PATH/configure/configure-lib"
@@ -11,21 +11,19 @@ while :; do
 
 	BAR_POSITION="$(sed -n 's/.*"position"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$WAYBAR_CONFIG")"
 
-	if [[ "$BAR_POSITION" == "top" ]]; then
-		OPTIONS=("Move top bar to bottom")
-	else
-		OPTIONS=("Move bottom bar to top")
-	fi
+	case "$BAR_POSITION" in
+		"top")    OPTIONS=("Move top bar to bottom") ;;
+		"bottom") OPTIONS=("Move bottom bar to top") ;;
+	esac
 
-	if [[ "$VIBRANIUM_BAR_SHOW_SHORTCUT_HINTS" == true ]]; then
-		OPTIONS+=("Hide shortcut hints")
-	else
-		OPTIONS+=("Show shortcut hints")
-	fi
+	case "$VIBRANIUM_BAR_SHOW_SHORTCUT_HINTS" in
+		"true")  OPTIONS+=("Hide shortcut hints") ;;
+		"false") OPTIONS+=("Show shortcut hints") ;;
+	esac
 
 	OPTIONS+=("Configure modules" "Enabled modules")
 	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Waybar options" "ESC to go back" -selected-row "$INDEX")"
-	[[ -z $CHOSEN ]] && break
+	[ -z "$CHOSEN" ] && break
 
     for i in "${!OPTIONS[@]}"; do
         if [ "${OPTIONS[$i]}" = "$CHOSEN" ]; then

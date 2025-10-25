@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 cat <<EOF > "$HOME/.config/zathura/zathurarc"
 include ../vibranium/theme/current/zathura

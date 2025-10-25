@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This script was written before vibranium-core-playerctl-control. The script needs refactoring.
 # It is assumed that this script will be used exclusively in conjunction with hypridle and its options on_lock_cmd and on_unlock_cmd.

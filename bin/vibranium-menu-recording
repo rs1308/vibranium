@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if pidof gpu-screen-recorder >/dev/null; then
 	vibranium-core-recording

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # An overcomplicated script that copies the selected pixel from the screen to the clipboard and logs 
 # the last selected colors in a cache file to be displayed later in the Waybar module tooltip. The cache remains across reboots.

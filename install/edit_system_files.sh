@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 PACMAN_CONF="/etc/pacman.conf"
 MAKEPKG_CONF="/etc/makepkg.conf"

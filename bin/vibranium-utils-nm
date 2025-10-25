@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # A simple script that launches the TUI utility for the active network manager. 
 # This script is usually called via the Waybar module.

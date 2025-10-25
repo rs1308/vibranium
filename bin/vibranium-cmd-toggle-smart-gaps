@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 FILE="$XDG_CONFIG_HOME/hypr/hyprland.conf.d/smart-gaps.conf"
 

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 export PATH="$PATH:$VIBRANIUM_PATH/configure"

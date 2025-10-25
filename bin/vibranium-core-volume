@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Script for setting the volume with the ability to set the volume up to 150%
 # TODO: Allow absolute volume levels to be transmitted instead of relative ones

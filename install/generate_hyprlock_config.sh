@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 cat << EOF > "$HOME/.config/hypr/hyprlock.conf"
 source = ../vibranium/theme/current/hyprland.conf

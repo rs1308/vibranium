@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # vibranium-utils-video-downscale
 # This script allows you to reduce the size of a video file by cutting the bitrate, resolution, and audio quality. 

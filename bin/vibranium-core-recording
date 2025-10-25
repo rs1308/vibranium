@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Overcomplicated script for screen recording in three modes: full screen, selected window, and selected screen region.
 # The script has a huge number of settings that are accessible through Vibranium settings.

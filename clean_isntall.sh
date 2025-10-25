@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 rm -rf $HOME/.themes
 rm -rf $HOME/.cache/{vibranium,hyprlock,papirus-icon-theme}
