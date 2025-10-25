@@ -5,7 +5,7 @@
 _is_enabled() {
 	local pattern
 	pattern="$(sysctl -n kernel.core_pattern)"
-	if [[ "$pattern" =~ ^\|/bin/false ]]; then
+	if [[ "$pattern" == "|/bin/false" ]]; then
 		return 0 
 	else
 		return 1

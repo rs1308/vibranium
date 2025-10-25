@@ -2,13 +2,13 @@
 
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 
-if [ -f /etc/sysctl.d/99-coredump.conf ]; then
-	OPTIONS=("Disable systemd coredump")
-else
+if [[ "$(sysctl -n kernel.core_pattern)" == "|/bin/false" ]]; then
 	OPTIONS=("Enable systemd coredump")
+else
+	OPTIONS=("Disable systemd coredump")
 fi
 
-OPTIONS+=("What is this?")
+OPTIONS+=("What is ...")
 
 while :; do
 	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "System tweaks" "ESC to go back")"
@@ -21,7 +21,7 @@ while :; do
 				exit 0
 			fi
 			;;
-		"What is this?")
+		"What is ...")
 			while :; do
 				what_is_this_opts=("Coredump")
 				what_is_this_chosen="$(printf "%s\n" "${what_is_this_opts[@]}" | rofi_cmd "What is" "ESC to go back")"
