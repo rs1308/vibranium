@@ -5,23 +5,38 @@ source "$VIBRANIUM_PATH/configure/configure-lib"
 
 INDEX=0
 
+_terminal_opacity() {
+	local action
+	local value
+	local cfg
+
+	action="$1"
+	value="$2"
+	cfg="$XDG_CONFIG_HOME/alacritty/alacritty.toml"
+
+	case "$action" in
+		"get")
+			sed -nE '/^\[window\]/,/^\[/{s/^[[:space:]]*opacity[[:space:]]*=[[:space:]]*"?([0-9.]+)"?/\1/p}' \
+				"$cfg"
+			;;
+		"set")
+			sed -i -E '/^\[window\]/,/^\[/{s/^([[:space:]]*opacity[[:space:]]*=[[:space:]]*)"?[0-9.]+("?)/\1'"$value"'\2/}' \
+				"$cfg"
+			;;
+	esac
+}
+
 while :; do
 	source "$VIBRANIUM_USER_SETTINGS"
 
 	power_menu_style="$([ "$VIBRANIUM_GLOBAL_POWER_MENU_STYLE" = "overlay" ] && echo overlay || echo menu)"
+	terminal_opacity="$(_terminal_opacity get)"
+	wm_animations="$(hyprctl -j getoption animations:enabled | jq -r '.int')"
 	
 	if [[ $VIBRANIUM_GLOBAL_USE_OSD == false ]]; then
-		power_profile_osd="<span alpha='50%'>Power profile OSD       : $VIBRANIUM_GLOBAL_POWER_PROFILE_USE_OSD</span> <span foreground='${P_RED}'>()</span>"
+		power_profile_osd="<span alpha='70%'>Power profile OSD       : $VIBRANIUM_GLOBAL_POWER_PROFILE_USE_OSD</span> <span foreground='${P_RED}'>()</span>"
 	else
 		power_profile_osd="Power profile OSD       : $VIBRANIUM_GLOBAL_POWER_PROFILE_USE_OSD"
-	fi
-
-	if [[ -z $terminal_opacity ]]; then
-		terminal_opacity="$(sed -nE '/^\[window\]/,/^\[/{s/^[[:space:]]*opacity[[:space:]]*=[[:space:]]*"?([0-9.]+)"?/\1/p}'\
-			"$VIBRANIUM/defaults/alacritty.toml")"
-	else
-		terminal_opacity="$(sed -nE '/^\[window\]/,/^\[/{s/^[[:space:]]*opacity[[:space:]]*=[[:space:]]*"?([0-9.]+)"?/\1/p}'\
-			"$XDG_CONFIG_HOME/alacritty/alacritty.toml")"
 	fi
 
 	OPTIONS=(
@@ -29,17 +44,12 @@ while :; do
 		"OSD enabled             : $VIBRANIUM_GLOBAL_USE_OSD"
 	)
 
-
-	if [[ "$(hyprctl -j getoption animations:enabled | jq -r '.int')" == 0 ]]; then
-		OPTIONS+=(
-			"<span alpha='50%'>Flash border            : $VIBRANIUM_GLOBAL_FLASH_BORDER</span> <span foreground='${P_RED}'>()</span>"
-			"<span alpha='50%'>Flash screen            : $VIBRANIUM_GLOBAL_FLASH_SCREEN</span> <span foreground='${P_RED}'>()</span>"
-		)
+	if [[ "$wm_animations" == 0 ]]; then
+		OPTIONS+=("<span alpha='70%'>Flash border            : $VIBRANIUM_GLOBAL_FLASH_BORDER</span> <span foreground='${P_RED}'>()</span>"
+				  "<span alpha='70%'>Flash screen            : $VIBRANIUM_GLOBAL_FLASH_SCREEN</span> <span foreground='${P_RED}'>()</span>")
 	else
-		OPTIONS+=(
-			"Flash border            : $VIBRANIUM_GLOBAL_FLASH_BORDER"
-			"Flash screen            : $VIBRANIUM_GLOBAL_FLASH_SCREEN"
-		)
+		OPTIONS+=("Flash border            : $VIBRANIUM_GLOBAL_FLASH_BORDER"
+				  "Flash screen            : $VIBRANIUM_GLOBAL_FLASH_SCREEN")
 	fi
 
 	OPTIONS+=(
@@ -54,11 +64,10 @@ while :; do
 		"Respect power profile   : $VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE"
 		"Terminal transparency   : $terminal_opacity"
 		"Video downscale use GPU : $VIBRANIUM_VIDEO_DOWNSCALE_USE_GPU"
-		"========================"
-		"App launcher settings"
-		"Playerctl options"
-		"Notifications"
-		"Edit env vars"
+		"<b>App launcher settings<b>"
+		"<b>Playerctl options</b>"
+		"<b>Notifications</b>"
+		"<b>Edit env vars</b>"
 	)
 
 	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Global options" "ESC to go back" \
@@ -91,7 +100,7 @@ while :; do
 					;;
 			esac
 			;;
-		"Playerctl options")
+		*"Playerctl options"*)
 			configure-playerctl
 			;;
 		"Video downscale"*)
@@ -121,42 +130,27 @@ while :; do
 				esac
 			done
 			;;
-		"Edit env vars")
+		*"Edit env vars"*)
 			vibranium-cmd-launch-terminal "$EDITOR" "$XDG_CONFIG_HOME/vibranium/environment"
 			vibranium-cmd-kill-rofi
 			exit 0
 			;;
 		"Terminal"*)
 			while :; do
-				alacritty_config="$XDG_CONFIG_HOME/alacritty/alacritty.toml"
 				prompt="Terminal transparency (float)"
 				input="$(printf "%s" "$prompt" | rofi_cmd "Terminal transparency" "0.0 - 1.0")"
 				[[ -z "$input" ]] && break
 				[[ "$prompt" == "$input" ]] && continue
 
-				if [[ ! "$input" =~ ^[0-9]+(\.[0-9]{1,2})?$ ]]; then
-					notify-send -r 2 -u critical -t 1500 "Vibranium" \
-						"<span foreground='${P_RED}'>A floating point between 0.0 and 1.0!</span>"
-					continue
-				fi
-
-				if awk -v x="$input" 'BEGIN{exit !(x ~ /^[0-9]*\.?[0-9]+$/ && x>=0 && x<=1)}'; then
-					if [[ "$input" == 1 ]]; then
-						input="1.0"
-					fi
-					if ! grep "\[window\]" "$alacritty_config" >/dev/null; then
-						printf "\n\n[window]\nopacity = %s" "$input" >> "$alacritty_config"
-					else
-						sed -i -E '/^\[window\]/,/^\[/{s/^([[:space:]]*opacity[[:space:]]*=[[:space:]]*)"?[0-9.]+("?)/\1'"$input"'\2/}' \
-							"$alacritty_config"
-					fi
+				if [[ "$input" =~ ^0(\.[0-9]+)?$ || "$input" == "1" || "$input" == "1.0" ]]; then
+					[[ "$input" == 1 ]] && input="1.0"
+					_terminal_opacity set "$input"
 					break
 				else
 					notify-send -r 2 -u critical -t 1500 "Vibranium" \
-						"<span foreground='${P_RED}'>A floating point between 0.0 and 1.0!</span>"
+						"A floating point between 0.0 and 1.0!"
 					continue
 				fi
-
 			done
 			;;
 		*"Flash"*"()"*)
@@ -373,7 +367,7 @@ while :; do
 				esac
 			done
 			;;
-		"App"*)
+		*"App launcher"*)
 			while :; do
 				source "$VIBRANIUM_USER_SETTINGS"
 				app_launcher_options=(
@@ -413,7 +407,7 @@ while :; do
 				esac
 			done
 			;;
-		"Notifications")
+		*"Notifications"*)
 			while :; do
 				dunst_cfg="$XDG_CONFIG_HOME/dunst/dunstrc"
 				current_height="$(sed -n 's/.*progress_bar_height[[:space:]]*=[[:space:]]*\([0-9]\+\).*/\1/p' "$dunst_cfg")"
@@ -538,7 +532,7 @@ while :; do
 				)
 
 				if [[ "$VIBRANIUM_GLOBAL_USE_OSD" == false ]]; then
-					osd_options+=("<span alpha='50%'>Progress bar height : ${current_height}px</span> <span foreground='${P_RED}'>()</span>")
+					osd_options+=("<span alpha='70%'>Progress bar height : ${current_height}px</span> <span foreground='${P_RED}'>()</span>")
 				else
 					osd_options+=("Progress bar height : ${current_height}px")
 				fi
@@ -625,7 +619,7 @@ while :; do
 								continue
 							fi
 
-							if ! awk "BEGIN { exit !($input >= 0.1 && $input <= 1.0) }"; then
+							if [[ ! "$input" =~ ^0\.[1-9][0-9]*$ && "$input" != "1" && "$input" != "1.0" ]]; then
 								notify-send -r 5 -u critical -t 1500 "Vibranium" "Between 0.1s and 1s!"
 								continue
 							fi
@@ -672,10 +666,7 @@ while :; do
 								continue
 							fi
 
-							if ! awk "BEGIN { exit !($input >= 0.1 && $input <= 1.0) }"; then
-								if [[ "$input" == 1 ]]; then
-									input="1.0"
-								fi
+							if [[ ! "$input" =~ ^0\.[1-9][0-9]*$ && "$input" != "1" && "$input" != "1.0" ]]; then
 								notify-send -r 5 -u critical -t 1500 "Vibranium" "Between 0.1s and 1s!"
 								continue
 							fi
@@ -686,7 +677,7 @@ while :; do
 						done
 						;;
 					"What"*)
-						msg="\n<span foreground='${P_GREEN}'><b>•</b></span> <span foreground='${P_PURPLE}'><b>Whether to flash the screen when taking a screenshot (in fullscreen mode)</b></span>\n"
+						msg="\n<span foreground='${P_GREEN}'><b>•</b></span> <span foreground='${P_PURPLE}'><b>Whether to flash the screen when taking a fullscreen screenshot</b></span>\n"
 						msg+="<span foreground='${P_GREEN}'><b>•</b></span> <span foreground='${P_YELLOW}'><b>This is a global feature that takes priority over local options</b></span>\n\n"
 						msg+="A purely aesthetic feature that indicates the screen was captured.\n\n"
 						msg+="If the global option is set to '<span foreground='${P_RED}'><b>false</b></span>', no flash effect will be applied\n"

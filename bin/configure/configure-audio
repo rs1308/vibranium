@@ -29,7 +29,7 @@ while :; do
 	OPTIONS+=("Allow above 100% : $VIBRANIUM_VOLUME_ALLOW_ABOVE_HUNDRED")
 	OPTIONS+=(
 		"Adjustment step  : $VIBRANIUM_VOLUME_ADJUSTMENT_STEP"
-		"<b>Open volume control app</b>"
+		"<b><i>Open volume control app</i></b>"
 	)
 
 	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Audio" "ESC to go back" -selected-row "$INDEX")"

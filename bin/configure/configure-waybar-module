@@ -38,7 +38,6 @@ while :; do
 						sed -i "/^VIBRANIUM_BAR_INHIBITOR_ICON/s/=.*/=\"${inhibitor_chosen}\"/" "$VIBRANIUM_USER_SETTINGS"
 						vibranium-cmd-refresh-waybar-module inhibitor
 						;;
-					*) continue
 				esac
 			done
 			;;
@@ -61,49 +60,91 @@ while :; do
 			done
 			;;
 		"Color Picker")
-			color_picker_index=0
+			cp_index=0
+			cp_options=("History size" "Change icon")
 
 			while :; do
-				icon_options=("droplet" "palette" "eyedropper")
-				icon_chosen="$(printf "%s\n" "${icon_options[@]}" | rofi_cmd "Icon" "ESC to go back" -selected-row "$color_picker_index")"
-				[ -z "$icon_chosen" ] && break
+				cp_chosen="$(printf "%s\n" "${cp_options[@]}" | rofi_cmd "$CHOSEN" "ESC to go back" -selected-row "$cp_index")"
+				[[ -z "$cp_chosen" ]] && break
 
-				for i in "${!icon_options[@]}"; do
-					if [ "${icon_options[$i]}" = "$icon_chosen" ]; then
-						color_picker_index="$i"
+				for i in "${!cp_options[@]}"; do
+					if [ "${cp_options[$i]}" = "$cp_chosen" ]; then
+						cp_index="$i"
 						break
 					fi
 				done
 
-				if [[ "${icon_options[*]}" =~ $icon_chosen ]]; then
-					option-validate "VIBRANIUM_COLOR_PICKER_WAYBAR_ICON"
-					sed -i "/^VIBRANIUM_COLOR_PICKER_WAYBAR_ICON/s/=.*/=\"${icon_chosen}\"/" "$VIBRANIUM_USER_SETTINGS"
-					vibranium-cmd-refresh-waybar-module color-picker
-					continue
-				fi
+				case "$cp_chosen" in
+					"Change icon")
+						icon_index=0
+						while :; do
+							icon_options=("droplet" "palette" "eyedropper")
+							icon_chosen="$(printf "%s\n" "${icon_options[@]}" | rofi_cmd "Icon" "ESC to go back" -selected-row "$icon_index")"
+							[ -z "$icon_chosen" ] && break
+
+							for i in "${!icon_options[@]}"; do
+								if [ "${icon_options[$i]}" = "$icon_chosen" ]; then
+									icon_index="$i"
+									break
+								fi
+							done
+
+							if [[ "${icon_options[*]}" =~ $icon_chosen ]]; then
+								option-validate "VIBRANIUM_COLOR_PICKER_WAYBAR_ICON"
+								sed -i "/^VIBRANIUM_COLOR_PICKER_WAYBAR_ICON/s/=.*/=\"${icon_chosen}\"/" \
+									"$VIBRANIUM_USER_SETTINGS"
+								vibranium-cmd-refresh-waybar-module color-picker
+								break
+							fi
+						done
+						;;
+					"History size")
+						history_file="$XDG_CACHE_HOME/vibranium/color-picker.history"
+						while :; do
+							hs_opts=("3" "5" "10" "15")
+							hs_chosen="$(printf "%s\n" "${hs_opts[@]}" | rofi_cmd "$cp_chosen" "ESC to go back")"
+							[[ -z "$hs_chosen" ]] && break
+
+							if [[ "${hs_opts[*]}" =~ $hs_chosen ]]; then
+								option-validate "VIBRANIUM_COLOR_PICKER_HISTORY_SIZE"
+								sed -i "/^VIBRANIUM_COLOR_PICKER_HISTORY_SIZE/s/=.*/=\"${hs_chosen}\"/" \
+									"$VIBRANIUM_USER_SETTINGS"
+
+								if [[ -f "$history_file" ]]; then
+									line_count=$(wc -l < "$history_file")
+									if (( line_count > hs_chosen )); then
+										tail -n "$hs_chosen" "$history_file" > "${history_file}.tmp" \
+											&& mv "${history_file}.tmp" "$history_file"
+									fi
+								fi
+
+								vibranium-cmd-refresh-waybar-module color-picker
+								break
+							fi
+						done
+						;;
+				esac
 			done
 			;;
 		"Weather")
 			while :; do
-				new_value="$(printf "Enter new value (string)" | rofi_cmd "City" "ESC to go back")"
-				[ -z "$new_value" ] && break
-				[[ ! "$new_value" =~ ^[A-Za-z]+$ ]] && {
+				new_value="$(printf "Enter new value (string)" | rofi_cmd "City" "current is ${VIBRANIUM_BAR_WEATHER_MODULE_CITY}")"
+				[ -z "$new_value" ] && break; [[ ! "$new_value" =~ ^[A-Za-z]+$ ]] && {
 					notify-send -r 1 -u critical -t 2000 "Vibranium" "Invalid city name!"
-					break 2
+					continue
 				}
 
-				# Create an option in user settings if it does not already exist.
-				# Only then perfom action
-				opt_name="VIBRANIUM_BAR_WEATHER_MODULE_CITY"
-				option-validate "$opt_name"
-
+				opt_name="VIBRANIUM_BAR_WEATHER_MODULE_CITY"; option-validate "$opt_name"
 				sed -i "s|^${opt_name}=.*|${opt_name}=\"${new_value}\"|" "$VIBRANIUM_USER_SETTINGS"
-				notify-send -r 1 "City updated!" "Monitoring weather in $new_value"
+				msg="Monitoring weather in <span foreground='${P_ACCENT}'><b>$new_value</b></span>"
 
 				if [ "$(vibranium-cmd-get-option VIBRANIUM_BAR_WEATHER_MODULE_ENABLE)" = "true" ]; then
+					notify-send -r 1 "City updated!" "$msg"
 					vibranium-cmd-refresh-waybar-module weather
+				else
+					notify-send -r 1 "City updated, but you forgot to enable the module" "$msg"
 				fi
-				exit 0
+				break
 			done
 			;;
 	esac

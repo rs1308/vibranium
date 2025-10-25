@@ -20,6 +20,7 @@ fi
 mkdir -p "$XDG_CACHE_HOME/vibranium"
 
 LAST_USED="$XDG_CACHE_HOME/vibranium/color-picker.history"
+
 # Clear the cache file if the script received the --clear argument.
 if [[ "$1" == "--clear" ]]; then
 	truncate -s 0 "$LAST_USED"
@@ -29,7 +30,7 @@ fi
 
 # Technically, this option works, but:
 # TODO: To fully implement this, we need to write a function that will convert all color formats to HEX 
-# so that the correct background can be displayed in the Waybar tooltip module.
+# so that the correct background can be displayed in the Waybar module
 check_enum VIBRANIUM_COLOR_PICKER_COLOR_FORMAT "hex" rgb cmyk hex hsl hsv
 check_bool VIBRANIUM_COLOR_PICKER_SHOW_HEX_PREVIEW true
 check_bool VIBRANIUM_COLOR_PICKER_LOWER_SENSETIVITY true
@@ -70,7 +71,6 @@ fi
 # a duplicate of one already existing in the cache file.
 if ! grep -Fxq "$selected_color" "$LAST_USED" 2>/dev/null; then
 	# Wipe file if reached limit
-	# NOTE: VIBRANIUM_COLOR_PICKER_HISTORY_SIZE is not yet implemented in Vibranium settings.
     if [[ "$(wc -l < "$LAST_USED" 2>/dev/null)" -ge $VIBRANIUM_COLOR_PICKER_HISTORY_SIZE ]]; then
         echo "$selected_color" > "$LAST_USED"
     else
@@ -81,13 +81,13 @@ fi
 preview_img="$XDG_RUNTIME_DIR/color-picker_recent-color.png"
 
 # Delete the preview file if it (somehow) exists from the previous launch
-if [ -f "$preview_img" ]; then
+if [[ -f "$preview_img" ]]; then
 	rm "$preview_img"
 fi
 
 # Generate a 1:1px image of the selected color to display in the notification
 if [[ $VIBRANIUM_COLOR_PICKER_SHOW_SELECTED_COLOR == true ]]; then
-	if ! command -v magick >/dev/null; then
+	if [[ ! -f /usr/bin/magick ]]; then
 		warn "The notification preview was not generated because ImageMagick is not installed"
 	else
 		magick -size 1x1 xc:"${selected_color}" "$preview_img"

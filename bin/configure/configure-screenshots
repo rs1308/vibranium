@@ -54,8 +54,8 @@ while :; do
 
 	if [ "$(hyprctl -j getoption animations:enabled | jq '.int')" = "0" ]; then
 		OPTIONS+=(
-			"<span alpha='50%'>Flash screen   : $VIBRANIUM_SCREENSHOT_FLASH_SCREEN</span> <span foreground='${P_RED}'>()</span>"
-			"<span alpha='50%'>Flash border   : $VIBRANIUM_SCREENSHOT_FLASH_BORDER</span> <span foreground='${P_RED}'>()</span>"
+			"<span alpha='70%'>Flash screen   : $VIBRANIUM_SCREENSHOT_FLASH_SCREEN</span> <span foreground='${P_RED}'>()</span>"
+			"<span alpha='70%'>Flash border   : $VIBRANIUM_SCREENSHOT_FLASH_BORDER</span> <span foreground='${P_RED}'>()</span>"
 		)
 	else
 		OPTIONS+=(

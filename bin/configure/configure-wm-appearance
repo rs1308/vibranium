@@ -274,11 +274,11 @@ while :; do
 
 				if [[ $blur_enabled == false ]]; then
 					blur_options+=(
-						"<i>Radius</i>     : $blur_radius <span foreground='${P_RED}'>()</span>"
-						"<i>Strength</i>   : $blur_strength <span foreground='${P_RED}'>()</span>"
-						"<i>Contrast</i>   : $blur_contrast <span foreground='${P_RED}'>()</span>"
-						"<i>Brightness</i> : $blur_brightness <span foreground='${P_RED}'>()</span>"
-						"<i>Saturation</i> : $blur_saturation <span foreground='${P_RED}'>()</span>"
+						"<span alpha='70%'>Radius     : $blur_radius</span> <span foreground='${P_RED}'>()</span>"
+						"<span alpha='70%'>Strength   : $blur_strength</span> <span foreground='${P_RED}'>()</span>"
+						"<span alpha='70%'>Contrast   : $blur_contrast</span> <span foreground='${P_RED}'>()</span>"
+						"<span alpha='70%'>Brightness : $blur_brightness</span> <span foreground='${P_RED}'>()</span>"
+						"<span alpha='70%'>Saturation : $blur_saturation</span> <span foreground='${P_RED}'>()</span>"
 					)
 				else
 					blur_options+=(

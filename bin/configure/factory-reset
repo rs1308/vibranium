@@ -27,6 +27,8 @@ reset_settings() {
     [ -n "$callback" ] && eval "$callback"
 
     notify-send -r 1 -t 5000 "Vibranium" "<span foreground='${P_RED}'><b>${message}</b></span>"
+
+	return 0
 }
 
 factory_reset() {
@@ -130,8 +132,9 @@ while :; do
             reset_settings "screen recording" "VIBRANIUM_RECORDING" "Screen recording settings have been restored to defaults!"
         ;;
 		*"FACTORY RESET"*)
-			factory_reset
-			vibranium-cmd-kill-rofi
-			exit 0
+			if factory_reset; then
+				vibranium-cmd-kill-rofi
+				exit 0
+			fi
     esac
 done

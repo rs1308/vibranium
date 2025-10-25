@@ -8,8 +8,8 @@ INDEX=0
 while :; do
 	source "$VIBRANIUM_USER_SETTINGS"
 	
-	use_ddc="$([ $VIBRANIUM_BRIGHTNESS_USE_DDC_CONTROL = true ] && echo yes || echo no)"
-	use_osd="$([ $VIBRANIUM_BRIGHTNESS_USE_OSD = true ] && echo yes || echo no)"
+	use_ddc="$([ "$VIBRANIUM_BRIGHTNESS_USE_DDC_CONTROL" = true ] && echo yes || echo no)"
+	use_osd="$([ "$VIBRANIUM_BRIGHTNESS_USE_OSD" = true ] && echo yes || echo no)"
 	step="$VIBRANIUM_BRIGHTNESS_STEP"
 
 	if [ "$VIBRANIUM_GLOBAL_USE_OSD" = false ]; then
