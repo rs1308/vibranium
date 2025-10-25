@@ -11,7 +11,7 @@ case "$(</sys/class/dmi/id/chassis_type)" in
         ;;
 esac
 
-cat << EOF > "$HOME/.config/hypr/hypridle.conf"
+cat <<EOF > "$HOME/.config/hypr/hypridle.conf"
 source = ~/.local/share/vibranium/defaults/hypr/hypridle.conf
 
 listener {
