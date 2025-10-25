@@ -145,8 +145,8 @@ VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE=true
 #
 # Note: Changes are applied instantly
 #
-# Default: true
-VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_BACKGROUND=true
+# Default: false
+VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_BACKGROUND=false
 
 # The amount of blur to apply to the lockscreen background.
 # Available options: string 'low' 'mid' 'hard'
@@ -157,8 +157,8 @@ VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_STRENGTH="mid"
 # How much to dim the lockscreen background when VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_BACKGROUND is false. 
 # Available options: string 'low' 'mid' 'hard'
 #
-# Default is 'mid'
-VIBRANIUM_GLOBAL_DIM_LOCKSCREEN_STRENGTH="mid"
+# Default is 'hard'
+VIBRANIUM_GLOBAL_DIM_LOCKSCREEN_STRENGTH="hard"
 
 # Whether to require the user to repeat the shortcut to kill the active window.
 # Available options: bool
