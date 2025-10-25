@@ -9,7 +9,7 @@ case "$(</sys/class/dmi/id/chassis_type)" in
         LOCK_AFTER=600
 		SLEEP_AFTER=900
         ;;
-case
+esac
 
 cat << EOF > "$HOME/.config/hypr/hypridle.conf"
 source = ~/.local/share/vibranium/defaults/hypr/hypridle.conf
