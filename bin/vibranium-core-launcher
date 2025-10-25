@@ -14,7 +14,8 @@
 #	- Power menu
 
 if pidof rofi >/dev/null; then
-	vibranium-cmd-kill-rofi
+	killall rofi
+	exit 0
 fi
 
 source "$VIBRANIUM_PATH/vibranium-core-lib"
