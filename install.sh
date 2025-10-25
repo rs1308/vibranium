@@ -163,12 +163,20 @@ enable_system_services() {
 		"gnome-polkit"
 	)
 
+	user_timers=(
+		"vibranium-update"
+	)
+
 	for service in "${system_services[@]}"; do
 		sudo systemctl -q enable "$service"
 	done
 
 	for service in "${user_services[@]}"; do
 		systemctl -q --user enable "$service"
+	done
+
+	for timer in "${user_timers[@]}"; do
+		systemctl -q --user enable "$timer"
 	done
 }
 
