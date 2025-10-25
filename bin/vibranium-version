@@ -11,6 +11,7 @@ else
 
     git -C "$VIBRANIUM" fetch --quiet origin >/dev/null 2>&1
     echo "Vibranium ${TAG}. Development branch, ${COMMITS_AHEAD} commits ahead of latest stable release"
+	exit 0
 fi
 
 if [ -f "$VIBRANIUM_STATE/update.available" ]; then
