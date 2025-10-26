@@ -10,6 +10,7 @@ while :; do
 	source "$VIBRANIUM_USER_SETTINGS"
 
 	BAR_POSITION="$(sed -n 's/.*"position"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$WAYBAR_CONFIG")"
+	BAR_HEIGHT="$(sed -n 's/.*"height"[[:space:]]*:[[:space:]]*\([^"]*\),.*/\1/p' "$WAYBAR_CONFIG")"
 
 	case "$BAR_POSITION" in
 		"top")    OPTIONS=("Move top bar to bottom") ;;
@@ -21,7 +22,7 @@ while :; do
 		"false") OPTIONS+=("Show shortcut hints") ;;
 	esac
 
-	OPTIONS+=("Configure modules" "Enabled modules")
+	OPTIONS+=("Configure modules" "Enabled modules" "Height: $BAR_HEIGHT")
 	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Waybar options" "ESC to go back" -selected-row "$INDEX")"
 	[ -z "$CHOSEN" ] && break
 
@@ -33,6 +34,25 @@ while :; do
     done
 
 	case "$CHOSEN" in
+		"Height"*)
+			while :; do
+				prompt="Waybar heigh (int)"
+				input="$(printf "%s" "$prompt" | rofi_cmd "Bar height" "30-45")"
+				[[ -z "$input" ]] && break; [[ ! "$input" =~ ^[0-9]+$ ]] && {
+					notify-send -r 1 "Vibranium" "An integer between 30-45"
+					continue
+				}
+
+				if (( input > 45 || input < 30 )); then
+					notify-send -r 1 "Vibranium" "An integer between 30-45"
+					continue
+				fi
+
+				sed -i -E "s/(\"height\"\s*:\s*)[0-9]+/\1${input}/" "$WAYBAR_CONFIG"
+				systemctl --user restart waybar
+				break
+			done
+			;;
 		"Move"*)
 			case "$BAR_POSITION" in
 				top)    vibranium-cmd-set-waybar-position "bottom" ;;
