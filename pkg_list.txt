@@ -7,6 +7,7 @@ power-profiles-daemon
 omarchy-chromium-bin
 gpu-screen-recorder
 alacritty-sixel-git
+webp-pixbuf-loader
 zathura-pdf-mupdf
 ttf-cascadia-code
 ffmpegthumbnailer
