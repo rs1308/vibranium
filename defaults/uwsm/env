@@ -58,10 +58,27 @@ case "$(</sys/class/dmi/id/chassis_type)" in
 	"1")  export VIBRANIUM_IS_VIRTUAL_MACHINE=true ;;
 esac
 
-if lspci | grep -qE "(Radeon RX|ATI|UHD|Iris|Arc|Nvidia)"; then
-	export VIBRANIUM_GPU_IS_SUPPORTED=true
-else
-	export VIBRANIUM_GPU_IS_SUPPORTED=false
-fi
+# https://wiki.archlinux.org/title/Hardware_video_acceleration#Configuration
+GPU="$(lspci | grep -E "VGA compatible controller.*(Radeon RX|ATI|UHD|Iris|Arc|Nvidia)")"
+case "$GPU" in
+	*"Radeon RX"*|*"ATI"*)
+		export VIBRANIUM_GPU_IS_SUPPORTED=true
+		export VDPAU_DRIVER="radeonsi"
+		export LIBVA_DRIVER_NAME="radeonsi"
+		;;
+	*"UHD"*|*"Iris"*|*"Arc"*)
+		export VIBRANIUM_GPU_IS_SUPPORTED=true
+		export VDPAU_DRIVER="va_gl"
+		export LIBVA_DRIVER_NAME="i965"
+		;;
+	*"Nvidia"*)
+		export VIBRANIUM_GPU_IS_SUPPORTED=true
+		export VDPAU_DRIVER="nvidia"
+		export LIBVA_DRIVER_NAME="nvidia"
+		;;
+	*)
+		export VIBRANIUM_GPU_IS_SUPPORTED=false
+		;;
+esac
 
 # vim:ft=bash
