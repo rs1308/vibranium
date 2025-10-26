@@ -12,7 +12,7 @@ Ensure you have an active internet connection and that `git` is installed.
 To install Vibranium, type the code below in TTY:
 
 ```bash
-mkdir -p "$HOME/.local/share"; cd "$HOME/.local/share"
+mkdir -p $HOME/.local/share; cd $HOME/.local/share
 git clone https://github.com/shvedes/vibranium; cd vibranium
 ./install.sh
 ```
@@ -23,10 +23,4 @@ Vibranium is currently in beta testing. Some features may break or not work at a
 
 ### Code Quality
 
-The code is currently focused on functionality rather than structure. Refactoring and performance improvements will come once all core features are implemented. The project’s architecture wasn’t planned from the start, so rewriting from scratch wasn’t practical—hence the current state of the code.
-
-## Current TODO List
-
-- [x] Implement tag-based versioning
-- [ ] Consider Omarchy(Ruby-On-Rails)-style migrations? There's no need to reinvent the wheel.
-- [x] First beta release?
+The code is currently focused on functionality rather than structure. Refactoring and performance improvements will come once all core features are implemented. The project’s architecture wasn’t planned from the start, so rewriting from scratch wasn’t practical—hence the current state of the code. For further information visit [**Vibranium wiki**](https://github.com/shvedes/vibranium/wiki)
