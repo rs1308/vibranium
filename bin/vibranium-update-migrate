@@ -4,17 +4,22 @@
 
 STATE_DIR="$VIBRANIUM_STATE/migrations"
 
+YELLOW=$'\e[0;33m'
+GREEN=$'\e[0;32m'
+RESET=$'\e[0m'
+
 mkdir -p "$STATE_DIR/skipped"
 for file in "$VIBRANIUM"/migrations/*.sh; do
     filename=$(basename "$file")
 
     if [[ ! -f "$STATE_DIR/$filename" && ! -f "$STATE_DIR/skipped/$filename" ]]; then
-        echo -e "\e[32m\nRunning migration (${filename%.sh})\e[0m"
+        echo -e "${YELLOW}[VIBRANIUM]${RESET} Running migration ${GREEN}${filename%.sh}${RESET}"
 
         if bash "$file"; then
             touch "$STATE_DIR/$filename"
         else
-            printf "%s[VIBRANIUM]%s Migration %s failed. Skip and continue? (y/N): " $'\e[0;31m' $'\e[0m' "${filename%.sh}"
+            printf "%s[VIBRANIUM]%s Migration %s failed. Skip and continue? (y/N): " \
+				"$YELLOW" "$RESET" "$file"
             read -r response
             case "$response" in
             [yY][eE][sS] | [yY])

@@ -5,49 +5,93 @@ set -e
 RED=$'\e[0;31m'
 RESET=$'\e[0m'
 GREEN=$'\e[0;32m'
+YELLOW=$'\e[0;33m'
 
 _error_handler() {
     local exit_code=$?
     local line_no=$1
-    echo -e "\n\e[31mError occurred at line $line_no. Exit code: $exit_code\e[0m"
-    echo "Git status at failure:"
+    echo -e "${RED}Error occurred at line${RESET} $line_no. ${RED}Exit code${RESET}: $exit_code\e[0m"
+    echo -e "${RED}[VIBRANIUM]${RESET} Git status at failure:"
     git -C "$VIBRANIUM" status
-    echo "Attempting safe reset..."
+    echo -e "${RED}[VIBRANIUM]${RESET} Attempting safe reset..."
     git -C "$VIBRANIUM" reset --merge || true
+	read -n1 -r -p $'\e[0;31m[VIBRANIUM]\e[0m Press any key to close this window' dummy
     exit "$exit_code"
 }
 
 _update() {
-	local latest_tag
+    local latest_tag current_tag
 
-	git -C "$VIBRANIUM" fetch --all --tags
-	latest_tag=$(git -C "$VIBRANIUM" tag -l --sort=-v:refname | head -n 1)
+	printf '\e[?25l' # Hide cursor
 
-	git -C "$VIBRANIUM" stash push -m "autostash before update to $latest_tag"
-	git -C "$VIBRANIUM" checkout "$latest_tag"
-	git -C "$VIBRANIUM" stash apply || {
-		echo -e "${YELLOW}[VIBRANIUM]${RESET} Warning: Stash apply failed due to conflicts. Resolve manually if needed." 
-	}
+	# Pull from remote
+	echo -e "${YELLOW}[VIBRANIUM]${RESET} Getting updates from remote..."
+    git -C "$VIBRANIUM" fetch --all --tags
 
-	rm "$VIBRANIUM_STATE/update.available"
-	vibranium-cmd-refresh-waybar-module vibranium-update
+    current_tag=$(git -C "$VIBRANIUM" describe --tags --exact-match 2>/dev/null || echo "master")
+	echo -e "${YELLOW}[VIBRANIUM]${RESET} Local: $current_tag"
 
-	vibranium-update-migrate
+    latest_tag=$(git -C "$VIBRANIUM" tag -l --sort=-v:refname | head -n 1)
+	echo -e "${YELLOW}[VIBRANIUM]${RESET} Remote: ${latest_tag}"
+
+	if [ "$current_tag" = "$latest_tag" ]; then
+		echo -e "${GREEN}[VIBRANIUM]${RESET} You are up to date"
+		read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
+		exit 0
+	elif [ "$current_tag" = "master" ]; then
+		ahead_count=$(git -C "$VIBRANIUM" rev-list --count "$latest_tag"..HEAD)
+
+		if [ "$ahead_count" -eq 0 ]; then
+			echo -e "${GREEN}[VIBRANIUM]${RESET} DEV: you're up to date on $latest_tag"
+		else
+			printf "%s[VIBRANIUM]%s DEV: %s branch, %s commit(s) ahead of %s\n" \
+			  "$GREEN" "$RESET" \
+			  "${YELLOW}${current_tag}${RESET}" \
+			  "${YELLOW}${ahead_count}${RESET}" \
+			  "${YELLOW}${latest_tag}${RESET}"
+		fi
+
+		read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
+		exit 0
+    else
+		echo -e "${YELLOW}[VIBRANIUM]${RESET} Trying to stash local changes..."
+        if git -C "$VIBRANIUM" stash push -m "autostash before update to $latest_tag" -q | grep -q 'No local changes'; then
+            echo -e "${GREEN}[VIBRANIUM]${RESET} No local changes to stash"
+        else
+            echo -e "${GREEN}[VIBRANIUM]${RESET} Local changes stashed"
+        fi
+
+		echo -e "${YELLOW}[VIBRANIUM]${RESET} Switching tags..."
+        git -C "$VIBRANIUM" checkout -q "$latest_tag"
+
+        if git -C "$VIBRANIUM" stash list -q | grep -q "autostash before update to $latest_tag"; then
+            git -C "$VIBRANIUM" stash apply -q
+            git -C "$VIBRANIUM" stash drop -q
+            echo -e "${GREEN}[VIBRANIUM]${RESET} Stash applied"
+        else
+            echo -e "${YELLOW}[VIBRANIUM]${RESET} No stash to apply"
+        fi
+    fi
+
+    vibranium-update-migrate
+    rm -f "$VIBRANIUM_STATE/update.available"
+    vibranium-cmd-refresh-waybar-module vibranium-update
 
     echo -e "${GREEN}[VIBRANIUM]${RESET} Vibranium updated to $latest_tag"
     read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
+    printf '\e[?25h' # show cursor
 }
 
 trap '_error_handler $LINENO' ERR
 
 printf "\n\e[33m%s\e[0m\n\n" "$(<"$VIBRANIUM/logo.txt")"
+PROMPT=$'\e[0;33m[VIBRANIUM]\e[0m Proceed with update? (Y/n): '
 
-PROMPT=$'\e[0;33m[VIBRANIUM]\e[0m You are about to update Vibranium. Proceed? (Y/n): '
 while :; do
     printf "%s" "$PROMPT"
     read -r answer
     case "$answer" in
-        [Yy]|"")
+        [Yy][Ee][Ss]|[Yy]|"")
 			_update
             exit 0
             ;;

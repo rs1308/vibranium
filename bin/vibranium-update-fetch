@@ -1,16 +1,20 @@
 #!/usr/bin/env bash
 
+# Shellcheck doesn't understand the context
 # shellcheck disable=SC2016
+
+while ! ping -c 1 8.8.8.8; do
+	sleep 1
+done
+
 REMOTE_LATEST=$(git -C "$VIBRANIUM" ls-remote --tags origin 2>/dev/null | sed -n '/refs\/tags\/[^^]*$/ { s#.*refs/tags/##; h }; ${x; p}')
 LOCAL_LATEST=$(git -C "$VIBRANIUM" describe --tags --abbrev=0 2>/dev/null)
 
-# e.g. network issue
 [ -z "$REMOTE_LATEST" ] && exit 1
 
 if [[ "$REMOTE_LATEST" != "$LOCAL_LATEST" ]]; then
 	echo "$REMOTE_LATEST" > "$VIBRANIUM_STATE/update.available"
-	# Vibranium update
-	pkill -RTMIN+12 waybar
-	# Separator
-	pkill -RTMIN+10 waybar
+	# Since it launches from the systemd service, we can't
+	# use external scripts from here.
+	pkill -RTMIN+12 waybar; pkill -RTMIN+10 waybar
 fi
