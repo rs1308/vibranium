@@ -1,0 +1,8 @@
+{
+	"cpu": {
+		"interval": 1,
+		"format": "\uf4bc",
+		"on-click": "vibranium-cmd-launch-terminal btop",
+		"on-click-right": "vibranium-cmd-launch-terminal nvtop"
+	}
+}

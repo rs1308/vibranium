@@ -5,19 +5,21 @@ source "$VIBRANIUM_PATH/configure/configure-lib"
 
 WAYBAR_CFG="$XDG_CONFIG_HOME/waybar/config.jsonc"
 
-check_keyboard_layout_module() {
-	if grep -E '^\s*//.*"hyprland/language"' "$WAYBAR_CFG" >/dev/null; then
-		return 0 # commented out - module disabled
+check_module() {
+	local module="$1"
+	if grep -Eq "^\s*//.*\"$module\"" "$WAYBAR_CFG"; then
+		return 0  # commented out - module disabled
 	else
 		return 1
 	fi
 }
 
-toggle_keyboard_layout_module() {
-	if check_keyboard_layout_module; then
-		sed -i 's|^\(\s*\)//\s*\(.*"hyprland/language".*\)|\1\2|' "$WAYBAR_CFG"
+toggle_module() {
+	local module="$1"
+	if check_module "$module"; then
+		sed -i "s|^\(\s*\)//\s*\(.*\"$module\".*\)|\1\2|" "$WAYBAR_CFG"
 	else
-		sed -i 's|^\(\s*\)\("\s*hyprland/language".*\)|\1// \2|' "$WAYBAR_CFG"
+		sed -i "s|^\(\s*\)\(\".*$module\".*\)|\1// \2|" "$WAYBAR_CFG"
 	fi
 	systemctl --user restart waybar
 }
@@ -28,10 +30,22 @@ INDEX=0
 while :; do
 	source "$VIBRANIUM_USER_SETTINGS"
 
-	if check_keyboard_layout_module; then
+	if check_module 'hyprland/language'; then
 		KEYBOARD_LAYOUT_STATUS="false"
 	else
 		KEYBOARD_LAYOUT_STATUS="true"
+	fi
+
+	if check_module 'disk'; then
+		DISK_ENABLED="false"
+	else
+		DISK_ENABLED="true"
+	fi
+
+	if check_module 'cpu'; then
+		CPU_ENABLED="false"
+	else
+		CPU_ENABLED="true"
 	fi
 
 	OPTIONS=(
@@ -41,6 +55,8 @@ while :; do
 		"Brightness      : $VIBRANIUM_BAR_BRIGHTNESS_MODULE_ENABLE"
 		"Weather         : $VIBRANIUM_BAR_WEATHER_MODULE_ENABLE"
 		"Pacman          : $VIBRANIUM_BAR_PACMAN_MODULE_ENABLE"
+		"Disk            : $DISK_ENABLED"
+		"CPU             : $CPU_ENABLED"
 	)
 
     CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Toggle modules" "ESC to go back" -selected-row "$INDEX")"
@@ -54,8 +70,14 @@ while :; do
     done
 
     case "$CHOSEN" in
+		"CPU"*)
+			toggle_module 'cpu'
+			;;
+		"Disk"*)
+			toggle_module 'disk'
+			;;
 		"Keyboard layout"*)
-			toggle_keyboard_layout_module
+			toggle_module 'hyprland/language'
 			;;
         "Color picker"*)
 			toggle_bool "VIBRANIUM_BAR_COLOR_PICKER_MODULE_ENABLE"
