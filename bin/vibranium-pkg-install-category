@@ -40,6 +40,15 @@ declare -A packages=(
     ["Gaming:Utilities:MangoHud"]="mangohud"
     ["Gaming:Utilities:Gamemode"]="gamemode"
 
+	["Graphics:Inkscape"]="inkscape"
+	["Graphics:Blender"]="blender"
+	["Graphics:Krita"]="krita"
+	["Graphics:Pinta"]="pinta"
+	["Graphics:GIMP"]="gimp"
+
+	["Utilities:System and Hardware"]="hdparm smartmontools nvme-cli mesa-utils libva-utils vdpauinfo iotop inxi dmidecode lshw"
+	["Utilities:Network"]="iperf3 mtr ethtool nmap tcpdump iftop traceroute"
+
     ["Office:Libreoffice"]="libreoffice-fresh"
     ["Office:ONLYOFFICE"]="onlyoffice-bin"
     ["Office:Obsidian"]="obsidian"
