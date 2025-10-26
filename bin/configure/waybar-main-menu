@@ -36,7 +36,7 @@ while :; do
 	case "$CHOSEN" in
 		"Height"*)
 			while :; do
-				prompt="Waybar heigh (int)"
+				prompt="Waybar height (int)"
 				input="$(printf "%s" "$prompt" | rofi_cmd "Bar height" "30-45")"
 				[[ -z "$input" ]] && break; [[ ! "$input" =~ ^[0-9]+$ ]] && {
 					notify-send -r 1 "Vibranium" "An integer between 30-45"
