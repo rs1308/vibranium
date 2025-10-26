@@ -14,6 +14,7 @@ YAY_FLAGS=(
     "--answeredit" "N"
     "--removemake"
     "--cleanafter"
+	"--sudoloop"
 )
 
 if ! tty -s; then
@@ -21,14 +22,14 @@ if ! tty -s; then
     exit 0
 fi
 
-_operation_aborted() {
+_operation_canceled() {
 	case "$1" in
 		quit)
-			notify-send -r 1 "Vibranium" "Operation aborted"
+			notify-send -r 1 "Vibranium" "Operation canceled"
 			kill 0
 			;;
 		*)
-			echo -e "${RED}[VIBRANIUM]${RESET} Operation aborted"
+			echo -e "${RED}[VIBRANIUM]${RESET} Operation canceled"
 			read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
 			printf '\e[?25h' # show cursor
 			;;
@@ -43,7 +44,7 @@ _installation_complete() {
     exit 0
 }
 
-trap '_operation_aborted quit' SIGHUP
+trap '_operation_canceled quit' SIGHUP
 trap 'exit 1' SIGINT
 
 if [[ "$1" =~ ^(-h|--help)$ ]]; then
@@ -94,7 +95,7 @@ else
     mapfile -t chosen < <(printf "%s\n" "${total_packages[@]}" | fzf "${fzf_args[@]}")
 
     if [ ${#chosen[@]} -eq 0 ]; then
-        _operation_aborted ""
+        _operation_canceled ""
     fi
 fi
 
@@ -105,7 +106,6 @@ for package in "${chosen[@]}"; do
     fi
 done
 
-
 if [ ${#filtered[@]} -eq 0 ]; then
 	echo -e "${GREEN}[VIBRANIUM]${RESET} Selected packages are already installed"
     read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
@@ -113,26 +113,35 @@ if [ ${#filtered[@]} -eq 0 ]; then
     exit 0
 fi
 
-printf '\e[?25h' # show cursor
-prompt=$'\e[0;33m[VIBRANIUM]\e[0m You are about to install the following packages: \e[0;33m'"${chosen[*]}"$'\e[0m. Proceed? (Y/n): \e[0m'
+printf '\e[?25l' # Hide cursor
+echo -e "${YELLOW}[VIBRANIUM]${RESET} Validating packages"
+for package in "${filtered[@]}"; do
+	if ! yay -Si "$package" &>/dev/null; then
+		echo -e "${RED}[VIBRANIUM]${RESET} ${package} does not exist!"
+		_operation_canceled ""
+	fi
+done
+
+if [[ ${#chosen[@]} -gt 5 ]]; then
+	output="${YELLOW}[VIBRANIUM]${RESET} You're about to install the following packages:\n"
+	for pkg in "${chosen[@]}"; do
+		output+="      ${YELLOW}[PKG]${GRAY} - ${BLUE}${pkg}${RESET}\n"
+	done
+	printf "%b" "$output"
+	prompt=$'\e[0;33m[VIBRANIUM]\e[0m Proceed? (Y/n): '
+else
+	prompt=$'\e[0;33m[VIBRANIUM]\e[0m You are about to install the following packages: \e[0;34m'"${chosen[*]}"$'\e[0m. Proceed? (Y/n): '
+fi
 
 while :; do
+	printf '\e[?25h' # show cursor
     printf "%s" "$prompt"
     read -r answer
     case "$answer" in
     [Yy][Ee][Ss] | [Yy] | "")
         if ! sudo -v; then
-            _operation_aborted ""
+            _operation_canceled ""
         fi
-
-        printf '\e[?25l' # Hide cursor
-		echo -e "${YELLOW}[VIBRANIUM]${RESET} Validating packages"
-		for package in "${filtered[@]}"; do
-		    if ! yay -Si "$package" &>/dev/null; then
-				echo -e "${RED}[VIBRANIUM]${RESET} ${package} does not exist!"
-		        _operation_aborted ""
-		    fi
-		done
 
         if [ ${#filtered[@]} -gt 1 ]; then
             for pkg in "${filtered[@]}"; do
@@ -288,7 +297,7 @@ while :; do
         _installation_complete
         ;;
     [Nn][Oo] | [Nn])
-        _operation_aborted ""
+        _operation_canceled ""
         ;;
     *)                      # Wrong input
         printf '\e[A\r\e[K' # Go up, to start, clear line
