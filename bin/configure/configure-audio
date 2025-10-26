@@ -62,10 +62,11 @@ while :; do
 				case "$allow_above_hundred_chosen" in
 					"Allow"*)
 						if [[ "$(toggle_bool -v VIBRANIUM_VOLUME_ALLOW_ABOVE_HUNDRED)" == false ]]; then
-							current_volume=$(wpctl get-volume "@DEFAULT_AUDIO_SINK@" | awk '{print $2}')
-							if awk -v v="$current_volume" 'BEGIN {exit !(v > 1.0)}'; then
+							current_volume=$(wpctl get-volume "@DEFAULT_AUDIO_SINK@")
+							[[ $current_volume =~ ([0-9]+\.[0-9]+) ]] && current_volume="${BASH_REMATCH[1]}"
+
+							if [[ $current_volume =~ ^(1\.[1-4][0-9]|1\.50|[2-9]) ]]; then
 								wpctl set-volume @DEFAULT_AUDIO_SINK@ 1.00
-								# notify-send -r 1 "Vibranium" "The volume level set to 100%"
 								break
 							fi
 						fi

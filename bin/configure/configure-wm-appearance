@@ -313,7 +313,7 @@ while :; do
 							input="$(printf "%s" "$prompt" | rofi_cmd "Blur saturation"  "0.0 - 1.0")"
 							[[ -z $input ]] && break; [[ "$prompt" == "$input" ]] && continue
 
-							if awk -v x="$input" 'BEGIN{exit !(x ~ /^[0-9]*\.?[0-9]+$/ && x>=0 && x<=1)}'; then
+							if [[ $input =~ ^0*(0\.[0-9]+|1(\.0*)?)$ ]]; then
 								vibranium-cmd-edit-wm-config "decoration:blur:vibrancy:$input" "$HYPR_CONFIG"
 								break
 							else
@@ -329,7 +329,7 @@ while :; do
 							input="$(printf "%s" "$prompt" | rofi_cmd "Blur brightness"  "0.0 - 2.0")"
 							[[ -z $input ]] && break; [[ "$prompt" == "$input" ]] && continue
 
-							if awk -v x="$input" 'BEGIN{exit !(x ~ /^[0-9]*\.?[0-9]+$/ && x>=0 && x<=2)}'; then
+							if [[ $input =~ ^0*(0\.[0-9]+|2(\.0*)?)$ ]]; then
 								vibranium-cmd-edit-wm-config "decoration:blur:brightness:$input" "$HYPR_CONFIG"
 								break
 							else
@@ -345,7 +345,7 @@ while :; do
 							input="$(printf "%s"  "$prompt" | rofi_cmd "Blur contrast"  "0.0 - 2.0")"
 							[[ -z $input ]] && break; [[ "$prompt" == "$input" ]] && continue
 
-							if awk -v x="$input" 'BEGIN{exit !(x ~ /^[0-9]*\.?[0-9]+$/ && x>=0 && x<=2)}'; then
+							if [[ $input =~ ^0*(0\.[0-9]+|2(\.0*)?)$ ]]; then
 								vibranium-cmd-edit-wm-config "decoration:blur:contrast:$input" "$HYPR_CONFIG"
 								break
 							else
@@ -366,8 +366,9 @@ while :; do
 							else
 								vibranium-cmd-edit-wm-config "decoration:blur:size:$input" "$HYPR_CONFIG"
 
-								if (( input > 10 )); then
-									notify-send -r 1 "Vibranium" "Please note that large values may affect overall performance"
+								if (( input > 5 )); then
+									notify-send -r 1 "Vibranium" \
+										"Please note that large values may affect overall performance"
 								fi
 								break
 							fi
@@ -384,8 +385,9 @@ while :; do
 							else
 								vibranium-cmd-edit-wm-config "decoration:blur:passes:$input" "$HYPR_CONFIG"
 
-								if (( input > 10 )); then
-									notify-send -r 1 "Vibranium" "Please note that large values may affect overall performance"
+								if (( input > 5 )); then
+									notify-send -r 1 "Vibranium" \
+										"Please note that large values may affect overall performance"
 								fi
 								break
 							fi

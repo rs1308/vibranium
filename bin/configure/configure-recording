@@ -5,8 +5,9 @@ source "$VIBRANIUM_PATH/configure/configure-lib"
 
 INDEX=0
 LIMIT_FPS_MIN=24
-LIMIT_FPS_MAX="$(hyprctl -j monitors | jq -r '.[] | select(.focused == true) | .refreshRate' | awk '{print int($1)==$1 ? $1 : int($1)+1}')"
+REFRESH_RATE="$(hyprctl -j monitors | jq -r '.[] | select(.focused == true) | .refreshRate')"
 
+[[ $REFRESH_RATE =~ ^([0-9]+)(\.[0-9]+)?$ ]] && LIMIT_FPS_MAX="${BASH_REMATCH[1]}"
 
 while :; do
 	source "$VIBRANIUM_USER_SETTINGS"
@@ -46,11 +47,12 @@ while :; do
 					continue
 				}
 
-				if awk "BEGIN{exit !($input > $LIMIT_FPS_MAX)}"; then
-					notify-send -r 3 -u critical -t 5000 "Vibranium" \
-						"Entered value exceeds the refresh rate of the active monitor ($LIMIT_FPS_MAX)!<span foreground='${P_GRAY}'>\nAre you sure you want this?</span>"
+				if (( input > LIMIT_FPS_MAX )); then
+					msg="<b>Entered value exceeds the refresh rate of the active monitor</b> "
+					msg+="(<span foreground='${P_ACCENT}'><b>$LIMIT_FPS_MAX</b></span>)!"
+					notify-send -r 3 -u critical -t 5000 "Vibranium" "$msg"
 					continue
-				elif awk "BEGIN{exit !($input < $LIMIT_FPS_MIN)}"; then
+				elif (( input < LIMIT_FPS_MIN )); then
 					notify-send -r 3 -u critical -t 5000 "Vibranium" \
 						"Value cannot be less than ${LIMIT_FPS_MIN}!"
 					continue
@@ -240,11 +242,13 @@ while :; do
 										input="$(printf "%s\n" "$prompt" | rofi_cmd "In-Game FPS" "${VIBRANIUM_RECORDING_FPS}-${LIMIT_FPS_MAX}")"
 										[ -z "$input" ] && break; [ "$input" = "$prompt" ] && continue
 										
-										if awk "BEGIN{exit !($input > $LIMIT_FPS_MAX)}"; then
-											notify-send -r 3 -u critical -t 5000 "Vibranium" \
-												"Entered value exceeds the refresh rate of the active monitor ($LIMIT_FPS_MAX)!<span foreground='${P_GRAY}'>\nAre you sure you want this?</span>"
+										if (( input > LIMIT_FPS_MAX )); then
+
+											msg="<b>Entered value exceeds the refresh rate of the active monitor</b> "
+											msg+="(<span foreground='${P_ACCENT}'><b>$LIMIT_FPS_MAX</b></span>)!"
+											notify-send -r 3 -u critical -t 5000 "Vibranium" "$msg"
 											continue
-										elif awk "BEGIN{exit !($input < $VIBRANIUM_RECORDING_FPS)}"; then
+										elif (( input < VIBRANIUM_RECORDING_FPS )); then
 											notify-send -r 3 -u critical -t 5000 "Vibranium" \
 												"Value cannot be less than ${VIBRANIUM_RECORDING_FPS}!"
 											continue
