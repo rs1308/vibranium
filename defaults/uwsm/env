@@ -58,7 +58,7 @@ case "$(</sys/class/dmi/id/chassis_type)" in
 	"1")  export VIBRANIUM_IS_VIRTUAL_MACHINE=true ;;
 esac
 
-if lspci | grep -qE "(Radeon RX|ATI|UHD|Iris|Arc)"; then
+if lspci | grep -qE "(Radeon RX|ATI|UHD|Iris|Arc|Nvidia)"; then
 	export VIBRANIUM_GPU_IS_SUPPORTED=true
 else
 	export VIBRANIUM_GPU_IS_SUPPORTED=false

@@ -87,7 +87,7 @@ install_packages() {
 			;;
 		*"Nvidia"*)
 			printf "%s[VIBRANIUM]%s Detected Nvidia GPU - adding drivers to install queue\n" "$YELLOW" "$RESET"
-			packages+=("nvidia-dkms" "nvidia-utils" "nvidia-settings")
+			packages+=("nvidia-dkms" "nvidia-utils" "nvidia-settings" "linux-headers")
 			;;
 		*)
 			printf "%s[VIBRANIUM]%s No supported GPU detected. Please install your GPU drivers manually\n" "$RED" "$RESET"

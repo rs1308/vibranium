@@ -17,7 +17,7 @@ fi
 export MAGICK_THREAD_LIMIT
 
 # We don't want to OOM on VRAM, right?
-if [[ $VIBRANIUM_IS_LAPTOP == false ]]; then
+if [[ $VIBRANIUM_IS_LAPTOP == false && $VIBRANIUM_GPU_IS_SUPPORTED == true ]]; then
 	export MAGICK_OCL_DEVICE=GPU
 fi
 

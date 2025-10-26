@@ -85,8 +85,7 @@ input_flags=()
 output_flags=()
 
 # If the GPU usage option is set to true and a supported GPU is installed, build ffmpeg flags for working with the GPU.
-# TODO: Use external utilities for more accurate determination, such as vainfo from libva-utils
-if [[ $VIBRANIUM_VIDEO_DOWNSCALE_USE_GPU == true ]] && lspci | grep -E "AMD/ATI|Intel"; then
+if [[ $VIBRANIUM_VIDEO_DOWNSCALE_USE_GPU == true && $VIBRANIUM_GPU_IS_SUPPORTED == true ]]; then
     input_flags=(-hwaccel vaapi -vaapi_device /dev/dri/renderD128)
 	# Some software does not work well or does not support H265/X265/HEVC at all (for example, Discord clients), so we use H264/X264 for compatibility
     output_flags=(-c:v h264_vaapi -qp "$compression" -preset 4 -vf "format=nv12,hwupload")
