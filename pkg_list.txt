@@ -9,6 +9,7 @@ gpu-screen-recorder
 alacritty-sixel-git
 zathura-pdf-mupdf
 ttf-cascadia-code
+ffmpegthumbnailer
 yaru-sound-theme
 noto-fonts-extra
 noto-fonts-emoji
