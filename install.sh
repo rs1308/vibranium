@@ -81,6 +81,7 @@ install_packages() {
 				"vpl-gpu-rt"
 				"vulkan-intel"
 				"libvdpau-va-gl"
+				"libva-intel-driver"
 				"lib32-vulkan-intel"
 				"intel-compute-runtime"
 			)
