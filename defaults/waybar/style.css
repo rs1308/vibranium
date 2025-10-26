@@ -57,9 +57,10 @@ tooltip {
   75%  { color: @urgent }
 }
 
-/* #custom-logout { */
-/* 	margin: 0px 12px 0px 4px */
-/* } */
+#custom-confirm-kill {
+	color: @foreground;
+	animation: recording-animation 1s infinite
+}
 
 #custom-recording-indicator {
 	color: @foreground;
