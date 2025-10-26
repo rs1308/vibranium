@@ -77,6 +77,13 @@ factory_reset() {
 			"$XDG_CONFIG_HOME/waybar/config.jsonc"
 	fi
 
+	current_volume=$(wpctl get-volume "@DEFAULT_AUDIO_SINK@")
+	[[ $current_volume =~ ([0-9]+\.[0-9]+) ]] && current_volume="${BASH_REMATCH[1]}"
+
+	if [[ $current_volume =~ ^(1\.[1-4][0-9]|1\.50|[2-9]) ]]; then
+		wpctl set-volume @DEFAULT_AUDIO_SINK@ 1.00
+	fi
+
 	vibranium-cmd-set-waybar-position -q top
 	notify-send -r 1 "Vibranium" "Settings have been reset to factory defaults"
 }
