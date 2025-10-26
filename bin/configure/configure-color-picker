@@ -43,7 +43,7 @@ while :; do
 			# done
 			;;
 		"<"*)
-			notify-send -r 1 "Vibranium" "Sorry, this options is not ready yet"
+			notify-send -r 1 "Vibranium" "Sorry, this option is not ready yet"
 			;;
 		"Lower sensitivity"*)
 			ls_index=0
