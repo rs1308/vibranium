@@ -183,7 +183,8 @@ enable_system_services() {
 
 create_directories() {
 	mkdir -p \
-		"${HOME}"/.config/{Vencord,vesktop}/{themes,settings} \
+		"$HOME"/{Downloads,Documents,Pictures,Videos,Templates} \
+		"$HOME"/.config/{Vencord,vesktop}/{themes,settings} \
 		"$HOME"/.config/heroic/{themes,store} \
 		"$HOME/.config/spicetify/Themes/text" \
 		"$HOME/.config/hypr/hyprland.conf.d" \
