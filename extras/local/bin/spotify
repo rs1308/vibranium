@@ -58,7 +58,9 @@ if command -v spicetify >/dev/null; then
 		msg+="Live theming will be applied after you log in to your account."
 		notify-send -r 1 -t 10000 "Vibranium" "$msg"
 
-		setsid uwsm app -- /opt/spotify/spotify --debug-level=OFF &
+		setsid uwsm app -- /opt/spotify/spotify --debug-level=OFF \
+			--enable-features=UseOzonePlatform \
+			--ozone-platform=wayland &
 
 		# Give user some time to read the notification
 		sleep 3
