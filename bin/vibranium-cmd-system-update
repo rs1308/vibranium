@@ -62,24 +62,26 @@ for pkg in "${pkg_list[@]}"; do
 done
 
 vibranium-cmd-refresh-waybar-module pacman
-printf "\r\033[K%s[VIBRANIUM]%s All packages updated" "$YELLOW" "$RESET"
-echo -e "\n${YELLOW}[VIBRANIUM]${RESET} System update complete"
+printf "\r\033[K%s[VIBRANIUM]%s System update complete" "$YELLOW" "$RESET"
 
 important_regex='^(systemd|linux(-.*)?|networkmanager|iwd)$'
 for pkg in "${pkg_list[@]}"; do
     if [[ $pkg =~ $important_regex ]]; then
         echo -e "${YELLOW}[VIBRANIUM]${RESET} Important system components have been updated"
-
         prompt=$'\e[0;33m[VIBRANIUM]\e[0m System restart is recommended. Restart now? (Y/n): '
+
         while :; do
             printf "%s\e[?25h" "$prompt"
             read -r answer
 			printf '\e[?25l'
             case "$answer" in
                 [Yy][Ee][Ss]|[Yy]|"")
-                    echo -e "${YELLOW}[VIBRANIUM]${RESET} Restarting..."
-					sleep 2; systemctl reboot
-					exit 0
+					printf '\e[?25l'
+					for i in {3..1}; do
+						printf "\r\033[K%s[VIBRANIUM]%s Restarting in %d..." "$YELLOW" "$RESET" "$i"
+						sleep 1
+					done
+					systemctl reboot
                     ;;
                 [Nn][Oo]|[Nn])
                     break
