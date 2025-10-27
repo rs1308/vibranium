@@ -8,6 +8,10 @@ if command -v pass >/dev/null; then
 	ACTIONS+=("Password manager")
 fi
 
+if command -v syncthing >/dev/null; then
+	ACTIONS+=("Launch Syncthing")
+fi
+
 if systemd-inhibit | grep "Prevent system suspend is active" > /dev/null; then
 	ACTIONS+=("<b><i>Disable sleep inhibition</i></b>")
 else
@@ -27,6 +31,11 @@ while :; do
     CHOSEN="$(printf "%s\n" "${ACTIONS[@]}" | rofi_cmd "Utilities" "ESC to go back")"
 
     case "$CHOSEN" in
+		"Launch Syncthing")
+			syncthing browser
+			vibranium-cmd-kill-rofi
+			exit 0
+			;;
 		"Apply tweaks")
 			while :; do
 				tweaks_opts=("System" "Apps")
