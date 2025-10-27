@@ -52,7 +52,7 @@ install_theme() {
   # Clone the repo
   git clone -q "https://github.com/Fausto-Korpsvart/$repo" || { echo "Failed to clone $repo"; return 1; }
   cd "$clone_dir/themes" || { echo "Failed to cd into $clone_dir/themes"; cd ..; rm -rf "$clone_dir"; return 1; }
-  git switch -q --detach HEAD~1
+  git switch -q --detach HEAD~3
 
   # Set base_name and variants based on repo
   case "$repo" in
