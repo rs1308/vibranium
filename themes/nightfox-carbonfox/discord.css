@@ -14,8 +14,8 @@
 
 /* Vibranium customs */
 body {
-	--font:             'JetBrains Mono' !important;
-	--code-font:        'JetBrains Mono' !important;
+	--font:             'Cascadia Code' !important;
+	--code-font:        'Cascadia Code' !important;
 	letter-spacing:     0ch !important;
 	--border-thickness: 3px !important;
 }

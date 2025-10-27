@@ -16,7 +16,7 @@
 /* Vibranium customs */
 body {
 	--font:             'Cascadia Code'     !important;
-	--code-font:        'Cascadia Cascadia' !important;
+	--code-font:        'Cascadia Code' !important;
 	letter-spacing:     0ch !important;
 	--border-thickness: 3px !important;
 }
