@@ -8,12 +8,6 @@ OPTIONS=(
 	"Utilities" "Help"
 )
 
-if [ -f "$VIBRANIUM_STATE/update.available" ]; then
-	OPTIONS+=(
-		"<b><i>Update Vibranium to <span foreground='${P_ACCENT}'>""$(<"$VIBRANIUM_STATE/update.available")""</span></i></b>"
-	)
-fi
-
 INDEX=0
 
 while :; do
@@ -28,11 +22,6 @@ while :; do
     done
 
     case "$CHOSEN" in
-		*"Update"*)
-			if vibranium-update; then
-				vibranium-cmd-kill-rofi
-			fi
-			;;
         "Vibranium Settings")
 			index=0
             while :; do
