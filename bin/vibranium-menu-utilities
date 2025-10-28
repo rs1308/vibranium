@@ -4,12 +4,12 @@ source "$VIBRANIUM_PATH/vibranium-core-lib"
 
 ACTIONS=("Apply tweaks" "Video downscaler")
 
-if command -v pass >/dev/null; then
-	ACTIONS+=("Password manager")
-fi
-
 if command -v syncthing >/dev/null; then
 	ACTIONS+=("Launch Syncthing")
+fi
+
+if command -v pass >/dev/null; then
+	ACTIONS+=("Password manager")
 fi
 
 if systemd-inhibit | grep "Prevent system suspend is active" > /dev/null; then
