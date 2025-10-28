@@ -8,19 +8,17 @@ INDEX=0
 while :; do
 	source "$VIBRANIUM_USER_SETTINGS"
 	
-	use_ddc="$([ "$VIBRANIUM_BRIGHTNESS_USE_DDC_CONTROL" = true ] && echo yes || echo no)"
-	use_osd="$([ "$VIBRANIUM_BRIGHTNESS_USE_OSD" = true ] && echo yes || echo no)"
-	step="$VIBRANIUM_BRIGHTNESS_STEP"
+	OPTIONS=(
+		"Include DDC protocol : $VIBRANIUM_BRIGHTNESS_USE_DDC_CONTROL"
+		"Adjustment step      : $VIBRANIUM_BRIGHTNESS_STEP"
+	)
 
-	if [ "$VIBRANIUM_GLOBAL_USE_OSD" = false ]; then
-		use_osd="$use_osd <span foreground='${P_RED}'>()</span>"
+	if [[ "$VIBRANIUM_GLOBAL_USE_OSD" == "false" ]]; then
+		OPTIONS+=("<span alpha='70%'>OSD feedback         : $VIBRANIUM_BRIGHTNESS_USE_OSD</span> <span foreground='${P_RED}'>()</span>")
+	else
+		OPTIONS+=("OSD feedback         : $VIBRANIUM_BRIGHTNESS_USE_OSD")
 	fi
 
-	OPTIONS=(
-		"Include DDC protocol : $use_ddc"
-		"OSD feedback         : $use_osd"
-		"Adjustment step      : $step"
-	)
 	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Brightness" "ESC to go back" -selected-row "$INDEX")"
 	[ -z "$CHOSEN" ] && break
 
@@ -33,7 +31,7 @@ while :; do
 
 	case "$CHOSEN" in
 		"Include DDC"*) toggle_bool "VIBRANIUM_BRIGHTNESS_USE_DDC_CONTROL" ;;
-		"OSD"*"()"*)
+		"OSD"*"()"*|"OSD"*)
 			# The VIBRANIUM_GLOBAL_USE_OSD option takes precedence over all other options that use the OSD.
 			# Therefore, if VIBRANIUM_GLOBAL_USE_OSD is set to false at the global level,
 			# no other option that uses the OSD will be active, even if its value is true.
