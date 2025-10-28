@@ -193,6 +193,7 @@ create_directories() {
 		"$HOME/.config/vibranium/theme" \
 		"$HOME/.config/qt6ct/colors" \
 		"$HOME/.config/btop/themes/" \
+		"$HOME/.config/discord" \
 		"$HOME/.config/wlogout" \
 		"$HOME/.config/gtk-3.0" \
 		"$HOME/.config/gtk-4.0" \
@@ -209,9 +210,13 @@ post_install() {
 
 	sudo sed -i '/^session_log/s/=.*/= .cache\/display_manager.log/' "$ly_ini"
 	cp ./config/mimeapps.list "$HOME/.config"
+
 	touch "$HOME/.local/state/vibranium/first-boot"
 	echo "suspended" > \
 		"$HOME/.local/state/vibranium/night-light"
+
+	printf '{\n\t"SKIP_HOST_UPDATE": true\n}' \
+		> "$HOME/.config/discord/settings.json"
 }
 
 sudo -v; clear
