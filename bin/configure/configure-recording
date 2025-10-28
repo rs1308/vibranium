@@ -93,7 +93,7 @@ while :; do
 
 				if [ "$(hyprctl -j getoption animations:enabled | jq '.int')" = "0" ]; then
 					advanced_options+=(
-						"Flash screen   : $VIBRANIUM_RECORDING_FLASH_SCREEN <span foreground='${P_RED}'>()</span>"
+						"<span alpha='70%'>Flash screen   : $VIBRANIUM_RECORDING_FLASH_SCREEN</span> <span foreground='${P_RED}'>()</span>"
 					)
 				else
 					advanced_options+=(
