@@ -61,7 +61,7 @@ install_packages() {
 	# GPU detection
 	case "$(lspci | grep VGA)" in
 		*Radeon*|*ATI*)
-			printf "%s[VIBRANIUM]%s Detected AMD GPU - adding drivers to install queue\n" "$YELLOW" "$RESET"
+			printf "%s[VIBRANIUM]%s Detected AMD GPU\n" "$YELLOW" "$RESET"
 			packages+=(
 				"mesa"
 				"lib32-mesa"
@@ -73,7 +73,7 @@ install_packages() {
 			)
 			;;
 		*UHD*|*Iris*|*Arc*)
-			printf "%s[VIBRANIUM]%s Detected Intel GPU - adding drivers to install queue\n" "$YELLOW" "$RESET"
+			printf "%s[VIBRANIUM]%s Detected Intel GPU\n" "$YELLOW" "$RESET"
 			packages+=(
 				"mesa"
 				"libvpl"
@@ -87,11 +87,11 @@ install_packages() {
 			)
 			;;
 		*"Nvidia"*)
-			printf "%s[VIBRANIUM]%s Detected Nvidia GPU - adding drivers to install queue\n" "$YELLOW" "$RESET"
+			printf "%s[VIBRANIUM]%s Detected Nvidia GPU\n" "$YELLOW" "$RESET"
 			packages+=("nvidia-dkms" "nvidia-utils" "nvidia-settings" "linux-headers" "lib32-nvidia-utils")
 			;;
 		*)
-			printf "%s[VIBRANIUM]%s No supported GPU detected. Please install your GPU drivers manually\n" "$RED" "$RESET"
+			printf "%s[VIBRANIUM]%s No supported GPU detected. Please install GPU drivers manually\n" "$RED" "$RESET"
 			printf "%s[VIBRANIUM]%s Think this is a mistake? Open an issue!\n" "$RED" "$RESET"
 			printf "%s[VIBRANIUM]%s This will not affect the installation\n" "$YELLOW" "$RESET"
 	esac
@@ -103,7 +103,7 @@ install_packages() {
 		[[ "${pkg:0:1}" == "#" ]] && continue
 
 		if ! pacman -Si "$pkg" >/dev/null 2>&1; then
-			aur_flag=" (AUR, may take longer time to install)"
+			aur_flag=" (AUR)"
 		else
 			aur_flag=""
 		fi
@@ -126,7 +126,7 @@ install_packages() {
 				;;
 		esac
 
-		yay -S --noconfirm --needed "$pkg" &>/dev/null
+		yay -S --noconfirm --needed --sudoloop "$pkg" &>/dev/null
 		pid=$!
 
 		while kill -0 "$pid" 2>/dev/null; do
@@ -168,22 +168,17 @@ enable_system_services() {
 		"vibranium-update"
 	)
 
-	for service in "${system_services[@]}"; do
-		sudo systemctl -q enable "$service"
-	done
-
-	for service in "${user_services[@]}"; do
-		systemctl -q --user enable "$service"
-	done
+	sudo systemctl -q enable "${system_services[@]}"
+    systemctl -q --user enable "${user_services[@]}"
 
 	for timer in "${user_timers[@]}"; do
-		systemctl -q --user enable "$timer"
+		systemctl -q --user enable "${timer}.timer"
 	done
 }
 
 create_directories() {
 	mkdir -p \
-		"$HOME"/{Downloads,Documents,Pictures,Videos,Templates} \
+		"$HOME"/{Downloads,Documents,Pictures,Videos,Music,Templates} \
 		"$HOME"/.config/{Vencord,vesktop}/{themes,settings} \
 		"$HOME"/.config/heroic/{themes,store} \
 		"$HOME/.config/spicetify/Themes/text" \
@@ -208,6 +203,7 @@ post_install() {
 	local ly_ini
 	ly_ini="/etc/ly/config.ini"
 
+	# Store Ly's session log in the ~/.cache directory
 	sudo sed -i '/^session_log/s/=.*/= .cache\/display_manager.log/' "$ly_ini"
 	cp ./config/mimeapps.list "$HOME/.config"
 
@@ -277,7 +273,32 @@ printf "\n%s[VIBRANIUM]%s Cleaning up" "${YELLOW}" "${RESET}"
 post_install
 cleanup
 
-printf "\n%s[VIBRANIUM]%s Installation complete%s" "${YELLOW}" "${GREEN}" "${RESET}"
-printf "\n%s[VIBRANIUM]%s Reboot your PC to start using Vibranium\n" "${YELLOW}" "${RESET}"
+printf "\n%s[VIBRANIUM]%s Installation complete. System restart required" "${GREEN}" "${RESET}"
+printf "\n%s[VIBRANIUM]%s After rebooting don't forget to select %sHyprland (uwsm-managed)%s in the login box" \
+	"$YELLOW" "$RESET" "$GRAY" "$RESET"
+
+prompt=$'\e[0;33m[VIBRANIUM]\e[0m Restart now? (Y/n): '
+while :; do
+	printf "%s\e[?25h" "$prompt"
+	read -r answer
+	printf '\e[?25l'
+
+	case "$answer" in
+		[Yy][Ee][Ss]|[Yy]|"")
+			printf '\e[?25l'
+			for i in {3..1}; do
+				printf "\r\033[K%s[VIBRANIUM]%s Restarting in %d..." "$YELLOW" "$RESET" "$i"
+				sleep 1
+			done
+			systemctl reboot
+			;;
+		[Nn][Oo]|[Nn])
+			break
+			;;
+		*)
+			printf '\r\e[K'
+			;;
+	esac
+done
 
 printf '\e[?25h'  # show cursor
