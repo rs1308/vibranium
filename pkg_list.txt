@@ -35,6 +35,7 @@ hyprsunset
 hyprpicker
 mediainfo
 hyprpaper
+fastfetch
 pipewire
 nwg-look
 hyprlock

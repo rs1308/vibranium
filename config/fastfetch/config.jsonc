@@ -1,0 +1,107 @@
+{
+    "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+    "logo": {
+		"source": "$XDG_CONFIG_HOME/fastfetch/logo.sixel",
+		"type": "sixel",
+		"height": 18,
+        "padding": {
+            "top": 1
+        }
+    },
+    "display": {"separator": " "},
+    "modules": [
+        "title",
+        "separator",
+        {
+            "type": "os",
+            "key": "\uf111",
+            "keyColor": "yellow"
+        },
+        {
+            "type": "kernel",
+            "key": "\uf111",
+            "keyColor": "yellow"
+        },
+        {
+            "type": "packages",
+            "key": "\uf111",
+            "keyColor": "yellow"
+        },
+        {
+            "type": "shell",
+            "key": "\uf111",
+            "keyColor": "yellow"
+        },
+        "break",
+
+        {
+            "type": "wm",
+            "key": "\uf111",
+            "keyColor": "blue"
+        },
+        {
+            "type": "lm",
+            "key": "\uf111",
+            "keyColor": "blue"
+        },
+        {
+            "type": "wmtheme",
+            "key": "\uf111",
+            "keyColor": "blue"
+        },
+        {
+            "type": "icons",
+            "key": "\uf111",
+            "keyColor": "blue"
+        },
+        {
+            "type": "terminal",
+            "key": "\uf111",
+            "keyColor": "blue"
+        },
+        {
+            "type": "wallpaper",
+            "key": "\uf111",
+            "keyColor": "blue"
+        },
+
+        "break",
+        {
+            "type": "cpu",
+            "key": "\uf111",
+            "keyColor": "green"
+        },
+        {
+            "type": "gpu",
+            "key": "\uf111",
+            "keyColor": "green"
+        },
+        {
+            "type": "disk",
+			"folders": "/",
+            "key": "\uf111",
+            "keyColor": "green"
+        },
+        {
+            "type": "memory",
+            "key": "\uf111",
+            "keyColor": "green"
+        },
+        {
+            "type": "swap",
+            "key": "\uf111",
+            "keyColor": "green"
+        },
+        {
+            "type": "display",
+            "key": "\uf111",
+            "keyColor": "green"
+        },
+        {
+            "type": "uptime",
+            "key": "\uf111",
+            "keyColor": "green"
+        },
+        "break"
+    ]
+}
