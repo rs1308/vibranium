@@ -71,4 +71,4 @@ notify_body+="<span foreground='${P_YELLOW}'> ${artist}</span>"
 notify-send -r 5 -i "$album_art" "Now Playing" "$notify_body"
 
 # Even though the image may be small, we don't need junk in RAM.
-rm "$album_art"
+rm -f "$album_art"

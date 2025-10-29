@@ -117,7 +117,7 @@ while :; do
 	fi
 
 	OPTIONS+=(
-		"<b>Playerctl options</b>"
+		"<b>Player options</b>"
 		"<b>Power profiles</b>"
 		"<b>Notifications</b>"
 		"<b>Edit env vars</b>"
@@ -152,8 +152,8 @@ while :; do
 					;;
 			esac
 			;;
-		*"Playerctl options"*)
-			configure-playerctl
+		*"Player options"*)
+			configure-player
 			;;
 		"Video downscale"*)
 			while :; do

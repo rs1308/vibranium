@@ -652,7 +652,7 @@ VIBRANIUM_RECORDING_FLASH_SCREEN=true
 VIBRANIUM_RECORDING_OUTPUT_DIR=""
 
 # 
-#             PLAYERCTL OPTIONS                #
+#                PLAYER OPTIONS                #
 # ============================================ #
 #                                              #
 
@@ -660,10 +660,10 @@ VIBRANIUM_RECORDING_OUTPUT_DIR=""
 # Available options: string 'very_slow' 'slow' 'normal' 'fast' 'very_fast' 'off'
 #
 # Default is 'normal'
-VIBRANIUM_PLAYERCTL_FADE_DURATION="normal"
+VIBRANIUM_PLAYER_FADE_DURATION="normal"
 
 # How fast should the fade effect be when switching to the next / prev track
 # Available options: string 'very_slow' 'slow' 'normal' 'fast' 'very_fast' 'off'
 #
 # Default is 'slow'
-VIBRANIUM_PLAYERCTL_FADE_DURATION_ON_SWITCH="slow"
+VIBRANIUM_PLAYER_FADE_DURATION_ON_SWITCH="slow"
