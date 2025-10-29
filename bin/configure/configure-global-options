@@ -32,12 +32,6 @@ while :; do
 	power_menu_style="$([ "$VIBRANIUM_GLOBAL_POWER_MENU_STYLE" = "overlay" ] && echo overlay || echo menu)"
 	terminal_opacity="$(_terminal_opacity get)"
 	wm_animations="$(hyprctl -j getoption animations:enabled | jq -r '.int')"
-	
-	if [[ $VIBRANIUM_GLOBAL_USE_OSD == false ]]; then
-		power_profile_osd="<span alpha='70%'>Power profile OSD       : $VIBRANIUM_GLOBAL_POWER_PROFILE_USE_OSD</span> <span foreground='${P_RED}'>()</span>"
-	else
-		power_profile_osd="Power profile OSD       : $VIBRANIUM_GLOBAL_POWER_PROFILE_USE_OSD"
-	fi
 
 	OPTIONS=(
 		"Now playing             : $VIBRANIUM_GLOBAL_SHOW_NOW_PLAYING"
@@ -58,14 +52,13 @@ while :; do
 		"Blur lockscreen         : $VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_BACKGROUND"
 		"Power menu style        : $power_menu_style"
 		"Copy to clipboard       : $VIBRANIUM_GLOBAL_COPY_TO_CLIPBOARD"
-		"$power_profile_osd"     
 		"Pause music on lock     : $VIBRANIUM_GLOBAL_PAUSE_MUSIC_ON_SESSION_LOCK"
 		"Welcome notification    : $VIBRANIUM_GLOBAL_SHOW_WELCOME_BACK_NOTIFICATION"
-		"Respect power profile   : $VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE"
 		"Terminal transparency   : $terminal_opacity"
 		"Video downscale use GPU : $VIBRANIUM_VIDEO_DOWNSCALE_USE_GPU"
 		"<b>App launcher settings</b>"
 		"<b>Playerctl options</b>"
+		"<b>Power profiles</b>"
 		"<b>Notifications</b>"
 		"<b>Edit env vars</b>"
 	)
@@ -160,13 +153,117 @@ while :; do
 			notify-send -r 1 "This option is locked" "$msg"
 			continue
 			;;
-		*"Power profile"*"()"*)
-			msg="This option is <span foreground='${P_RED}'><b>locked</b></span> "
-			msg+="because OSD is <span foreground='${P_RED}'><b>disabled</b></span> "
-			notify-send -r 1 "This option is locked" "$msg"
-			;;
-		"Power profile"*)
-			toggle_bool VIBRANIUM_GLOBAL_POWER_PROFILE_USE_OSD
+		*"Power profiles"*)
+			pp_index=0
+			while true; do
+				source "$VIBRANIUM_USER_SETTINGS"
+				use_feedback="$VIBRANIUM_GLOBAL_POWER_PROFILE_USE_FEEDBACK"
+				use_pp_osd="$VIBRANIUM_GLOBAL_POWER_PROFILE_USE_OSD"
+				use_osd="$VIBRANIUM_GLOBAL_USE_OSD"
+
+				pp_opts=("Respect power profile : $VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE")
+				pp_opts+=("Use visual feedback   : $use_feedback")
+
+				if [[ "$use_feedback" == true && "$use_osd" == true ]]; then
+					pp_opts+=("Use OSD               : $use_pp_osd")
+				else
+					pp_opts+=("<span alpha='70%'>Use OSD               : $use_pp_osd</span> <span foreground='${P_RED}'>()</span>")
+				fi
+
+				pp_chosen="$(printf "%s\n" "${pp_opts[@]}" | rofi_cmd "Power profiles" "ESC to go back" -selected-row "$pp_index")"
+				[[ -z "$pp_chosen" ]] && break
+
+				for i in "${!pp_opts[@]}"; do
+					if [ "${pp_opts[$i]}" = "$pp_chosen" ]; then
+						pp_index="$i"
+						break
+					fi
+				done
+
+				case "$pp_chosen" in
+					"Use visual"*)
+						toggle_bool VIBRANIUM_GLOBAL_POWER_PROFILE_USE_FEEDBACK
+						;;
+					"Use OSD"*)
+						toggle_bool VIBRANIUM_GLOBAL_POWER_PROFILE_USE_OSD
+						;;
+					*"()"*)
+						if [[ "$use_feedback" == false ]]; then
+							msg="Visual feedback is disabled. Enable it first"
+							pp_index=1
+						else
+							msg="OSD is disabled globally. To enable OSD, go to: \n"
+							msg+="<span foreground='${P_YELLOW}'>Vibranium settings</span> <span foreground='${P_BLUE}'>→</span> "
+							msg+="<span foreground='${P_YELLOW}'>Configure Vibranium</span> <span foreground='${P_BLUE}'>→</span> "
+							msg+="<span foreground='${P_YELLOW}'>General</span>"
+						fi
+						notify-send -r 1 "This option is locked" "$msg"
+						;;
+					"Respect"*)
+						while :; do
+							respect_power_profile_options=(
+								"Respect power profile : $VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE"
+								"What is this?"
+							)
+							respect_power_profile_chosen="$(printf "%s\n" "${respect_power_profile_options[@]}" | rofi_cmd "Respect power profile" "ESC to go back")"
+							[ -z "$respect_power_profile_chosen" ] && break
+
+							case "$respect_power_profile_chosen" in
+								"Respect"*)
+									# Ok, so imagine this: user sets VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE to false, then
+									# uses blur for a while in, let’s say, power-saver mode. When the user decides to turn
+									# VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE back on, blur will disappear (if in power-saver,
+									# as expected). That’s fine, that’s how it should work. But when the user switches to a
+									# non–power-saver profile, blur won’t restore on its own. The logic below uses a state
+									# file to handle that.
+									conf="$XDG_CONFIG_HOME/hypr/hyprland.conf.d/look-and-feel.conf"
+
+									# $ time hyprctl -j getoption decoration:blur:enabled | jq '.set'
+									#
+									# real  0m0.004s
+									# user  0m0.003s
+									# sys   0m0.002s
+									#
+									# $ time <sed command below>
+									#
+									# real  0m0.001s
+									# user  0m0.001s
+									# sys   0m0.000s
+									#
+									# Call me crazy, I don’t care
+									blur_enabled="$(sed -n '/decoration[[:space:]]*{/,/}/{/blur[[:space:]]*{/,/}/{s/.*enabled[[:space:]]*=[[:space:]]*\([^;]*\).*/\1/p}}' "$conf" 2>/dev/null)"
+
+									# One-time execution at this point
+									[ -z "$blur_enabled" ] && blur_enabled="$(vibranium-cmd-edit-wm-config decoration:blur:enabled:"$(hyprctl -j getoption decoration:blur:enabled | jq '.set')" "$conf")"
+
+									if [ "$(toggle_bool -v "VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE")" = "true" ]; then
+										# If on power-saver and blur is on → disable blur and save blur status for later restore
+										if [[ "$(vibranium-utils-power-profile-get)" == "power-saver" && "$blur_enabled" == true ]]; then
+											touch "$VIBRANIUM_STATE/blur.restore"
+											vibranium-cmd-toggle-blur
+										fi
+									else
+										# Coming from VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE = true → false
+										# Restore blur
+										if [[ -f "$VIBRANIUM_STATE/blur.restore" ]] && [[ $blur_enabled = false ]]; then
+											rm "$VIBRANIUM_STATE/blur.restore"
+											vibranium-cmd-toggle-blur
+										fi
+									fi
+									break
+								;;
+								"What"*)
+									msg="\n<span foreground='${P_ACCENT}'><b>•</b></span> <b>Whether to respect the active power profile when processing compute tasks</b>\n\n"
+									msg+="When enabled, power and GPU hungry processes like cache generation, blur,\ncompute tasks, etc will be suspended on "
+									msg+="'<span foreground='${P_GREEN}'>power-saver</span>' power profile"
+									# msg+="When enabled, background processes like lockscreen background pre-caching are suspended until the power profile switches to " 
+									# msg+="'<span foreground='${P_YELLOW}'><b>Balanced</b></span>' or '<span foreground='${P_RED}'><b>Performance</b></span>'"
+									notify-send -r 3 -t 15000 "What is this?" "$msg"
+									continue
+							esac
+						done
+				esac
+			done
 			;;
 		"Copy to clipboard"*)
 			while :; do
@@ -190,7 +287,6 @@ while :; do
 			done
 			;;
 		"Now playing"*)
-
 			now_playing_index=0
 			while :; do
 				source "$VIBRANIUM_USER_SETTINGS"
@@ -455,70 +551,6 @@ while :; do
 								"$XDG_CONFIG_HOME/dunst/dunstrc"; vibranium-cmd-refresh-dunst
 							break
 						done
-				esac
-			done
-			;;
-		"Respect"*)
-			while :; do
-				respect_power_profile_options=(
-					"Respect power profile : $VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE"
-					"What is this?"
-				)
-				respect_power_profile_chosen="$(printf "%s\n" "${respect_power_profile_options[@]}" | rofi_cmd "Respect power profile" "ESC to go back")"
-				[ -z "$respect_power_profile_chosen" ] && break
-
-				case "$respect_power_profile_chosen" in
-					"Respect"*)
-						# Ok, so imagine this: user sets VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE to false, then
-						# uses blur for a while in, let’s say, power-saver mode. When the user decides to turn
-						# VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE back on, blur will disappear (if in power-saver,
-						# as expected). That’s fine, that’s how it should work. But when the user switches to a
-						# non–power-saver profile, blur won’t restore on its own. The logic below uses a state
-						# file to handle that.
-						conf="$XDG_CONFIG_HOME/hypr/hyprland.conf.d/look-and-feel.conf"
-
-						# $ time hyprctl -j getoption decoration:blur:enabled | jq '.set'
-						#
-						# real  0m0.004s
-						# user  0m0.003s
-						# sys   0m0.002s
-						#
-						# $ time <sed command below>
-						#
-						# real  0m0.001s
-						# user  0m0.001s
-						# sys   0m0.000s
-						#
-						# Call me crazy, I don’t care
-						blur_enabled="$(sed -n '/decoration[[:space:]]*{/,/}/{/blur[[:space:]]*{/,/}/{s/.*enabled[[:space:]]*=[[:space:]]*\([^;]*\).*/\1/p}}' "$conf" 2>/dev/null)"
-
-						# One-time execution at this point
-						[ -z "$blur_enabled" ] && blur_enabled="$(vibranium-cmd-edit-wm-config decoration:blur:enabled:"$(hyprctl -j getoption decoration:blur:enabled | jq '.set')" "$conf")"
-
-						if [ "$(toggle_bool -v "VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE")" = "true" ]; then
-							# If on power-saver and blur is on → disable blur and save blur status for later restore
-							if [[ "$(vibranium-utils-power-profile-get)" == "power-saver" && "$blur_enabled" == true ]]; then
-								touch "$VIBRANIUM_STATE/blur.restore"
-								vibranium-cmd-toggle-blur
-							fi
-						else
-							# Coming from VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE = true → false
-							# Restore blur
-							if [[ -f "$VIBRANIUM_STATE/blur.restore" ]] && [[ $blur_enabled = false ]]; then
-								rm "$VIBRANIUM_STATE/blur.restore"
-								vibranium-cmd-toggle-blur
-							fi
-						fi
-						break
-					;;
-					"What"*)
-						msg="\n<span foreground='${P_ACCENT}'><b>•</b></span> <b>Whether to respect the active power profile when processing compute tasks</b>\n\n"
-						msg+="When enabled, power and GPU hungry processes like cache generation, blur,\ncompute tasks, etc will be suspended on "
-						msg+="'<span foreground='${P_GREEN}'>power-saver</span>' power profile"
-						# msg+="When enabled, background processes like lockscreen background pre-caching are suspended until the power profile switches to " 
-						# msg+="'<span foreground='${P_YELLOW}'><b>Balanced</b></span>' or '<span foreground='${P_RED}'><b>Performance</b></span>'"
-						notify-send -r 3 -t 15000 "What is this?" "$msg"
-						continue
 				esac
 			done
 			;;

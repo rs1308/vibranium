@@ -23,8 +23,11 @@ profiles=("power-saver" "balanced" "performance")
 current="$(vibranium-utils-power-profile-get)"
 
 notify() {
-    if [ "$QUIET" = true ]; then
+	check_bool VIBRANIUM_GLOBAL_POWER_PROFILE_USE_FEEDBACK true
+    if [[ $QUIET = true ]]; then
         return 0
+	elif [[ "$VIBRANIUM_GLOBAL_POWER_PROFILE_USE_FEEDBACK" == false ]]; then
+		return 0
     fi
 
     local profile="$1"

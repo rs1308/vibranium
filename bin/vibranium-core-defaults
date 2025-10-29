@@ -65,6 +65,12 @@ VIBRANIUM_GLOBAL_USE_OSD=true
 # Default is true
 VIBRANIUM_GLOBAL_POWER_PROFILE_USE_OSD=true
 
+# Whether to use visual feedback when changing power profiles
+# Available options: bool
+#
+# Default is true
+VIBRANIUM_GLOBAL_POWER_PROFILE_USE_FEEDBACK=true
+
 # Whether to use special function in app launcher, which will swap cyrillic
 # layout to latin to use search properly and back to cyrillic when menu is closed.
 # If you have no idea what you just read then you probably don't need this.

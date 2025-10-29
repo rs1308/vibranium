@@ -23,7 +23,7 @@ while :; do
 	if [[ "$VIBRANIUM_GLOBAL_USE_OSD" == true ]]; then
 		OPTIONS+=("OSD    feedback  : $VIBRANIUM_VOLUME_USE_OSD")
 	else
-		OPTIONS+=("OSD    feedback  : $VIBRANIUM_VOLUME_USE_OSD <span foreground='${P_RED}'>()</span>")
+		OPTIONS+=("<span alpha='70%'>OSD    feedback  : $VIBRANIUM_VOLUME_USE_OSD</span> <span foreground='${P_RED}'>()</span>")
 	fi
 
 	OPTIONS+=("Allow above 100% : $VIBRANIUM_VOLUME_ALLOW_ABOVE_HUNDRED")
