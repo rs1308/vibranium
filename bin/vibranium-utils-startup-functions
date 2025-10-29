@@ -6,6 +6,12 @@
 
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 
+check_bool VIBRANIUM_GLOBAL_APP_LAUNCHER_SHOW_ON_START false
+
+if [[ "$VIBRANIUM_GLOBAL_APP_LAUNCHER_SHOW_ON_START" == true ]]; then
+	setsid -f vibranium-core-launcher
+fi
+
 [ ! -d "$VIBRANIUM_STATE" ] && mkdir "$VIBRANIUM_STATE"
 
 if [ -f "$VIBRANIUM_STATE/first-boot" ]; then

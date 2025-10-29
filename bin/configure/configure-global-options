@@ -516,19 +516,30 @@ while :; do
 			done
 			;;
 		*"App launcher"*)
+			index=0
 			while :; do
 				source "$VIBRANIUM_USER_SETTINGS"
 				app_launcher_options=(
-					"Show app icons : $(vibranium-cmd-get-option VIBRANIUM_GLOBAL_APP_LAUNCHER_SHOW_ICONS)"
-					"Auto select    : $(vibranium-cmd-get-option VIBRANIUM_GLOBAL_APP_LAUNCHER_AUTO_SELECT)"
+					"Auto select           : $(vibranium-cmd-get-option VIBRANIUM_GLOBAL_APP_LAUNCHER_AUTO_SELECT)"
+					"Show app icons        : $(vibranium-cmd-get-option VIBRANIUM_GLOBAL_APP_LAUNCHER_SHOW_ICONS)"
+					"Show on session start : $(vibranium-cmd-get-option VIBRANIUM_GLOBAL_APP_LAUNCHER_SHOW_ON_START)"
 				)
-				app_launcher_chosen="$(printf "%s\n" "${app_launcher_options[@]}" | rofi_cmd "App launcher" "ESC to go back")"
+				app_launcher_chosen="$(printf "%s\n" "${app_launcher_options[@]}" | rofi_cmd "App launcher" "ESC to go back" -selected-row "$index")"
 				[[ -z $app_launcher_chosen ]] && break;
 
+				for i in "${!app_launcher_options[@]}"; do
+					if [[ "${app_launcher_options[$i]}" == "$app_launcher_chosen" ]]; then
+						index="$i"
+						break
+					fi
+				done
+
 				case "$app_launcher_chosen" in
-					"Show"*)
+					"Show on session"*)
+						toggle_bool "VIBRANIUM_GLOBAL_APP_LAUNCHER_SHOW_ON_START"
+						;;
+					"Show app icons"*)
 						toggle_bool "VIBRANIUM_GLOBAL_APP_LAUNCHER_SHOW_ICONS"
-						continue
 						;;
 					"Auto"*)
 						while :; do

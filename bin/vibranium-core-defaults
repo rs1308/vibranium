@@ -133,6 +133,12 @@ VIBRANIUM_GLOBAL_APP_LAUNCHER_SHOW_ICONS=true
 # Default: false
 VIBRANIUM_GLOBAL_APP_LAUNCHER_AUTO_SELECT=false
 
+# Whether to automatically show app launcher when starting the session
+# Available options: bool
+#
+# Default is false
+VIBRANIUM_GLOBAL_APP_LAUNCHER_SHOW_ON_START=false
+
 # Whether to respect the current power profile when performing compute-intensive actions.
 # If set to 'true' and the current power profile is 'power' (which prioritizes energy saving),
 # scripts like 'vibranium-core-set-wallpaper' will skip heavy blur processing for the lock screen background,
