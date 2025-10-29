@@ -319,45 +319,6 @@ check_enum() {
     fi
 }
 
-log() {
-    printf "\e[0;34m[INFO]\e[0m ${*}\n"
-}
-
-warn() {
-    printf "\e[0;33m[WARNING]\e[0m ${*}\n"
-}
-
-error() {
-    printf "\e[0;31m[ERROR]\e[0m ${*}\n"
-}
-
-flash_border() {
-    check_int VIBRANIUM_GLOBAL_FLASH_BORDER_DURATION 0.2 float
-    # sleep $VIBRANIUM_GLOBAL_FLASH_BORDER_DURATION
-
-	if [[ "$(hyprctl -j getoption animations:enabled | jq -r '.int')" == 0 ]]; then
-		return 0
-	fi
-
-	for i in $(seq 1 2); do
-		hyprctl -q "keyword general:col.active_border rgb(ffffff)"
-		sleep 0.15
-		hyprctl -q reload
-		i=$(( i + 1 ))
-	done
-}
-
-flash_screen() {
-    check_int VIBRANIUM_GLOBAL_FLASH_SCREEN_DURATION 0.15 float
-	if [[ "$(hyprctl -j getoption animations:enabled | jq -r '.int')" == 0 ]]; then
-		return 0
-	fi
-	
-	hyprctl -q hyprsunset gamma 150
-	sleep 0.1
-	hyprctl -q hyprsunset gamma 100
-}
-
 # Self-explanatory
 is_fullscreen() {
     if [ "$(hyprctl -j activewindow | jq '.fullscreen')" = 2 ]; then
@@ -376,5 +337,61 @@ is_in_game() {
         return 0
     else
         return 1
+    fi
+}
+
+is_headless() {
+	if [ -t 0 ] && [ -c /dev/tty ]; then
+		return 1
+	else
+		return 0
+	fi
+}
+
+log() {
+	! is_headless && echo -e "${BLUE}[INFO]${RESET} ${*}"
+}
+
+warn() {
+	! is_headless && echo -e "${YELLOW}[WARNING]${RESET} ${*}"
+}
+
+error() {
+	! is_headless && echo -e "${RED}[ERROR]${RESET} ${*}"
+}
+
+# Usage: _flash <border|screen>
+_flash() {
+    local type speed_var seconds
+
+	type="$1"
+
+    check_enum VIBRANIUM_GLOBAL_FLASH_BORDER_SPEED "medium" slow medium fast very_fast
+    check_enum VIBRANIUM_GLOBAL_FLASH_SCREEN_SPEED "medium" slow medium fast very_fast
+
+    declare -A speed_map=(
+        [slow]=0.35 [medium]=0.25
+        [fast]=0.15 [very_fast]=0.05
+    )
+
+    case "$type" in
+        border) speed_var=VIBRANIUM_GLOBAL_FLASH_BORDER_SPEED ;;
+        screen) speed_var=VIBRANIUM_GLOBAL_FLASH_SCREEN_SPEED ;;
+    esac
+
+    seconds=${speed_map[$(eval echo \$$speed_var)]}
+
+    [[ "$(hyprctl -j getoption animations:enabled | jq -r '.int')" == 0 ]] && return 0
+
+    if [[ $type == border ]]; then
+        for _ in 1 2; do
+            hyprctl -q "keyword general:col.active_border rgb(ffffff)"
+            sleep $seconds
+            hyprctl -q reload
+        done
+    else
+        hyprctl -q hyprsunset gamma 150
+        sleep $seconds
+        hyprctl -q hyprsunset gamma 100
     fi
 }

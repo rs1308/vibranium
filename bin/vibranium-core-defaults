@@ -30,12 +30,10 @@ VIBRANIUM_DATE_FORMAT="%Y-%m-%d-%H-%M-%S"
 VIBRANIUM_GLOBAL_FLASH_BORDER=true
 
 # How many seconds should take border flashing animation
-# Available options: int <seconds>
+# Available options: string 'slow' 'medium' 'fast' 'very_fast'
 #
-# Note fractional integer are supported
-#
-# Default is 0.2
-VIBRANIUM_GLOBAL_FLASH_BORDER_DURATION=0.2
+# Default is 'medium'
+VIBRANIUM_GLOBAL_FLASH_BORDER_SPEED="medium"
 
 # Whether to flash screen when (usually) taking screenshots and starting screen recording.
 # Available options: bool
@@ -46,10 +44,10 @@ VIBRANIUM_GLOBAL_FLASH_BORDER_DURATION=0.2
 VIBRANIUM_GLOBAL_FLASH_SCREEN=true
 
 # How many seconds should take screen flashing animation
-# Available options: float <seconds>
+# Available options: string 'slow' 'medium' 'fast' 'very_fast'
 #
-# Default is 0.15
-VIBRANIUM_GLOBAL_FLASH_SCREEN_DURATION=0.15
+# Default is 'medium'
+VIBRANIUM_GLOBAL_FLASH_SCREEN_SPEED="medium"
 
 # Whether to use OSD
 # Available options: bool
@@ -366,7 +364,7 @@ VIBRANIUM_SCREENSHOT_FLASH_SCREEN=true
 #       if VIBRANIUM_GLOBAL_FLASH_BORDER is false and this is true, no effect
 #       will be applied.
 #
-# Note: Also check out VIBRANIUM_GLOBAL_FLASH_BORDER_DURATION
+# Note: Also check out VIBRANIUM_GLOBAL_FLASH_BORDER_SPEED
 # Default is true
 VIBRANIUM_SCREENSHOT_FLASH_BORDER=true
 

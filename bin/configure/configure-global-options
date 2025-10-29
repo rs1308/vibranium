@@ -26,49 +26,107 @@ _terminal_opacity() {
 	esac
 }
 
+# shhh
+_flash_submenu() {
+	local enabled_var="$1" speed_var="$2" title="$3"
+	local index=0
+
+	while :; do
+		local chosen
+		local opts=("Enabled : ${!enabled_var}")
+		source "$VIBRANIUM_USER_SETTINGS"
+
+		if [[ "${!enabled_var}" == true ]]; then
+			opts+=("Speed   : ${!speed_var//_/ }")
+		else
+			opts+=("<span alpha='70%'>Speed   : ${!speed_var//_/ }</span> <span foreground='${P_RED}'>()</span>")
+		fi
+
+		chosen="$(printf "%s\n" "${opts[@]}" | rofi_cmd "$title" "ESC to go back" -selected-row "$index")"
+		[[ -z "$chosen" ]] && break
+
+		for i in "${!opts[@]}"; do
+			if [[ "${opts[$i]}" == "$chosen" ]]; then
+				index="$i"
+				break
+			fi
+		done
+
+		case "$chosen" in
+			*""*)
+				continue
+				;;
+			"Enabled"*)
+				toggle_bool "$enabled_var"
+				;;
+			"Speed"*)
+				s_index=0
+				while :; do
+					spd_opts=("Slow" "Medium" "Fast" "Very fast")
+					spd_chosen="$(printf "%s\n" "${spd_opts[@]}" | rofi_cmd "Effect speed" "ESC to go back" -selected-row "$s_index")"
+					[[ -z "$spd_chosen" ]] && break
+
+					for i in "${!spd_opts[@]}"; do
+						if [[ "${spd_opts[$i]}" == "$spd_chosen" ]]; then
+							s_index="$i"
+							break
+						fi
+					done
+
+
+					case "$spd_chosen" in
+						"Slow"|"Medium"|"Fast"|"Very fast")
+							spd_chosen="${spd_chosen,,}"
+							spd_chosen="${spd_chosen// /_}"
+
+							option-validate "$speed_var"
+							sed -i "/^${speed_var}/s/=.*/=\"${spd_chosen}\"/" \
+								"$VIBRANIUM_USER_SETTINGS"
+							break
+							;;
+					esac
+				done
+				;;
+		esac
+	done
+}
+
 while :; do
 	source "$VIBRANIUM_USER_SETTINGS"
 
-	power_menu_style="$([ "$VIBRANIUM_GLOBAL_POWER_MENU_STYLE" = "overlay" ] && echo overlay || echo menu)"
-	terminal_opacity="$(_terminal_opacity get)"
-	wm_animations="$(hyprctl -j getoption animations:enabled | jq -r '.int')"
-
 	OPTIONS=(
-		"Now playing             : $VIBRANIUM_GLOBAL_SHOW_NOW_PLAYING"
-		"OSD enabled             : $VIBRANIUM_GLOBAL_USE_OSD"
+		"Now playing              : $VIBRANIUM_GLOBAL_SHOW_NOW_PLAYING"
+		"OSD enabled              : $VIBRANIUM_GLOBAL_USE_OSD"
+		"Show wallpaper           : $VIBRANIUM_GLOBAL_SHOW_WALLPAPER"
+		"Confirm to kill          : $VIBRANIUM_GLOBAL_CONFIRM_TO_KILL"
+		"Blur lockscreen          : $VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_BACKGROUND"
+		"Power menu style         : $VIBRANIUM_GLOBAL_POWER_MENU_STYLE"
+		"Copy to clipboard        : $VIBRANIUM_GLOBAL_COPY_TO_CLIPBOARD"
+		"Pause music on lock      : $VIBRANIUM_GLOBAL_PAUSE_MUSIC_ON_SESSION_LOCK"
+		"Welcome notification     : $VIBRANIUM_GLOBAL_SHOW_WELCOME_BACK_NOTIFICATION"
+		"Terminal transparency    : $(_terminal_opacity get)"
+		"Video downscale use GPU  : $VIBRANIUM_VIDEO_DOWNSCALE_USE_GPU"
+		"<b>App launcher settings</b>"
 	)
 
-	if [[ "$wm_animations" == 0 ]]; then
-		OPTIONS+=("<span alpha='70%'>Flash border            : $VIBRANIUM_GLOBAL_FLASH_BORDER</span> <span foreground='${P_RED}'>()</span>"
-				  "<span alpha='70%'>Flash screen            : $VIBRANIUM_GLOBAL_FLASH_SCREEN</span> <span foreground='${P_RED}'>()</span>")
+	if [[ "$(hyprctl -j getoption animations:enabled | jq -r .int)" == 1 ]]; then
+		OPTIONS+=("<b>Screen / Border flash</b>")
 	else
-		OPTIONS+=("Flash border            : $VIBRANIUM_GLOBAL_FLASH_BORDER"
-				  "Flash screen            : $VIBRANIUM_GLOBAL_FLASH_SCREEN")
+		OPTIONS+=("<span alpha='70%'><b>Screen / Border flash</b></span> <span foreground='${P_RED}'>()</span>")
 	fi
 
 	OPTIONS+=(
-		"Show wallpaper          : $VIBRANIUM_GLOBAL_SHOW_WALLPAPER"
-		"Confirm to kill         : $VIBRANIUM_GLOBAL_CONFIRM_TO_KILL"
-		"Blur lockscreen         : $VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_BACKGROUND"
-		"Power menu style        : $power_menu_style"
-		"Copy to clipboard       : $VIBRANIUM_GLOBAL_COPY_TO_CLIPBOARD"
-		"Pause music on lock     : $VIBRANIUM_GLOBAL_PAUSE_MUSIC_ON_SESSION_LOCK"
-		"Welcome notification    : $VIBRANIUM_GLOBAL_SHOW_WELCOME_BACK_NOTIFICATION"
-		"Terminal transparency   : $terminal_opacity"
-		"Video downscale use GPU : $VIBRANIUM_VIDEO_DOWNSCALE_USE_GPU"
-		"<b>App launcher settings</b>"
 		"<b>Playerctl options</b>"
 		"<b>Power profiles</b>"
 		"<b>Notifications</b>"
 		"<b>Edit env vars</b>"
 	)
 
-	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Global options" "ESC to go back" \
-		-selected-row "$INDEX")"
+	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Global options" "ESC to go back" -selected-row "$INDEX")"
 	[ -z "$CHOSEN" ] && break
 	
     for i in "${!OPTIONS[@]}"; do
-        if [ "${OPTIONS[$i]}" = "$CHOSEN" ]; then
+        if [[ "${OPTIONS[$i]}" == "$CHOSEN" ]]; then
 			INDEX="$i"
 			break
         fi
@@ -145,13 +203,6 @@ while :; do
 					continue
 				fi
 			done
-			;;
-		*"Flash"*"()"*)
-			msg="This option is <span foreground='${P_RED}'><b>locked</b></span> because "
-			msg+="<span foreground='${P_ACCENT}'><b>animations</b></span> "
-			msg+="<span foreground='${P_RED}'><b>disabled</b></span>"
-			notify-send -r 1 "This option is locked" "$msg"
-			continue
 			;;
 		*"Power profiles"*)
 			pp_index=0
@@ -625,109 +676,37 @@ while :; do
 				esac
 			done
 			;;
-		"Flash border"*)
-			while :; do
-				source "$VIBRANIUM_USER_SETTINGS"
-				flash_border_options=(
-					"Flash border   : $VIBRANIUM_GLOBAL_FLASH_BORDER"
-					"Duration       : ${VIBRANIUM_GLOBAL_FLASH_BORDER_DURATION}s" "What is this?"
-				)
-				flash_border_chosen="$(printf "%s\n" "${flash_border_options[@]}" | rofi_cmd "Flash border" "ESC to go back")"
-				[ -z "$flash_border_chosen" ] && break
-
-				case "$flash_border_chosen" in
-					"Flash"*)
-						toggle_bool "VIBRANIUM_GLOBAL_FLASH_BORDER"
-						break
-						;;
-					"Duration"*)
-						while :; do
-							prompt="Flashing effect duration (in seconds)"
-							input="$(printf "%s\n" "$prompt" | rofi_cmd "Flash duration" "Duration (0.1s - 1.0s)")"
-							[ -z "$input" ] && break; [ "$input" = "$prompt" ] && continue
-
-							if ! [[ "$input" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
-								notify-send -r 5 -u critical -t 1500 "Vibranium" "Only integers or floats allowed!"
-								continue
-							fi
-
-							if [[ ! "$input" =~ ^0\.[1-9][0-9]*$ && "$input" != "1" && "$input" != "1.0" ]]; then
-								notify-send -r 5 -u critical -t 1500 "Vibranium" "Between 0.1s and 1s!"
-								continue
-							fi
-
-							sed -i "/^VIBRANIUM_GLOBAL_FLASH_BORDER_DURATION/s/=.*/=${input}/" "$VIBRANIUM_USER_SETTINGS"
-							break
-						done
-						;;
-					"What"*)
-						msg="\n<span foreground='${P_GREEN}'><b>•</b></span> <span foreground='${P_PURPLE}'><b>Whether to flash a window's border when taking a screenshot</b></span>\n"
-						msg+="<span foreground='${P_GREEN}'><b>•</b></span> <span foreground='${P_YELLOW}'><b>This is a global feature that takes priority over local options</b></span>\n\n"
-						msg+="A purely aesthetic feature that indicates the screen was captured.\n\n"
-						msg+="If the global option is set to '<span foreground='${P_RED}'><b>false</b></span>', no flash effect will be applied\n"
-						msg+="even if this option is set to '<span foreground='${P_GREEN}'><b>true</b></span>' in the screenshot settings."
-						notify-send -r 3 -t 15000 "What is this?" "$msg"
-						continue
-				esac
-			done
+		*"flash"*""*)
+			msg="Option is not available because animations are disabled"
+			notify-send "This option is locked" "$msg"
 			;;
-		"Flash screen"*)
+		*"Screen / Border flash"*)
+			index=0
 			while :; do
-				source "$VIBRANIUM_USER_SETTINGS"
-				flash_screen_options=(
-					"Flash screen   : $VIBRANIUM_GLOBAL_FLASH_SCREEN"
-					"Duration       : ${VIBRANIUM_GLOBAL_FLASH_SCREEN_DURATION}s"
-					"What is this?"
-				)
-				flash_screen_chosen="$(printf "%s\n" "${flash_screen_options[@]}" | rofi_cmd "Flash screen" "ESC to go back")"
-				[ -z "$flash_screen_chosen" ] && break
+				f_opts=("Screen"  "Border")
+				f_chosen="$(printf "%s\n" "${f_opts[@]}" | rofi_cmd "Flash effect" "ESC to go back" -selected-row "$index")"
+				[[ -z "$f_chosen" ]] && break
 
-				case "$flash_screen_chosen" in
-					"Flash screen"*)
-						toggle_bool "VIBRANIUM_GLOBAL_FLASH_SCREEN"
+				for i in "${!f_opts[@]}"; do
+					if [[ "${f_opts[$i]}" == "$f_chosen" ]]; then
+						index="$i"
 						break
-						;;
-					"Duration"*)
-						while :; do
-							prompt="Flashing effect duration (in seconds)"
-							input="$(printf "%s\n" "$prompt" | rofi_cmd "Flash duration" "Duration (0.1s - 1.0s)")"
-							[ -z "$input" ] && break; [ "$input" = "$prompt" ] && continue
+					fi
+				done
 
-							if ! [[ "$input" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
-								notify-send -r 5 -u critical -t 1500 "Vibranium" "Only integers or floats allowed!"
-								continue
-							fi
-
-							if [[ ! "$input" =~ ^0\.[1-9][0-9]*$ && "$input" != "1" && "$input" != "1.0" ]]; then
-								notify-send -r 5 -u critical -t 1500 "Vibranium" "Between 0.1s and 1s!"
-								continue
-							fi
-
-							option-validate "VIBRANIUM_GLOBAL_FLASH_SCREEN_DURATION"
-							sed -i "/^VIBRANIUM_GLOBAL_FLASH_SCREEN_DURATION/s/=.*/=${input}/" "$VIBRANIUM_USER_SETTINGS"
-							break
-						done
-						;;
-					"What"*)
-						msg="\n<span foreground='${P_GREEN}'><b>•</b></span> <span foreground='${P_PURPLE}'><b>Whether to flash the screen when taking a fullscreen screenshot</b></span>\n"
-						msg+="<span foreground='${P_GREEN}'><b>•</b></span> <span foreground='${P_YELLOW}'><b>This is a global feature that takes priority over local options</b></span>\n\n"
-						msg+="A purely aesthetic feature that indicates the screen was captured.\n\n"
-						msg+="If the global option is set to '<span foreground='${P_RED}'><b>false</b></span>', no flash effect will be applied\n"
-						msg+="even if this option is set to '<span foreground='${P_GREEN}'><b>true</b></span>' in the screenshot settings."
-						notify-send -r 3 -t 15000 "What is this?" "$msg"
-						continue
+				case "$f_chosen" in
+					"Screen") _flash_submenu VIBRANIUM_GLOBAL_FLASH_SCREEN VIBRANIUM_GLOBAL_FLASH_SCREEN_SPEED "Screen" ;;
+					"Border") _flash_submenu VIBRANIUM_GLOBAL_FLASH_BORDER VIBRANIUM_GLOBAL_FLASH_BORDER_SPEED "Border" ;;
 				esac
 			done
 			;;
 		"Power menu style"*)
-			if [ "$VIBRANIUM_GLOBAL_POWER_MENU_STYLE" = "overlay" ]; then
-				option-validate "VIBRANIUM_GLOBAL_POWER_MENU_STYLE"
+			option-validate "VIBRANIUM_GLOBAL_POWER_MENU_STYLE"
+
+			if [[ "$VIBRANIUM_GLOBAL_POWER_MENU_STYLE" == "overlay" ]]; then
 				sed -i "/^VIBRANIUM_GLOBAL_POWER_MENU_STYLE/s/=.*/=\"menu\"/" "$VIBRANIUM_USER_SETTINGS"
-			elif [ "$VIBRANIUM_GLOBAL_POWER_MENU_STYLE" = "menu" ]; then
-				option-validate "VIBRANIUM_GLOBAL_POWER_MENU_STYLE"
-				sed -i "/^VIBRANIUM_GLOBAL_POWER_MENU_STYLE/s/=.*/=\"overlay\"/" "$VIBRANIUM_USER_SETTINGS"
 			else
-				continue
+				sed -i "/^VIBRANIUM_GLOBAL_POWER_MENU_STYLE/s/=.*/=\"overlay\"/" "$VIBRANIUM_USER_SETTINGS"
 			fi
 	esac
 done

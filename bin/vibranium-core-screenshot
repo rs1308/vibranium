@@ -156,7 +156,7 @@ case "$1" in
 
         # Optionally flash border to indicate target
         if [[ $VIBRANIUM_GLOBAL_FLASH_BORDER == true ]] && [[ ${VIBRANIUM_SCREENSHOT_FLASH_BORDER} == true ]]; then
-            flash_border &
+			_flash border
         fi
         log "Performing actions"
         grim -g "$window_geometry" "${opt_options[@]}" "$output_file"
@@ -172,7 +172,7 @@ case "$1" in
 
 		if [[ $VIBRANIUM_GLOBAL_FLASH_SCREEN == true ]] && [[ $VIBRANIUM_SCREENSHOT_FLASH_SCREEN == true ]]; then
 			log "${YELLOW}\$VIBRANIUM_SCREENSHOT_FLASH_SCREEN${RESET} is ${YELLOW}'true'${RESET}. Applying flash effect"
-			flash_screen
+			_flash screen
 		fi
         ;;
     *) usage ;;

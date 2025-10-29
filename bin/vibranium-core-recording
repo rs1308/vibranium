@@ -55,7 +55,7 @@ cleanup() {
 	# Flash screen to indicate that recording is complete
 	if [ $VIBRANIUM_GLOBAL_FLASH_SCREEN = true ] && [ $VIBRANIUM_RECORDING_FLASH_SCREEN = true ]; then
 		log "Flashing screen"
-		flash_screen
+		_flash screen
 	fi
 
     log "Updating waybar module"
@@ -203,7 +203,7 @@ fi
 log "Recording started"
 if [ $VIBRANIUM_GLOBAL_FLASH_SCREEN = true ] && [ $VIBRANIUM_RECORDING_FLASH_SCREEN = true ]; then
 	log "Flashing screen"
-	flash_screen
+	_flash screen
 fi
 
 log "Updating waybar module"
