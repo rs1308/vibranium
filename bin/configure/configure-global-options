@@ -32,9 +32,10 @@ _flash_submenu() {
 	local index=0
 
 	while :; do
+		source "$VIBRANIUM_USER_SETTINGS"
+
 		local chosen
 		local opts=("Enabled : ${!enabled_var}")
-		source "$VIBRANIUM_USER_SETTINGS"
 
 		if [[ "${!enabled_var}" == true ]]; then
 			opts+=("Speed   : ${!speed_var//_/ }")
@@ -677,7 +678,7 @@ while :; do
 			done
 			;;
 		*"flash"*""*)
-			msg="Option is not available because animations are disabled"
+			msg="Option is not available because animations disabled"
 			notify-send "This option is locked" "$msg"
 			;;
 		*"Screen / Border flash"*)
