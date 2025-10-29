@@ -28,5 +28,5 @@ export MANPAGER="\$EDITOR +Man!"
 # export MANGOHUD_CONFIG="fps_only,alpha=0.3,background_alpha=0,text_color=ffffff,font_size=18"
 
 If you are a pass user (https://www.passwordstore.org/), you can specify a specific folder that pass will use to look for passwords. For example:
-# export PASSWORD_STORE_DIR="\$XDG_DATA_HOME/password-store
+# export PASSWORD_STORE_DIR="\$XDG_DATA_HOME/password-store"
 EOF

@@ -35,9 +35,6 @@ export VIBRANIUM="$XDG_DATA_HOME/vibranium"
 export VIBRANIUM_PATH="$VIBRANIUM/bin"
 export PATH="$HOME/.local/bin:$VIBRANIUM_PATH:$PATH"
 
-# Export user-defined environment
-source "$XDG_CONFIG_HOME/vibranium/environment"
-
 # Theming
 export XCURSOR_THEME="macOS"
 export XCURSOR_SIZE=22
@@ -80,5 +77,8 @@ case "$GPU" in
 		export VIBRANIUM_GPU_IS_SUPPORTED=false
 		;;
 esac
+
+# Export user-defined environment
+source "$XDG_CONFIG_HOME/vibranium/environment"
 
 # vim:ft=bash
