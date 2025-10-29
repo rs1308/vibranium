@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Image Viewer
-Exec=imv-dir %F
+Exec=imv %F
 Icon=multimedia-photo-viewer
 MimeType=image/jpeg;image/png;image/svg+xml;
 Keywords=image;png;jpeg;jpg;avif;media;imv;

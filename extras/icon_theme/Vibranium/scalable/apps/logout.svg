@@ -12,5 +12,5 @@
   <path
      d="M 20,10 16,6 V 9 H 8 v 2 h 8 v 3 m 2,2 A 10,10 0 1 1 18,4 h -2.73 a 8,8 0 1 0 0,12 z"
      id="path1"
-     style="fill:#e5e5e5;fill-opacity:1" />
+     style="fill: #e5e5e5;fill-opacity:1" />
 </svg>
