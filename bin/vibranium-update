@@ -7,69 +7,75 @@ RESET=$'\e[0m'
 GREEN=$'\e[0;32m'
 YELLOW=$'\e[0;33m'
 
-_error_handler() {
-    local exit_code=$?
-    local line_no=$1
-    echo -e "${RED}Error occurred at line${RESET} $line_no. ${RED}Exit code${RESET}: $exit_code\e[0m"
-    echo -e "${RED}[VIBRANIUM]${RESET} Git status at failure:"
-    git -C "$VIBRANIUM" status
-    echo -e "${RED}[VIBRANIUM]${RESET} Attempting safe reset..."
-    git -C "$VIBRANIUM" reset --merge || true
-	read -n1 -r -p $'\e[0;31m[VIBRANIUM]\e[0m Press any key to close this window' dummy
-    exit "$exit_code"
-}
-
 _update() {
-    local latest_tag current_tag
+    local latest_tag current_tag current_commit latest_commit stashed
 
-	printf '\e[?25l' # Hide cursor
+    printf '\e[?25l' # Hide cursor
 
-	# Pull from remote
-	echo -e "${YELLOW}[VIBRANIUM]${RESET} Getting updates from remote..."
-    git -C "$VIBRANIUM" fetch --all --tags
+    # Pull from remote with pruning
+    echo -e "${YELLOW}[VIBRANIUM]${RESET} Getting updates from remote..."
+    git -C "$VIBRANIUM" fetch --all --tags --prune --prune-tags || {
+        echo -e "${RED}[VIBRANIUM]${RESET} Failed to fetch updates. Check your network or repository permissions."
+        read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
+        printf '\e[?25h' # Show cursor
+        exit 1
+    }
 
-    current_tag=$(git -C "$VIBRANIUM" describe --tags --exact-match 2>/dev/null || echo "master")
-	echo -e "${YELLOW}[VIBRANIUM]${RESET} Local: $current_tag"
+    latest_tag=$(git -C "$VIBRANIUM" tag --sort=-creatordate | head -n 1)
+    current_tag=$(git -C "$VIBRANIUM" describe --tags --exact-match 2>/dev/null ||
+        git -C "$VIBRANIUM" rev-parse --short HEAD)
 
-    latest_tag=$(git -C "$VIBRANIUM" tag -l --sort=-v:refname | head -n 1)
-	echo -e "${YELLOW}[VIBRANIUM]${RESET} Remote: ${latest_tag}"
+    latest_commit=$(git -C "$VIBRANIUM" rev-parse "$latest_tag" 2>/dev/null)
+    current_commit=$(git -C "$VIBRANIUM" rev-parse HEAD)
 
-	if [ "$current_tag" = "$latest_tag" ]; then
-		echo -e "${GREEN}[VIBRANIUM]${RESET} You are up to date"
-		read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
-		exit 0
-	elif [ "$current_tag" = "master" ]; then
-		ahead_count=$(git -C "$VIBRANIUM" rev-list --count "$latest_tag"..HEAD)
+    echo -e "${YELLOW}[VIBRANIUM]${RESET} Local: $current_tag ($current_commit)"
+    echo -e "${YELLOW}[VIBRANIUM]${RESET} Remote: ${latest_tag} ($latest_commit)"
 
-		if [ "$ahead_count" -eq 0 ]; then
-			echo -e "${GREEN}[VIBRANIUM]${RESET} DEV: you're up to date on $latest_tag"
-		else
-			printf "%s[VIBRANIUM]%s DEV: %s branch, %s commit(s) ahead of %s\n" \
-			  "$GREEN" "$RESET" \
-			  "${YELLOW}${current_tag}${RESET}" \
-			  "${YELLOW}${ahead_count}${RESET}" \
-			  "${YELLOW}${latest_tag}${RESET}"
-		fi
+    if [[ "$current_commit" == "$latest_commit" ]]; then
+        echo -e "${GREEN}[VIBRANIUM]${RESET} You are up to date"
+        read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
+        printf '\e[?25h' # Show cursor
+        exit 0
+    fi
 
-		read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
-		exit 0
+    if ! git -C "$VIBRANIUM" diff --quiet HEAD || ! git -C "$VIBRANIUM" diff --cached --quiet ||
+        [[ -n "$(git -C "$VIBRANIUM" ls-files --others --exclude-standard)" ]]; then
+        echo -e "${YELLOW}[VIBRANIUM]${RESET} Stashing local changes..."
+        git -C "$VIBRANIUM" stash push --include-untracked -m "autostash before update to $latest_tag" -q || {
+            echo -e "${RED}[VIBRANIUM]${RESET} Failed to stash changes."
+            read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
+            printf '\e[?25h' # Show cursor
+            exit 1
+        }
+        stashed=true
+        echo -e "${GREEN}[VIBRANIUM]${RESET} Local changes stashed"
     else
-		echo -e "${YELLOW}[VIBRANIUM]${RESET} Trying to stash local changes..."
-        if git -C "$VIBRANIUM" stash push -m "autostash before update to $latest_tag" -q | grep -q 'No local changes'; then
-            echo -e "${GREEN}[VIBRANIUM]${RESET} No local changes to stash"
-        else
-            echo -e "${GREEN}[VIBRANIUM]${RESET} Local changes stashed"
+        echo -e "${GREEN}[VIBRANIUM]${RESET} No local changes to stash"
+    fi
+
+    echo -e "${YELLOW}[VIBRANIUM]${RESET} Updating to ${latest_tag}..."
+    git -C "$VIBRANIUM" checkout -q "$latest_tag" || {
+        echo -e "${RED}[VIBRANIUM]${RESET} Failed to checkout $latest_tag."
+        if [ "$stashed" = true ]; then
+            git -C "$VIBRANIUM" stash apply -q || true
+            git -C "$VIBRANIUM" stash drop -q || true
         fi
+        read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
+        printf '\e[?25h' # Show cursor
+        exit 1
+    }
 
-		echo -e "${YELLOW}[VIBRANIUM]${RESET} Switching tags..."
-        git -C "$VIBRANIUM" checkout -q "$latest_tag"
-
-        if git -C "$VIBRANIUM" stash list -q | grep -q "autostash before update to $latest_tag"; then
+    if [[ "$stashed" == true ]]; then
+        if git -C "$VIBRANIUM" stash list | grep -q "autostash before update to $latest_tag"; then
             git -C "$VIBRANIUM" stash apply -q
+            if [[ $? -ne 0 ]]; then
+                echo -e "${RED}[VIBRANIUM]${RESET} Stash apply failed due to conflicts. Please resolve manually."
+                read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
+                printf '\e[?25h' # Show cursor
+                exit 1
+            fi
             git -C "$VIBRANIUM" stash drop -q
             echo -e "${GREEN}[VIBRANIUM]${RESET} Stash applied"
-        else
-            echo -e "${YELLOW}[VIBRANIUM]${RESET} No stash to apply"
         fi
     fi
 
@@ -79,10 +85,8 @@ _update() {
 
     echo -e "${GREEN}[VIBRANIUM]${RESET} Vibranium updated to $latest_tag"
     read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
-    printf '\e[?25h' # show cursor
+    printf '\e[?25h' # Show cursor
 }
-
-trap '_error_handler $LINENO' ERR
 
 printf "\n\e[33m%s\e[0m\n\n" "$(<"$VIBRANIUM/logo.txt")"
 PROMPT=$'\e[0;33m[VIBRANIUM]\e[0m Proceed with update? (Y/n): '
@@ -91,18 +95,17 @@ while :; do
     printf "%s" "$PROMPT"
     read -r answer
     case "$answer" in
-        [Yy][Ee][Ss]|[Yy]|"")
-			_update
-            exit 0
-            ;;
-        [Nn]|[Nn][Oo])
-            echo -e "${RED}[VIBRANIUM]${RESET} Operation aborted"
-            read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
-            exit 1
-            ;;
-        *)
-            continue
-            ;;
+    [Yy][Ee][Ss] | [Yy] | "")
+        _update
+        exit 0
+        ;;
+    [Nn] | [Nn][Oo])
+        echo -e "${RED}[VIBRANIUM]${RESET} Operation aborted"
+        read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
+        exit 1
+        ;;
+    *)
+        continue
+        ;;
     esac
 done
-
