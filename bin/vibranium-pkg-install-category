@@ -10,7 +10,11 @@ declare -A packages=(
     ["Communication:Signal"]="signal-desktop"
 	["Communication:Slack"]="slack-desktop-wayland"
 
-    ["Entertainment:Spotify"]="spicetify-cli spotify"
+    ["Multimedia:Spotify"]="spicetify-cli spotify"
+	["Multimedia:MPD:ncmpcpp"]="mpd mpc ncmpcpp"
+	["Multimedia:MPD:rmpc"]="mpd mpc rmpc"
+	["Multimedia:MPD:cmus"]="mpd mpc cmus"
+	["Multimedia:VLC"]="VLC"
 
 	["Network:qBittorrent"]="qbittorrent"
 	["Network:Transmission"]="transmission-gtk"
