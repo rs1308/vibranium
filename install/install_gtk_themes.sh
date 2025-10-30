@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 YELLOW=$'\e[0;33m'
-GREEN=$'\e[0;32m'
 RESET=$'\e[0m'
 GRAY=$'\e[90m'
 
@@ -14,6 +13,9 @@ REPOS=(
   "Tokyonight-GTK-Theme"
   "Everforest-GTK-Theme"
   "Catppuccin-GTK-Theme"
+  "Kanagawa-GKT-Theme" 
+  #          ^
+  # That's hilarious
 )
 
 # Destination directory
@@ -29,6 +31,7 @@ accents["Rose-Pine-GTK-Theme"]="pink"
 accents["Tokyonight-GTK-Theme"]=""
 accents["Everforest-GTK-Theme"]="green"
 accents["Catppuccin-GTK-Theme"]="lavender"
+accents["Kanagawa-GKT-Theme"]="grey"
 
 # Associative array for colors per theme (space-separated strings)
 declare -A colors
@@ -39,6 +42,7 @@ colors["Rose-Pine-GTK-Theme"]="dark light"
 colors["Tokyonight-GTK-Theme"]="dark"
 colors["Everforest-GTK-Theme"]="dark"
 colors["Catppuccin-GTK-Theme"]="dark light"
+colors["Kanagawa-GKT-Theme"]="dark light"
 
 printf "\r\033%s[VIBRANIUM]%s Installing GTK themes" "${YELLOW}"  "${RESET}"
 
@@ -83,6 +87,10 @@ install_theme() {
     "Catppuccin-GTK-Theme")
       base_name="Catppuccin"
       variants=("default" "frappe" "macchiato")
+      ;;
+    "Kanagawa-GKT-Theme")
+      base_name="Kanagawa"
+      variants=("default" "dragon")
       ;;
     *)
       echo "No configuration for $repo"
@@ -171,6 +179,16 @@ install_theme() {
             "default") desired_name="Tokyonight-Night" ;;
             "moon") desired_name="Tokyonight-Moon" ;;
           esac
+          ;;
+        "Kanagawa-GKT-Theme")
+		  if [ "$color" = "light" ]; then
+			desired_name="$base_name-Lotus"
+		  else
+            case "$variant" in
+              "default") desired_name="Kanagawa-Wave" ;;
+              "dragon") desired_name="Kanagawa-Dragon" ;;
+            esac
+		  fi
           ;;
         "Osaka-GTK-Theme")
           case "$variant" in

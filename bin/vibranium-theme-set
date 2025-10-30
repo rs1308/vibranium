@@ -189,6 +189,7 @@ apply_chromium_colors() {
     "tokyonight-night") color="26, 27, 38" ;;
 
 	"kanagawa-wave") color="31, 31, 40" ;;
+	"kanagawa-dragon") color="24, 22, 22" ;;
     esac
 
     chromium --no-startup-window --set-theme-color="$color"
