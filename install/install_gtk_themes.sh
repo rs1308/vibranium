@@ -15,7 +15,7 @@ REPOS=(
   "Catppuccin-GTK-Theme"
   "Kanagawa-GKT-Theme" 
   #          ^
-  # That's hilarious
+  # This is hilarious
 )
 
 # Destination directory
@@ -42,7 +42,7 @@ colors["Rose-Pine-GTK-Theme"]="dark light"
 colors["Tokyonight-GTK-Theme"]="dark"
 colors["Everforest-GTK-Theme"]="dark"
 colors["Catppuccin-GTK-Theme"]="dark light"
-colors["Kanagawa-GKT-Theme"]="dark light"
+colors["Kanagawa-GKT-Theme"]="dark"
 
 printf "\r\033%s[VIBRANIUM]%s Installing GTK themes" "${YELLOW}"  "${RESET}"
 

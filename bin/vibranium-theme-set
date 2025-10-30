@@ -13,7 +13,7 @@ declare -A FAMILIES=(
     [Nightfox]="Nightfox Nordfox Carbonfox Terafox"
     [Rosepine]="Rosepine Moon Dawn"
     [Osaka]="Osaka Jade Solarized Light"
-	[Kanagawa]="Wave Dragon Lotus"
+	[Kanagawa]="Wave Dragon"
 )
 
 declare -A STANDALONE_THEMES=(
