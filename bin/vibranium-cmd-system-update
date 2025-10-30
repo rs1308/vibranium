@@ -62,7 +62,7 @@ for pkg in "${pkg_list[@]}"; do
 done
 
 vibranium-cmd-refresh-waybar-module pacman
-printf "\r\033[K%s[VIBRANIUM]%s System update complete" "$YELLOW" "$RESET"
+printf "\r\033[K%s[VIBRANIUM]%s System update complete\n" "$YELLOW" "$RESET"
 
 important_regex='^(systemd|linux(-.*)?|networkmanager|iwd)$'
 for pkg in "${pkg_list[@]}"; do
