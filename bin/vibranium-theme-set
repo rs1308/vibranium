@@ -13,6 +13,7 @@ declare -A FAMILIES=(
     [Nightfox]="Nightfox Nordfox Carbonfox Terafox"
     [Rosepine]="Rosepine Moon Dawn"
     [Osaka]="Osaka Jade Solarized Light"
+	[Kanagawa]="Wave Dragon Lotus"
 )
 
 declare -A STANDALONE_THEMES=(
@@ -61,6 +62,10 @@ declare -A PAPIRUS_COLORS=(
     [Osaka-Jade]=teal
     [Osaka-Solarized]=darkcyan
     [Osaka-Light]=green
+
+	[Kanagawa-Wave]=yaru
+	[Kanagawa-Dragon]=yaru
+	[Kanagawa-Lotus]=palebrown
 )
 
 LINK_TARGET="$XDG_CONFIG_HOME/vibranium/theme/current"
@@ -182,6 +187,8 @@ apply_chromium_colors() {
 
     "tokyonight-moon") color="34, 36, 54" ;;
     "tokyonight-night") color="26, 27, 38" ;;
+
+	"kanagawa-wave") color="31, 31, 40" ;;
     esac
 
     chromium --no-startup-window --set-theme-color="$color"
