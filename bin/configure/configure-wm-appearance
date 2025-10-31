@@ -30,33 +30,26 @@ edit_int() {
 }
 
 set_animations_preset() {
-	local expressive default current
-	local folder target
+	local folder target current anim_opts anim_chosen
 
 	folder="$VIBRANIUM/defaults/hypr/animations"
 	target="$HOME/.config/hypr/hyprland.conf.d/animations.conf"
 
-	expressive="$folder/expressive.conf"
-	default="$folder/default.conf"
+	mapfile -t anim_opts < <(basename -a "$folder"/*.conf | sed 's/\.conf$//')
 
-	current="$(basename "$(readlink "$HOME/.config/hypr/hyprland.conf.d/animations.conf")")"
-	current="${current%.conf}"
+	if [[ -L "$target" ]]; then
+		current="$(basename "$(readlink "$target")")"
+		current="${current%.conf}"
+	else
+		current=""
+	fi
 
 	while :; do
-		anim_opts=("Default" "Expressive")
 		anim_chosen="$(printf "%s\n" "${anim_opts[@]}" | rofi_cmd "Animations" "ESC to go back")"
 		[[ -z "$anim_chosen" ]] && break
 
-		case "$anim_chosen" in
-			"Default")
-				ln -sf "$default" "$target"
-				hyprctl -q reload config-only
-				;;
-			"Expressive")
-				ln -sf "$expressive" "$target"
-				hyprctl -q reload config-only
-				;;
-		esac
+		ln -sf "$folder/$anim_chosen.conf" "$target"
+		hyprctl -q reload config-only
 		break
 	done
 }
