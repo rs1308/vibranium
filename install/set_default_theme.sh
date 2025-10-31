@@ -63,3 +63,6 @@ printf "# vim:ft=bash\n# shellcheck disable=all\n# Auto-generated file. Do not e
 
 cp -r ./config/* "$HOME/.config"
 sed -i "s/user/$USER/" "$HOME/.config/qt6ct/qt6ct.conf"
+
+ln -sf "$HOME/.local/share/vibranium/defaults/hypr/animations/default.conf" \
+	"$HOME/.config/hypr/hyprland.conf.d/animations.conf"
