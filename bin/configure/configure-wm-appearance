@@ -29,6 +29,38 @@ edit_int() {
 	done
 }
 
+set_animations_preset() {
+	local expressive default current
+	local folder target
+
+	folder="$VIBRANIUM/defaults/hypr/animations"
+	target="$HOME/.config/hypr/hyprland.conf.d/animations.conf"
+
+	expressive="$folder/expressive.conf"
+	default="$folder/default.conf"
+
+	current="$(basename "$(readlink "$HOME/.config/hypr/hyprland.conf.d/animations.conf")")"
+	current="${current%.conf}"
+
+	while :; do
+		anim_opts=("Default" "Expressive")
+		anim_chosen="$(printf "%s\n" "${anim_opts[@]}" | rofi_cmd "Animations" "ESC to go back")"
+		[[ -z "$anim_chosen" ]] && break
+
+		case "$anim_chosen" in
+			"Default")
+				ln -sf "$default" "$target"
+				hyprctl -q reload config-only
+				;;
+			"Expressive")
+				ln -sf "$expressive" "$target"
+				hyprctl -q reload config-only
+				;;
+		esac
+		break
+	done
+}
+
 while :; do
 	mapfile -t lines < <(
 		hyprctl --batch -j \
@@ -67,6 +99,8 @@ while :; do
 		current_shadow="${lines[7]}"
 		current_active_opacity="${lines[8]}"
 		current_inactive_opacity="${lines[9]}"
+		current_animations_preset="$(basename "$(readlink "$HOME/.config/hypr/hyprland.conf.d/animations.conf")")"
+		current_animations_preset="${current_animations_preset%.conf}"
 
 	OPTIONS=(
 		"Inactive window opacity : ${current_inactive_opacity}"
@@ -74,6 +108,7 @@ while :; do
 		"Dim inactive window     : ${current_dim}"
 		"Drop window shadow      : ${current_shadow}"
 		"Animations enabled      : ${current_animations}"
+		"Animations preset       : ${current_animations_preset}"
 		"Border roundness        : ${current_roundness}px"
 	)
 
@@ -230,10 +265,13 @@ while :; do
 				break
 			done
 			;;
-		"Animations"*)
+		"Animations enabled"*)
 			vibranium-cmd-toggle-animations
 			;;
-		*"()")
+		"Animations preset"*)
+			set_animations_preset
+			;;
+		*"Blur enabled"*"()"*)
 			msg="This option is <span foreground='${P_RED}'><b>locked</b></span> "
 			msg+="because the global\noption '<span foreground='${P_YELLOW}'><b>Respect Power Profile</b></span>' "
 			msg+="is '<span foreground='${P_GREEN}'><b>true</b></span>'\n"
