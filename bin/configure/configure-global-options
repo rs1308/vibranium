@@ -332,7 +332,7 @@ while :; do
 						msg="\n<span foreground='${P_ACCENT}'><b>•</b></span> "
 						msg+="<b>Whether to automatically copy to clipboard when working with files</b>\n\n"
 						msg+="This could be a <span foreground='${P_YELLOW}'><b>screenshot</b></span>, a recorded or downscaled "
-						msg+="<span foreground='${P_YELLOW}'><b>video</b></span>, or any\nother type of file operation"
+						msg+="<span foreground='${P_YELLOW}'><b>video</b></span>,\nor any other type of file operation"
 						notify-send -r 3 -t 15000 "What is this?" "$msg"
 						continue
 				esac
@@ -487,9 +487,10 @@ while :; do
 						break
 					;;
 					"What"*)
-						msg="\n<span foreground='${P_GREEN}'><b>•</b></span> <span foreground='${P_PURPLE}'><b>Whether to pause "
-						msg+="the active music when locking session</b></span>\n\n"
-						msg+="When enabled, music will fade out when the screen is\nlocked and fade back in when it is unlocked."
+						msg="\n<span foreground='${P_GREEN}'><b>•</b></span> <b>Whether to pause "
+						msg+="the active music when locking session</b>\n\n"
+						msg+="When <span foreground='${P_GREEN}'><b>enabled</b></span>, "
+						msg+="music will fade out when the screen is\nlocked and fade back in when it is unlocked."
 						notify-send -r 3 -t 15000 "What is this?" "$msg"
 						continue
 				esac
@@ -507,8 +508,7 @@ while :; do
 						break
 					;;
 					"What"*)
-						msg="\n<span foreground='${P_ACCENT}'><b>•</b></span> "
-						msg+="<b>Whether to show the '<span foreground='${P_YELLOW}'>Welcome back, ${USER}!</span>' "
+						msg="<b>Whether to show the '<span foreground='${P_YELLOW}'>Welcome back, ${USER}!</span>' "
 						msg+="notification when unlocking session</b>\n\n"
 						notify-send -r 3 -t 15000 "What is this?" "$msg"
 						continue
@@ -520,9 +520,9 @@ while :; do
 			while :; do
 				source "$VIBRANIUM_USER_SETTINGS"
 				app_launcher_options=(
-					"Auto select           : $(vibranium-cmd-get-option VIBRANIUM_GLOBAL_APP_LAUNCHER_AUTO_SELECT)"
-					"Show app icons        : $(vibranium-cmd-get-option VIBRANIUM_GLOBAL_APP_LAUNCHER_SHOW_ICONS)"
-					"Show on session start : $(vibranium-cmd-get-option VIBRANIUM_GLOBAL_APP_LAUNCHER_SHOW_ON_START)"
+					"Auto select           : $VIBRANIUM_GLOBAL_APP_LAUNCHER_AUTO_SELECT"
+					"Show app icons        : $VIBRANIUM_GLOBAL_APP_LAUNCHER_SHOW_ICONS"
+					"Show on session start : $VIBRANIUM_GLOBAL_APP_LAUNCHER_SHOW_ON_START"
 				)
 				app_launcher_chosen="$(printf "%s\n" "${app_launcher_options[@]}" | rofi_cmd "App launcher" "ESC to go back" -selected-row "$index")"
 				[[ -z $app_launcher_chosen ]] && break;
@@ -543,7 +543,7 @@ while :; do
 						;;
 					"Auto"*)
 						while :; do
-							auto_select_options=("Auto select : $(vibranium-cmd-get-option VIBRANIUM_GLOBAL_APP_LAUNCHER_AUTO_SELECT)" "What is this?")
+							auto_select_options=("Auto select : $VIBRANIUM_GLOBAL_APP_LAUNCHER_AUTO_SELECT" "What is this?")
 							auto_select_chosen="$(printf "%s\n" "${auto_select_options[@]}" | rofi_cmd "Auto select" "ESC to go back")"
 							[[ -z $auto_select_chosen ]] && break
 
@@ -556,8 +556,8 @@ while :; do
 										msg="\n<span foreground='${P_ACCENT}'><b>•</b></span> <b>Whether to automatically select the last remaining entry</b>\n\n"
 										msg+="When only one entry remains in the menu after filtering, automatically launch it.\n"
 										msg+="This can significantly speed up application launch and menu navigation, but may seem inconvenient at first\n\n"
-										# msg+="<span foreground='${P_GREEN}'><b>•</b></span> <span foreground='${P_RED}'><b>This does not affect the clipboard menu</b></span>"
-										notify-send -r 3 -t 15000 "What is this?" "$msg"
+										msg+="<span foreground='${P_ACCENT}'><b>•</b></span> <b>This does not affect the clipboard menu</b>"
+										notify-send -r 3 -t 20000 "What is this?" "$msg"
 										continue
 									;;
 							esac
@@ -682,7 +682,8 @@ while :; do
 					"What"*)
 						msg="\n<span foreground='${P_ACCENT}'><b>•</b></span> <b>Whether to confirm action when triggering the kill window shortcut</b>\n"
 						msg+="<span foreground='${P_ACCENT}'><b>•</b></span> <b>Setting it to true helps prevent accidental force window kills</b>\n\n"
-						msg+="      When the <span foreground='${P_RED}'><b>force window kill</b></span> shortcut is triggered, this\n      option asks you to press it again to confirm the action"
+						msg+="When the <span foreground='${P_RED}'><b>force window kill</b></span> shortcut is triggered, this\n"
+						msg+="option asks you to press it again to confirm the action"
 						notify-send -r 3 -t 15000 "What is this?" "$msg"
 						continue
 				esac

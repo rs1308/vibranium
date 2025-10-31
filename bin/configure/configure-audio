@@ -83,19 +83,18 @@ while :; do
 		"Visual"*)
 			toggle_bool "VIBRANIUM_VOLUME_USE_VISUAL_FEEDBACK"
 			;;
-		"OSD"*)
+		*"OSD"*""*)
 			# The VIBRANIUM_GLOBAL_USE_OSD option takes precedence over all other options that use the OSD.
 			# Therefore, if VIBRANIUM_GLOBAL_USE_OSD is set to false at the global level,
 			# no other option that uses the OSD will be active, even if its value is true.
-			[ "$VIBRANIUM_GLOBAL_USE_OSD" = "false" ] && {
-				msg="\nTo enable OSD feedback for volume changes, go to:\n"
-				msg+="<span foreground='${P_YELLOW}'>Vibranium settings</span> <span foreground='${P_BLUE}'>→</span> "
-				msg+="<span foreground='${P_YELLOW}'>Configure Vibranium</span> <span foreground='${P_BLUE}'>→</span> "
-				msg+="<span foreground='${P_YELLOW}'>General</span>"
-				notify-send -r 3 -t 10000 "This Option Is Disabled Globally" "$msg"
-				continue
-			}
-
+			msg="\nTo enable OSD feedback for volume changes, go to:\n"
+			msg+="<span foreground='${P_YELLOW}'>Vibranium settings</span> <span foreground='${P_BLUE}'>→</span> "
+			msg+="<span foreground='${P_YELLOW}'>Configure Vibranium</span> <span foreground='${P_BLUE}'>→</span> "
+			msg+="<span foreground='${P_YELLOW}'>General</span>"
+			notify-send -r 3 -t 10000 "This Option Is Disabled Globally" "$msg"
+			continue
+			;;
+		"OSD"*)
 			toggle_bool "VIBRANIUM_VOLUME_USE_OSD"
 			;;
 		"Audio"*)

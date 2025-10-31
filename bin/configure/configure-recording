@@ -24,7 +24,7 @@ while :; do
 		"Video quality      : $quality"
 		"Capture volume     : $capture_vol"
 		"Capture microphone : $capture_mic"
-		"Advanced"
+		"<b><i>Advanced</i></b>"
 	)
 	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Recording" "ESC to go back" -selected-row "$INDEX")"
 	[ -z "$CHOSEN" ] && break
@@ -83,7 +83,7 @@ while :; do
 		"Capture microphone"*)
 				toggle_bool "VIBRANIUM_RECORDING_CAPTURE_SOURCE"
 			;;
-		"Advanced")
+		*"Advanced"*)
 			while :; do
 				source "$VIBRANIUM_USER_SETTINGS"
 				advanced_options=(
@@ -149,39 +149,51 @@ while :; do
 						esac
 						;;
 					"Recording mode"*)
-						mode_options=("Constant Frame Rate" "Variable Frame Rate" "What is this?")
-						mode_chosen="$(printf "%s\n" "${mode_options[@]}" | rofi_cmd "Mode" "ESC to go back")"
+						while :; do
+							mode_options=("Constant Frame Rate" "Variable Frame Rate" "What is this?")
+							mode_chosen="$(printf "%s\n" "${mode_options[@]}" | rofi_cmd "Mode" "ESC to go back")"
+							[[ -z "$mode_chosen" ]] && break
 
-						option="VIBRANIUM_RECORDING_FRAMERATE_MODE"
-						case "$mode_chosen" in
-							"Constant"*) option-validate "$option"; sed -i "/^${option}/s/=.*/=\"cfr\"/" "$VIBRANIUM_USER_SETTINGS" ;;
-							"Variable"*) option-validate "$option"; sed -i "/^${option}/s/=.*/=\"vfr\"/" "$VIBRANIUM_USER_SETTINGS" ;;
-							"What"*)
-								# Constant Frame Rate (CFR): Each frame is stored at a fixed interval  
-								# • Pros: best for editing, audio sync, and compatibility  
-								# • Cons: if hardware struggles, frames may drop  
-								#  
-								# Variable Frame Rate (VFR): Intervals between frames can vary  
-								# • Pros: smoother recording under load, fewer frame drops  
-								# • Cons: some editors and players handle it poorly, sync can drift  
-								#  
-								# Use CFR if you plan to edit the video. Use VFR for lighter, adaptive recording  
+							option="VIBRANIUM_RECORDING_FRAMERATE_MODE"
+							case "$mode_chosen" in
+								"Constant"*)
+									option-validate "$option"
+									sed -i "/^${option}/s/=.*/=\"cfr\"/" "$VIBRANIUM_USER_SETTINGS"
+									break
+									;;
+								"Variable"*)
+									option-validate "$option"
+									sed -i "/^${option}/s/=.*/=\"vfr\"/" "$VIBRANIUM_USER_SETTINGS"
+									break
+									;;
+								"What"*)
+									# Constant Frame Rate (CFR): Each frame is stored at a fixed interval  
+									# • Pros: best for editing, audio sync, and compatibility  
+									# • Cons: if hardware struggles, frames may drop  
+									#  
+									# Variable Frame Rate (VFR): Intervals between frames can vary  
+									# • Pros: smoother recording under load, fewer frame drops  
+									# • Cons: some editors and players handle it poorly, sync can drift  
+									#  
+									# Use CFR if you plan to edit the video. Use VFR for lighter, adaptive recording  
 
-								msg="\n<span foreground='${P_YELLOW}'><b>Constant Frame Rate (CFR)</b></span>: "
-								msg+="Each frame is stored at a fixed interval\n"
-								msg+="• <span foreground='${P_GREEN}'><b>Pros</b></span>: best for editing, audio sync, and compatibility\n"
-								msg+="• <span foreground='${P_RED}'><b>Cons</b></span>: if hardware struggles, frames may drop\n\n"
+									msg="\n<span foreground='${P_YELLOW}'><b>Constant Frame Rate (CFR)</b></span>: "
+									msg+="Each frame is stored at a fixed interval\n"
+									msg+="• <span foreground='${P_GREEN}'><b>Pros</b></span>: best for editing, audio sync, and compatibility\n"
+									msg+="• <span foreground='${P_RED}'><b>Cons</b></span>: if hardware struggles, frames may drop\n\n"
 
-								msg+="<span foreground='${P_YELLOW}'><b>Variable Frame Rate (VFR)</b></span>: "
-								msg+="Intervals between frames can vary\n"
-								msg+="• <span foreground='${P_GREEN}'><b>Pros</b></span>: smoother recording under load, fewer frame drops\n"
-								msg+="• <span foreground='${P_RED}'><b>Cons</b></span>: some editors and players handle it poorly, sync can drift\n\n"
+									msg+="<span foreground='${P_YELLOW}'><b>Variable Frame Rate (VFR)</b></span>: "
+									msg+="Intervals between frames can vary\n"
+									msg+="• <span foreground='${P_GREEN}'><b>Pros</b></span>: smoother recording under load, fewer frame drops\n"
+									msg+="• <span foreground='${P_RED}'><b>Cons</b></span>: some editors and players handle it poorly, sync can drift\n\n"
 
-								msg+="<span foreground='${P_YELLOW}'>Use CFR if you plan to edit the video. Use VFR for lighter, adaptive recording</span>"
-								notify-send -r 3 -t 25000 "What is this?" "$msg"
-								continue
-								;;
-						esac
+									msg+="Use <span foreground='${P_ACCENT}'><b>CFR</b></span> if you plan to edit the video. "
+									msg+="Use <span foreground='${P_ACCENT}'><b>VFR</b></span> for lighter, adaptive recording"
+									notify-send -r 3 -t 25000 "What is this?" "$msg"
+									continue
+									;;
+							esac
+						done
 						;;
 					"Video codec"*)
 						video_codec_options=("auto" "h264" "hevc" "av1" "vp8" "vp9" "hevc_hdr" "av1_hdr" "hevc_10bit" "av1_10bit")
