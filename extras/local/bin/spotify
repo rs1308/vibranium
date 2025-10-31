@@ -38,9 +38,8 @@ loop() {
 	notify-send -r 1 -t 5000 "Vibranium" "$msg"
 
         download_theme
-	spicetify -qn backup
 	spicetify config current_theme text color_scheme main
-	spicetify -q apply
+	spicetify -q backup apply
 
 	spicetify --quiet watch -s &
 	sleep 1; killall spotify
