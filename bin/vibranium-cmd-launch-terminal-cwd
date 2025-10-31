@@ -13,6 +13,8 @@ case "$VIBRANIUM_DEFAULT_TERMINAL" in
 			echo "Using existing Alacritty process"
 			ARGS+=(msg create-window)
 			ARGS+=(--working-directory)
+		else
+			ARGS+=(--working-directory)
 		fi
 		;;
 esac
