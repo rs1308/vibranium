@@ -95,6 +95,8 @@ _flash_submenu() {
 while :; do
 	source "$VIBRANIUM_USER_SETTINGS"
 
+	bar_enabled="$([ "$(systemctl --user is-active waybar)" = "active" ] && echo true || echo false)"
+
 	OPTIONS=(
 		"Now playing              : $VIBRANIUM_GLOBAL_SHOW_NOW_PLAYING"
 		"OSD enabled              : $VIBRANIUM_GLOBAL_USE_OSD"
@@ -103,6 +105,7 @@ while :; do
 		"Blur lockscreen          : $VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_BACKGROUND"
 		"Power menu style         : $VIBRANIUM_GLOBAL_POWER_MENU_STYLE"
 		"Copy to clipboard        : $VIBRANIUM_GLOBAL_COPY_TO_CLIPBOARD"
+		"Status bar enabled       : $bar_enabled"
 		"Pause music on lock      : $VIBRANIUM_GLOBAL_PAUSE_MUSIC_ON_SESSION_LOCK"
 		"Welcome notification     : $VIBRANIUM_GLOBAL_SHOW_WELCOME_BACK_NOTIFICATION"
 		"Terminal transparency    : $(_terminal_opacity get)"
@@ -134,6 +137,12 @@ while :; do
     done
 
 	case "$CHOSEN" in
+		"Status bar"*)
+			case "$bar_enabled" in
+				"true")  systemctl --user disable --now waybar ;;
+				"false") systemctl --user enable  --now waybar ;;
+			esac
+			;;
 		"Show wallpaper"*)
 			toggle_bool "VIBRANIUM_GLOBAL_SHOW_WALLPAPER"
 			case "$VIBRANIUM_GLOBAL_SHOW_WALLPAPER" in
