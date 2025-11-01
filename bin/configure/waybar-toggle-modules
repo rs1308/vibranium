@@ -48,13 +48,41 @@ while :; do
 		CPU_ENABLED="true"
 	fi
 
+	if check_module 'network'; then
+		NETWORK_ENABLED="false"
+	else
+		NETWORK_ENABLED="true"
+	fi
+
+	if check_module 'pulseaudio#microphone'; then
+		MICROPHONE_ENABLED="false"
+	else
+		MICROPHONE_ENABLED="true"
+	fi
+
+	if check_module 'pulseaudio#volume'; then
+		VOLUME_ENABLED="false"
+	else
+		VOLUME_ENABLED="true"
+	fi
+
+	if check_module 'bluetooth'; then
+		BLUETOOTH_ENABLED="false"
+	else
+		BLUETOOTH_ENABLED="true"
+	fi
+
 	OPTIONS=(
 		"Keyboard layout : $KEYBOARD_LAYOUT_STATUS"
 		"Power profile   : $VIBRANIUM_BAR_POWER_PROFILE_MODULE_ENABLE"
 		"Color picker    : $VIBRANIUM_BAR_COLOR_PICKER_MODULE_ENABLE"
 		"Brightness      : $VIBRANIUM_BAR_BRIGHTNESS_MODULE_ENABLE"
+		"Microphone      : $MICROPHONE_ENABLED"
+		"Bluetooth       : $BLUETOOTH_ENABLED"
 		"Weather         : $VIBRANIUM_BAR_WEATHER_MODULE_ENABLE"
+		"Network         : $NETWORK_ENABLED"
 		"Pacman          : $VIBRANIUM_BAR_PACMAN_MODULE_ENABLE"
+		"Volume          : $VOLUME_ENABLED"
 		"Disk            : $DISK_ENABLED"
 		"CPU             : $CPU_ENABLED"
 	)
@@ -70,6 +98,18 @@ while :; do
     done
 
     case "$CHOSEN" in
+		"Bluetooth"*)
+			toggle_module 'bluetooth'
+			;;
+		"Network"*)
+			toggle_module 'network'
+			;;
+		"Microphone"*)
+			toggle_module 'pulseaudio#microphone'
+			;;
+		"Volume"*)
+			toggle_module 'pulseaudio#volume'
+			;;
 		"CPU"*)
 			toggle_module 'cpu'
 			;;
