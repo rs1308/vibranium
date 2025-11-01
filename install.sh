@@ -60,6 +60,10 @@ install_packages() {
 
 	# GPU detection
 	case "$(lspci | grep VGA)" in
+		*"Nvidia"*)
+			printf "%s[VIBRANIUM]%s Detected Nvidia GPU\n" "$YELLOW" "$RESET"
+			packages+=("nvidia-dkms" "nvidia-utils" "nvidia-settings" "linux-headers" "lib32-nvidia-utils")
+			;;
 		*Radeon*|*ATI*)
 			printf "%s[VIBRANIUM]%s Detected AMD GPU\n" "$YELLOW" "$RESET"
 			packages+=(
@@ -85,10 +89,6 @@ install_packages() {
 				"lib32-vulkan-intel"
 				"intel-compute-runtime"
 			)
-			;;
-		*"Nvidia"*)
-			printf "%s[VIBRANIUM]%s Detected Nvidia GPU\n" "$YELLOW" "$RESET"
-			packages+=("nvidia-dkms" "nvidia-utils" "nvidia-settings" "linux-headers" "lib32-nvidia-utils")
 			;;
 		*)
 			printf "%s[VIBRANIUM]%s No supported GPU detected. Please install GPU drivers manually\n" "$RED" "$RESET"

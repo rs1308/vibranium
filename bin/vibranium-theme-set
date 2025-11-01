@@ -263,7 +263,7 @@ apply_theme() {
         log "Setting dark icon theme"
     fi
     gsettings set org.gnome.desktop.interface icon-theme "$icon_theme"
-    papirus-folders --theme "$papirus_theme" --color "${color:-blue}" &> /dev/null &
+    papirus-folders --theme "$papirus_theme" --color "${color:-blue}" -u &> /dev/null &
     # papirus_pid=$!
     apply_chromium_colors &
 }
