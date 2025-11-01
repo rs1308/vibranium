@@ -54,8 +54,8 @@ VIBRANIUM_GLOBAL_FLASH_SCREEN_SPEED="medium"
 #
 # Note: This is a global setting that takes precedence over the settings of specific actions.
 #
-# Default is true
-VIBRANIUM_GLOBAL_USE_OSD=true
+# Default is false
+VIBRANIUM_GLOBAL_USE_OSD=false
 
 # Whether to use OSD when changing power profiles
 # Available options: bool
