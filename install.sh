@@ -2,7 +2,6 @@
 
 set -euo pipefail
 
-
 LOOKNFEEL_CONF="$HOME/.config/hypr/hyprland.conf.d/look-and-feel.conf"
 LOOKNFEEL_OPTS=(
 	"animations:enabled:true"
@@ -27,8 +26,10 @@ if [[ "$(id -u)" == 0 ]]; then
 fi
 
 if ! command -v yay >/dev/null; then
-	printf "%s[VIBRANIUM]%s Installing %syay%s. %sYou might be asked for sudo several times%s\n" \
-		"$YELLOW" "$RESET" "$GRAY" "$RESET" "$GRAY" "$RESET"
+	printf "%s[VIBRANIUM]%s Installing %syay%s\n" \
+		"$YELLOW" "$RESET" "$YELLOW" "$RESET"
+	printf "%s[VIBRANIUM]%s You might be asked for sudo several times" \
+		"$YELLOW" "$RESET"
 	if ! command -v git >/dev/null; then
 		sudo pacman -S git --noconfirm
 	fi
@@ -274,7 +275,7 @@ post_install
 cleanup
 
 printf "\n%s[VIBRANIUM]%s Installation complete. System restart required" "${GREEN}" "${RESET}"
-printf "\n%s[VIBRANIUM]%s After rebooting don't forget to select %sHyprland (uwsm-managed)%s in the login box" \
+printf "\n%s[VIBRANIUM]%s After rebooting don't forget to select %sHyprland (uwsm-managed)%s in the login box\n" \
 	"$YELLOW" "$RESET" "$GRAY" "$RESET"
 
 prompt=$'\e[0;33m[VIBRANIUM]\e[0m Restart now? (Y/n): '

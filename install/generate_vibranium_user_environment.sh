@@ -6,7 +6,7 @@ cat <<EOF > "$HOME/.config/vibranium/environment"
 # The text below is just an example. Feel free to delete or change it
 
 export SUDO_PROMPT
-SUDO_PROMPT="$(tput setaf 1)$(tput bold)[sudo]$(tput sgr0) Password for \$USER: "
+SUDO_PROMPT="\$(tput setaf 1)\$(tput bold)[sudo]\$(tput sgr0) Password for \$USER: "
 
 # Set your default editor
 # This could be nvim, nano, emacs, kate or whatever you want
@@ -27,6 +27,6 @@ export MANPAGER="\$EDITOR +Man!"
 # instead of a special file in the root folder of each game:
 # export MANGOHUD_CONFIG="fps_only,alpha=0.3,background_alpha=0,text_color=ffffff,font_size=18"
 
-If you are a pass user (https://www.passwordstore.org/), you can specify a specific folder that pass will use to look for passwords. For example:
+# If you are a pass user (https://www.passwordstore.org/), you can specify a specific folder that pass will use to look for passwords. For example:
 # export PASSWORD_STORE_DIR="\$XDG_DATA_HOME/password-store"
 EOF
