@@ -147,7 +147,7 @@ while :; do
 
 	OPTIONS=(
 		"Keyboard repeat delay : ${current_repeat_delay}ms"
-		"Keyboard repeat rate  : ${current_repeat_rate}ms"
+		"Keyboard repeat rate  : ${current_repeat_rate}"
 		"Mouse acceleration    : ${current_accel_profile}"
 		"Hide cursor after     : ${current_cursor_hide}s"
 		"Hide on key press     : ${current_hide_key_press}"
