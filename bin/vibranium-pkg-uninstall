@@ -48,17 +48,7 @@ while :; do
                 exit 1
             fi
 
-			printf '\e[?25l'  # hide cursor
-			if [ ${#chosen[@]} -gt 1 ]; then
-				for pkg in "${chosen[@]}"; do
-					sudo pacman -Rnsc --noconfirm "$pkg" &> /dev/null &
-					spinner $! "${YELLOW}[VIBRANIUM]${RESET} Removing $pkg" ""
-				done
-			else
-				echo -e "${YELLOW}[VIBRANIUM]${RESET} Removing ${YELLOW}${chosen[*]}${RESET}"
-				sudo pacman -Rnsc --noconfirm "${chosen[@]}" &> /dev/null
-			fi
-
+			sudo pacman -Rns  "${chosen[@]}"
             echo -e "${GREEN}[VIBRANIUM]${RESET} Operation completed successfully"
             read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
             exit 0
