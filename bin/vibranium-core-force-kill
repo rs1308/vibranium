@@ -8,6 +8,11 @@
 read -r CURRENT_CLASS PID < <(hyprctl -j activewindow | jq -r '[.class, .pid] | @tsv')
 STATE_FILE="$XDG_RUNTIME_DIR/$(basename "$0").confirm"
 
+if [[ -z "$PID" ]]; then
+	# There are no windows on current workspace
+	exit 1
+fi
+
 # First, check whether the confirmation function is enabled globally. 
 # If not, forcefully close the window immediately (no confirmation)
 if [[ "$(vibranium-cmd-get-option VIBRANIUM_GLOBAL_CONFIRM_TO_KILL)" == false ]]; then
