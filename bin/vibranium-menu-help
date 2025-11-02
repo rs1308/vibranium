@@ -3,7 +3,7 @@
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 
 INDEX=0
-OPTIONS=( "Hyprland wiki"  "Vibranium wiki"  "Arch Linux wiki" "How to: package manager" )
+OPTIONS=( "Hyprland"  "Vibranium"  "Arch Linux")
 
 while :; do
 	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Help" "ESC to go back" -selected-row "$INDEX")"
@@ -17,16 +17,13 @@ while :; do
     done
 
 	case "$CHOSEN" in
-		"Hyprland wiki")
+		"Hyprland")
 			LINK="https://wiki.hypr.land"
 			;;
-		"Arch Linux wiki")
+		"Arch Linux")
 			LINK="https://wiki.archlinux.org"
 			;;
-		"How"*)
-			LINK="https://wiki.archlinux.org/title/Pacman"
-			;;
-		"Vibranium wiki")
+		"Vibranium")
 			LINK="https://github.com/shvedes/vibranium/wiki"
 	esac
 

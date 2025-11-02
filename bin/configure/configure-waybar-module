@@ -22,7 +22,7 @@ while :; do
 			inhibitor_index=0
 			while :; do
 				inhibitor_options=("coffee" "lock" "eye")
-				inhibitor_chosen="$(printf "%s\n" "${inhibitor_options[@]}" | rofi_cmd "Sleep inhibitor" "ESC to go back" -selected-row "$inhibitor_index")"
+				inhibitor_chosen="$(printf "%s\n" "${inhibitor_options[@]}" | rofi_cmd "Icon" "ESC to go back" -selected-row "$inhibitor_index")"
 				[[ -z "$inhibitor_chosen" ]] && break
 
 				for i in "${!inhibitor_options[@]}"; do
@@ -43,7 +43,7 @@ while :; do
 			;;
 		"Pacman")
 			while :; do
-				new_value="$(printf "Enter new value (int)" | rofi_cmd "Display if ≥ {int} updates" "ESC to go back" -theme-str 'window {width: 22%;}')"
+				new_value="$(printf "Enter new value (int)" | rofi_cmd "Display if ≥ N updates" "ESC to go back")"
 				[ -z "$new_value" ] && break
 
 				if [[ "$new_value" =~ ^[0-9]+$ ]]; then
@@ -102,8 +102,8 @@ while :; do
 						history_file="$XDG_CACHE_HOME/vibranium/color-picker.history"
 						while :; do
 							hs_opts=("3" "5" "10" "15")
-							hs_chosen="$(printf "%s\n" "${hs_opts[@]}" | rofi_cmd "$cp_chosen" "ESC to go back")"
-							[[ -z "$hs_chosen" ]] && break
+							hs_chosen="$(printf "%s entries\n" "${hs_opts[@]}" | rofi_cmd "$cp_chosen" "ESC to go back")"
+							[[ -z "$hs_chosen" ]] && break; hs_chosen="${hs_chosen%% *}"
 
 							if [[ "${hs_opts[*]}" =~ $hs_chosen ]]; then
 								option-validate "VIBRANIUM_COLOR_PICKER_HISTORY_SIZE"

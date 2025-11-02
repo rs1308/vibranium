@@ -5,6 +5,8 @@
 # -q : quiet mode (no notification)
 # Updates configs, restarts Waybar, refreshes Dunst.
 
+source "$XDG_CONFIG_HOME/vibranium/theme/current/vibranium-lib-theme"
+
 CURRENT_POSITION="$(grep position "$XDG_CONFIG_HOME/waybar/config.jsonc" | awk -F'"' '{print $4}')"
 
 if [ -z "$1" ]; then
@@ -73,5 +75,5 @@ systemctl --user restart waybar
 vibranium-cmd-refresh-dunst
 
 if [[ "$quiet" != true ]]; then
-	notify-send -r 1 -t 1500 "Vibranium" "Bar moved to ${move_to}"
+	notify-send -r 1 -t 1500 "Vibranium" "Bar moved to <span foreground='$P_ACCENT'>${move_to}</span>"
 fi

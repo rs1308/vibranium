@@ -122,8 +122,9 @@ while :; do
             reset_settings "global" "VIBRANIUM_GLOBAL" "Global settings have been restored to defaults!"
         ;;
         "Reset Waybar"*)
-			vibranium-cmd-set-waybar-position -q top; systemctl --user restart waybar
             reset_settings "Waybar" "VIBRANIUM_BAR" "Waybar settings have been restored to defaults!"
+			cp -r "$VIBRANIUM/config/waybar" "$HOME/.config"
+			vibranium-cmd-set-waybar-position -q top; systemctl --user restart waybar
         ;;
         "Reset brightness"*)
             reset_settings "brightness" "VIBRANIUM_BRIGHTNESS" "Brightness settings have been restored to defaults!"
@@ -132,7 +133,7 @@ while :; do
             reset_settings "screenshot" "VIBRANIUM_SCREENSHOT" "Screenshot settings have been restored to defaults!"
         ;;
 		"Reset color picker settings")
-            reset_settings "color picker" "VIBRANIUM_COLOR_PICKER" "Color picker settings have been restored to defaults!"
+            reset_settings "color picker" "VIBRANIUM_COLOR_PICKER" "Color picker settings have been restored to defaults!" 
 			vibranium-cmd-refresh-waybar-module color-picker
 		;;
         "Reset screen recording"*)
