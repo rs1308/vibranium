@@ -43,18 +43,6 @@ fi
 # Rofi
 sed -i -E "s/(font:\s*\")[^\"]* ([0-9]+)\"/\1${selected} \2\"/" "$XDG_CONFIG_HOME/rofi/config.rasi"
 
-# Discord CSS
-# sed -i -E "s/$(vibranium-font-get)/${selected}/g" "$XDG_CONFIG_HOME/vibranium/theme/current/discord.css"
-
-# Discord theme symlinks
-# for folder in "Vencord" "vesktop"; do
-# 	cfg="$XDG_CONFIG_HOME/${folder}/themes/vibranium.theme.css"
-# 	if [[ -f "$cfg" ]]; then
-# 		rm -f "$cfg"
-# 		ln -s "$XDG_CONFIG_HOME/vibranium/theme/current/discord.css" "$cfg"
-# 	fi
-# done
-
 # Reload dunst
 vibranium-cmd-refresh-dunst
 

@@ -376,15 +376,6 @@ vibranium-cmd-refresh-dunst
 log "Updating QT colors"
 touch "$XDG_CONFIG_HOME/qt6ct/qt6ct.conf"
 
-log "Updating Discord"
-discord_folders=("Vencord" "vesktop")
-for folder in "${discord_folders[@]}"; do
-    if [[ -f "$XDG_CONFIG_HOME/${folder}/themes/vibranium.theme.css" ]]; then
-        rm -f "$XDG_CONFIG_HOME/${folder}/themes/vibranium.theme.css"
-        ln -s "${CURRENT_LINK}/discord.css" "$XDG_CONFIG_HOME/${folder}/themes/vibranium.theme.css"
-    fi
-done
-
 if pgrep -a electron | grep heroic > /dev/null; then
     log "Active Heroic process found! Refreshing live.."
     hyprctl -q dispatch sendshortcut CTRL, R, class:heroic
