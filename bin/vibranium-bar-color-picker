@@ -2,6 +2,10 @@
 
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 
+if [[ "$VIBRANIUM_BAR_COLOR_PICKER_MODULE_ENABLE" == false ]]; then
+	exit 0
+fi
+
 history_file="$XDG_CACHE_HOME/vibranium/color-picker.history"
 
 # TODO: support for other formats
@@ -34,9 +38,9 @@ if [[ -s $history_file ]]; then
 fi
 
 if [[ $VIBRANIUM_BAR_SHOW_SHORTCUT_HINTS == true ]]; then
+	bind="$(vibranium-cmd-keybindings -i 'Color picker' | sed -n '1s/^[0-9]\.\s*//p')"
 	tooltip+="\n<span foreground='${P_GRAY}'>---------------------------------------</span>"
-	tooltip+="\n <span foreground='${P_ACCENT}'><b>CTRL ALT + C:</b></span>"
-	tooltip+=" <span foreground='${P_YELLOW}'><b>pick a color </b></span> "
+	tooltip+="\n<span foreground='${P_ACCENT}'><b>${bind}</b></span>: pick a color"
 fi
 
 case $VIBRANIUM_COLOR_PICKER_WAYBAR_ICON in
@@ -46,12 +50,4 @@ case $VIBRANIUM_COLOR_PICKER_WAYBAR_ICON in
     *)            icon='\uf043' ;; # droplet
 esac
 
-case $VIBRANIUM_BAR_COLOR_PICKER_MODULE_ENABLE in
-    "true")
-        printf '{"text": "%s", "tooltip": "%s"}' "$icon" "$tooltip"
-        ;;
-    *)
-        printf '{"text": ""}'
-        exit 0
-        ;;
-esac
+printf '{"text": "%s", "tooltip": "%s"}' "$icon" "$tooltip"

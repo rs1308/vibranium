@@ -26,16 +26,10 @@ case "$current" in
 esac
 
 if [ "$VIBRANIUM_BAR_SHOW_SHORTCUT_HINTS" = "true" ]; then
-	# It is pretty bad right now.
-	# Maybe in the future we'll use seq to calculate separator width based on the rest lines lenght, as well as spacing.
-	profile="<span foreground='${P_ACCENT}'><b> Current profile:</b></span>   <span foreground='${P_YELLOW}'><b>${current}</b></span>"
+	bind="$(vibranium-cmd-keybindings -i 'Next power profile' | sed -n '1s/^[0-9]\.\s*//p')"
+	profile="<span foreground='${P_ACCENT}'><b> Current profile</b></span>: <span foreground='${P_YELLOW}'><b>${current}</b></span>"
 	guide="\n<span foreground='${P_GRAY}'>---------------------------------</span>"
-	guide+="\n<span foreground='${P_ACCENT}'><b> Left click:</b></span>        <span foreground='${P_YELLOW}'><b>powersave</b></span>"
-	guide+="\n<span foreground='${P_ACCENT}'><b> Middle click:</b></span>      <span foreground='${P_YELLOW}'><b>balanced</b></span>"
-	guide+="\n<span foreground='${P_ACCENT}'><b> Right click:</b></span>       <span foreground='${P_YELLOW}'><b>performance</b></span>"
-	guide+="\n<span foreground='${P_GRAY}'>--------------------------------</span>"
-	guide+="\n<span foreground='${P_ACCENT}'><b> SUPER + B:</b></span>         <span foreground='${P_YELLOW}'><b>next profile</b></span>"
-	guide+="\n<span foreground='${P_ACCENT}'><b> SUPER + Shift + B:</b></span> <span foreground='${P_YELLOW}'><b>prev profile</b></span>"
+	[ -n "$bind" ] && guide+="\n <span foreground='${P_ACCENT}'><b>${bind}</b></span>: next power profile"
 else
 	profile="<span foreground='${P_ACCENT}'><b>Current profile:</b></span> <span foreground='${P_YELLOW}'><b>${current}</b></span>"
 fi

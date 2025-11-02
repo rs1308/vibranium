@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 
-# TODO: parse output from 'vibranium-cmd-keybindings --list' and display actual shortcuts, not hardcoded one
-
-source "$XDG_CONFIG_HOME/vibranium/theme/current/vibranium-lib-theme" # Colors of the active theme
-source "$VIBRANIUM_PATH/vibranium-core-defaults" # Defaults first
-source "$XDG_CONFIG_HOME/vibranium/settings" # Then user's overrides
+source "$XDG_CONFIG_HOME/vibranium/theme/current/vibranium-lib-theme"
+source "$VIBRANIUM_PATH/vibranium-core-defaults"
+source "$XDG_CONFIG_HOME/vibranium/settings"
 
 if [[ $VIBRANIUM_BAR_BRIGHTNESS_MODULE_ENABLE == false ]]; then
     exit 0
@@ -12,22 +10,23 @@ fi
 
 brightness="$(<"$VIBRANIUM_STATE/brightness")"
 if [[ $VIBRANIUM_BAR_SHOW_SHORTCUT_HINTS == true ]]; then
-	# It is pretty bad right now.
-	# Maybe in the future we'll use seq to calculate separator width based on the rest lines lenght, as well as spacing.
-	guide="<span foreground='${P_GRAY}'>---------------------------------------------</span>"
-	guide+="\n<span foreground='${P_ACCENT}'> Scroll wheel:</span>        <span foreground='${P_YELLOW}'><b>adjust  brightness </b></span>"
-	guide+="\n<span foreground='${P_ACCENT}'> Right  click:</span>        <span foreground='${P_YELLOW}'><b>maximum brightness </b></span>"
-	guide+="\n<span foreground='${P_ACCENT}'> Left   click:</span>        <span foreground='${P_YELLOW}'><b>minimum brightness </b></span>"
-	guide+="\n<span foreground='${P_ACCENT}'> Middle click:</span>        <span foreground='${P_YELLOW}'><b>half of the brightness </b></span>"
+	bind1="$(vibranium-cmd-keybindings -i 'Brightness up' | sed -n '1s/^[0-9]\.\s*//p')"
+	bind2="$(vibranium-cmd-keybindings -i 'Brightness down' | sed -n '1s/^[0-9]\.\s*//p')"
 
-	guide+="<span foreground='${P_GRAY}'>---------------------------------------------</span>"
-	guide+="\n<span foreground='${P_ACCENT}'> Brightness keys:    </span> <span foreground='${P_YELLOW}'><b>adjust brightness </b></span>"
-	guide+="\n<span foreground='${P_ACCENT}'> SUPER + SHIFT + F11:</span> <span foreground='${P_YELLOW}'><b>brightness up</b></span>"
-	guide+="\n<span foreground='${P_ACCENT}'> SUPER + SHIFT + F10:</span> <span foreground='${P_YELLOW}'><b>brightness down</b></span>"
+	guide+="<span foreground='${P_GRAY}'>---------------------------------------</span>"
+	guide+="\n<span foreground='${P_ACCENT}'> Scroll wheel</span>: adjust brightness "
+	guide+="\n<span foreground='${P_ACCENT}'> Right click</span>:  maximum brightness "
+	guide+="\n<span foreground='${P_ACCENT}'> Left  click</span>:  minimum brightness "
+	guide+="\n<span foreground='${P_ACCENT}'> Middle click</span>: half brightness "
+	guide+="\n<span foreground='${P_GRAY}'>---------------------------------------</span>\n"
 
-	tooltip="\t<span foreground='${P_ACCENT}'><b>       Brightness:</b></span> ${brightness}%\n${guide}"
+	[ -n "$bind1" ] && guide+=" <span foreground='${P_GREEN}'><b>${bind1}</b></span>: brightness up\n"
+	[ -n "$bind2" ] && guide+=" <span foreground='${P_GREEN}'><b>${bind2}</b></span>: brightness down\n"
+	guide+="<span foreground='${P_ACCENT}'> Brightness keys</span>: adjust brightness"
+	
+	tooltip="\t<span foreground='${P_ACCENT}'><b>Current brightness</b></span>: ${brightness}%\n${guide}"
 else
-	tooltip="<span foreground='${P_ACCENT}'><b>Brightness:</b></span> ${brightness}%${guide}"
+	tooltip="<span foreground='${P_ACCENT}'><b>Brightness</b></span>: ${brightness}%${guide}"
 fi
 
 printf '{"text": "", "tooltip": "%s", "percentage": %s}' "$tooltip" "$brightness"

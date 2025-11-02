@@ -87,9 +87,50 @@ parse_bindings() {
 }'
 }
 
+by_index() {
+	local desc="$1"
+	hyprctl -j binds |
+	jq -r --arg d "$desc" '
+	  def modmap(x):
+		if x == 0 then ""
+		elif x == 1 then "SHIFT"
+		elif x == 4 then "CTRL"
+		elif x == 5 then "SHIFT CTRL"
+		elif x == 8 then "ALT"
+		elif x == 9 then "SHIFT ALT"
+		elif x == 12 then "CTRL ALT"
+		elif x == 13 then "SHIFT CTRL ALT"
+		elif x == 64 then "SUPER"
+		elif x == 65 then "SUPER SHIFT"
+		elif x == 68 then "SUPER CTRL"
+		elif x == 69 then "SUPER SHIFT CTRL"
+		elif x == 72 then "SUPER ALT"
+		elif x == 73 then "SUPER SHIFT ALT"
+		elif x == 76 then "SUPER CTRL ALT"
+		elif x == 77 then "SUPER SHIFT CTRL ALT"
+		else x|tostring end;
+
+	  [.[] | select(.description == $d)] as $matches |
+	  if ($matches | length) == 0 then
+		"No keybindings found for: " + $d
+	  else
+		($matches | to_entries[] | "\(.key + 1). " +
+		  ((modmap(.value.modmask) + " " + (.value.key // "")) | gsub("^ +| +$";""))
+		)
+	  end
+	'
+}
+
 case "$1" in
 	"--list"|"-l")
 		dynamic_bindings | sort -u | parse_bindings
+		;;
+	"--index"|"-i")
+		if [[ -z "$2" ]]; then
+			echo "--index requires an argument"
+			exit 1
+		fi
+		by_index "$2"
 		;;
 	*)
 		dynamic_bindings | sort -u | parse_bindings | rofi_cmd "Keybindings" "search shortcuts" -no-auto-select
