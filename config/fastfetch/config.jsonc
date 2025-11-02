@@ -65,7 +65,7 @@
         {
             "type": "memory",
             "key": "\uf111",
-			"format": "RAM   {1} / {2}",
+			"format": "RAM {1} / {2}",
             "keyColor": "blue"
         },
         {
