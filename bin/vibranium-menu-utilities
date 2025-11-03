@@ -5,7 +5,9 @@ source "$VIBRANIUM_PATH/vibranium-core-lib"
 ACTIONS=("Apply tweaks" "Video downscaler")
 
 if command -v syncthing >/dev/null; then
-	ACTIONS+=("Launch Syncthing")
+	if [[ "$(systemctl --user is-active syncthing)" == "active" ]]; then
+		ACTIONS+=("Launch Syncthing")
+	fi
 fi
 
 if command -v pass >/dev/null; then
