@@ -63,6 +63,9 @@ factory_reset() {
 			"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/look-and-feel.conf"
 	done
 
+	rm -f "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/smart-gaps.conf" || true
+	ln -sf "$VIBRANIUM/defaults/hypr/animations/default.conf" \
+		"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/animations.conf"
 	vibranium-theme-set "Nightfox"
 
 	rm -rf "$VIBRANIUM_STATE"/{wallpaper,power-profile,blur.restore}
@@ -84,7 +87,18 @@ factory_reset() {
 		wpctl set-volume @DEFAULT_AUDIO_SINK@ 1.00
 	fi
 
-	vibranium-cmd-set-waybar-position -q top
+
+	if [[ "$(systemctl --user is-active waybar)" == "inactive" ]]; then
+		systemctl --user enable --now waybar
+		vibranium-cmd-set-waybar-position -q top
+	fi
+
+	if [[ "$(systemctl --user is-enabled hyprpaper)" == "disabled" ]]; then
+		systemctl --user enable --now hyprpaper
+	fi
+
+	rm -rf "${XDG_CACHE_HOME:?}/hyprlock" &
+
 	notify-send -r 1 "Vibranium" "Settings have been reset to factory defaults"
 }
 
