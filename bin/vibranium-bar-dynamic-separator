@@ -4,8 +4,6 @@
 source "$VIBRANIUM_PATH/vibranium-core-defaults"
 source "$XDG_CONFIG_HOME/vibranium/settings"
 
-NIGHT_LIGHT_STATE="$(<"$VIBRANIUM_STATE/night-light")"
-
 show() { printf '{"text": "|"}'; exit; }
 
 [[ -f "$XDG_RUNTIME_DIR/worker.active" ]] && show
@@ -25,10 +23,6 @@ for f in /run/systemd/inhibit/*; do
 		esac
 	done < "$f"
 done
-
-# Night light
-# pidof hyprsunset >/dev/null && show
-[[ "$NIGHT_LIGHT_STATE" != "suspended" ]] && show
 
 # Screen recorder
 pidof gpu-screen-recorder &>/dev/null && show

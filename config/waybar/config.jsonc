@@ -44,7 +44,6 @@
 		"modules-right": [
 			"custom/vibranium-update",
 			"custom/confirm-kill",
-			"custom/night-light",
 			"custom/worker",
 			"custom/recording-indicator",
 			"custom/color-picker",
@@ -55,6 +54,7 @@
 			// "disk",
 			// "cpu",
 			"custom/brightness",
+			"custom/night-light",
 			"pulseaudio#volume",
 			"pulseaudio#microphone",
 			"bluetooth",
