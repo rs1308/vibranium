@@ -36,18 +36,15 @@ tooltip {
 
 .modules-right {
 	color: @foreground;
+	margin-right: 8px
 }
 
 .module {
 	margin: 0px 6px
 }
 
-#traygroup {
-	margin-right: 6px
-}
-
 #tray {
-	margin-right: 10px;
+	margin-right: 8px;
 }
 
 @keyframes recording-animation {

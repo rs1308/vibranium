@@ -36,18 +36,6 @@ while :; do
 		KEYBOARD_LAYOUT_STATUS="true"
 	fi
 
-	if check_module 'disk'; then
-		DISK_ENABLED="false"
-	else
-		DISK_ENABLED="true"
-	fi
-
-	if check_module 'cpu'; then
-		CPU_ENABLED="false"
-	else
-		CPU_ENABLED="true"
-	fi
-
 	if check_module 'network'; then
 		NETWORK_ENABLED="false"
 	else
@@ -83,8 +71,6 @@ while :; do
 		"Network         : $NETWORK_ENABLED"
 		"Pacman          : $VIBRANIUM_BAR_PACMAN_MODULE_ENABLE"
 		"Volume          : $VOLUME_ENABLED"
-		"Disk            : $DISK_ENABLED"
-		"CPU             : $CPU_ENABLED"
 	)
 
     CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Toggle modules" "ESC to go back" -selected-row "$INDEX")"
@@ -109,12 +95,6 @@ while :; do
 			;;
 		"Volume"*)
 			toggle_module 'pulseaudio#volume'
-			;;
-		"CPU"*)
-			toggle_module 'cpu'
-			;;
-		"Disk"*)
-			toggle_module 'disk'
 			;;
 		"Keyboard layout"*)
 			toggle_module 'hyprland/language'
