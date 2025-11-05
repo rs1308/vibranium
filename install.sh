@@ -216,6 +216,8 @@ post_install() {
 		> "$HOME/.config/discord/settings.json"
 }
 
+git switch -q "$(git tag --sort=-creatordate | head -n 1)"
+
 sudo -v; clear
 # Move VT to the bottom
 printf '\e[2J\e[%d;1H' "${LINES:-$(tput lines)}"
