@@ -52,10 +52,16 @@ parse_bindings() {
     awk -F, '
 {
     # Ignore specific cases
-    if ($0 ~ /switch:on:Lid Switch/ || $2 ~ /^XF86/) next;
+    if ($0 ~ /switch:on:Lid Switch/ || $0 ~ /XF86/) next;
 
     # Combine the modifier and key (first two fields)
     key_combo = $1 " + " $2;
+
+    # Normalize mouse and scroll naming
+    gsub(/mouse_down/, "Scroll down", key_combo);
+    gsub(/mouse_up/, "Scroll up", key_combo);
+    gsub(/mouse:272/, "Left click", key_combo);
+    gsub(/mouse:273/, "Right click", key_combo);
 
     # Clean up: strip leading "+" if present, trim spaces
     gsub(/^[ \t]*\+?[ \t]*/, "", key_combo);
@@ -85,7 +91,7 @@ parse_bindings() {
     }
 
     if (action != "") {
-        printf "%-25s : %s\n", key_combo, action;
+        printf "%-28s : %s\n", key_combo, action;
     }
 }'
 }
