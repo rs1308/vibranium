@@ -2,11 +2,19 @@
 
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 
-ACTIONS=("Apply tweaks" "Video downscaler")
+ACTIONS=()
+
+if systemd-inhibit | grep "Prevent system suspend is active" > /dev/null; then
+	ACTIONS+=("<b>Allow sleep</b>")
+else
+	ACTIONS+=("Block sleep")
+fi
+
+ACTIONS+=("Apply tweaks" "Video downscaler")
 
 if command -v syncthing >/dev/null; then
 	if [[ "$(systemctl --user is-active syncthing)" == "active" ]]; then
-		ACTIONS+=("Launch Syncthing")
+		ACTIONS+=("Launch <b>Syncthing</b>")
 	fi
 fi
 
@@ -14,13 +22,7 @@ if command -v pass >/dev/null; then
 	ACTIONS+=("Password manager")
 fi
 
-if systemd-inhibit | grep "Prevent system suspend is active" > /dev/null; then
-	ACTIONS+=("<b><i>Stop sleep inhibitor</i></b>")
-else
-	ACTIONS+=("Start sleep inhibitor")
-fi
-
-ACTIONS+=("Reload Vibranium configuration")
+ACTIONS+=("Reload Vibranium")
 
 read -r PID NAME <<< "$(hyprctl -j activewindow | jq -r '[.pid,.initialTitle]|@tsv')"
 if [[ -n "$PID" && -r "/proc/$PID/stat" ]]; then
@@ -36,8 +38,10 @@ while :; do
     CHOSEN="$(printf "%s\n" "${ACTIONS[@]}" | rofi_cmd "Utilities" "ESC to go back")"
 
     case "$CHOSEN" in
-		"Launch Syncthing")
+		"Launch <b>Syncthing</b>")
 			syncthing browser
+			# In case if it was launched from
+			# the main menu, not the CTRL-ALT-U shortcut
 			vibranium-cmd-kill-rofi
 			exit 0
 			;;
@@ -57,12 +61,12 @@ while :; do
 				esac
 			done
 			;;
-		"Reload Vibranium configuration")
+		"Reload Vibranium")
 			vibranium-utils-reload
 			vibranium-cmd-kill-rofi
 			exit 0
 			;;
-        *"sleep inhibitor"*)
+        *"sleep"*)
 			vibranium-cmd-inhibit-toggle
 			vibranium-cmd-kill-rofi
 			exit 0
