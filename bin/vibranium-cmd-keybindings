@@ -51,6 +51,9 @@ dynamic_bindings() {
 parse_bindings() {
     awk -F, '
 {
+    # Ignore specific cases
+    if ($0 ~ /switch:on:Lid Switch/ || $2 ~ /^XF86/) next;
+
     # Combine the modifier and key (first two fields)
     key_combo = $1 " + " $2;
 
@@ -82,7 +85,7 @@ parse_bindings() {
     }
 
     if (action != "") {
-        printf "%-30s → %s\n", key_combo, action;
+        printf "%-25s : %s\n", key_combo, action;
     }
 }'
 }
@@ -133,6 +136,8 @@ case "$1" in
 		by_index "$2"
 		;;
 	*)
-		dynamic_bindings | sort -u | parse_bindings | rofi_cmd "Keybindings" "search shortcuts" -no-auto-select
+		dynamic_bindings | sort -u | parse_bindings | rofi_cmd \
+			"Keybindings" "search shortcuts" -no-auto-select \
+			-theme-str 'listview{lines: 30;}'
 		;;
 esac
