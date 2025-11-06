@@ -3,7 +3,7 @@
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 
 INDEX=0
-OPTIONS=( "Hyprland"  "Vibranium"  "Arch Linux")
+OPTIONS=( "Hyprland"  "Vibranium"  "Arch Linux" "<b><i>Keybindings</i></b>")
 
 while :; do
 	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Help" "ESC to go back" -selected-row "$INDEX")"
@@ -17,6 +17,10 @@ while :; do
     done
 
 	case "$CHOSEN" in
+		*"Keybindings"*)
+			vibranium-cmd-keybindings
+			vibranium-cmd-kill-rofi
+			;;
 		"Hyprland")
 			LINK="https://wiki.hypr.land"
 			;;
