@@ -216,7 +216,7 @@ post_install() {
 		> "$HOME/.config/discord/settings.json"
 }
 
-git switch -q "$(git tag --sort=-creatordate | head -n 1)"
+git checkout -q --detach "$(git tag --sort=-creatordate | head -n 1)"
 
 sudo -v; clear
 # Move VT to the bottom
