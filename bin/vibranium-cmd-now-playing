@@ -61,6 +61,8 @@ if [ "$VIBRANIUM_GLOBAL_NOW_PLAYING_SHOW_ALBUM_ART" = "true" ]; then
 			mpc readpicture "$(mpc --format "%file%" current)" > "$album_art"
 			;;
 	esac
+else
+	exit 0
 fi
 
 notify_body="<span foreground='${P_ORANGE}'> ${title}</span>\n"
