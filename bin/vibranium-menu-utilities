@@ -5,7 +5,7 @@ source "$VIBRANIUM_PATH/vibranium-core-lib"
 ACTIONS=()
 
 if systemd-inhibit | grep "Prevent system suspend is active" > /dev/null; then
-	ACTIONS+=("<b>Allow sleep</b>")
+	ACTIONS+=("Allow sleep")
 else
 	ACTIONS+=("Block sleep")
 fi
@@ -14,7 +14,7 @@ ACTIONS+=("Apply tweaks" "Video downscaler")
 
 if command -v syncthing >/dev/null; then
 	if [[ "$(systemctl --user is-active syncthing)" == "active" ]]; then
-		ACTIONS+=("Launch <b>Syncthing</b>")
+		ACTIONS+=("Launch Syncthing")
 	fi
 fi
 
@@ -28,9 +28,9 @@ read -r PID NAME <<< "$(hyprctl -j activewindow | jq -r '[.pid,.initialTitle]|@t
 if [[ -n "$PID" && -r "/proc/$PID/stat" ]]; then
 	read -r _ _ state _ < "/proc/$PID/stat"
 	if [[ $state != T ]]; then
-		ACTIONS+=("Freeze <span foreground='${P_YELLOW}'><b><i>${NAME}</i></b></span>")
+		ACTIONS+=("Freeze <span foreground='${P_YELLOW}'><b>${NAME}</b></span>")
 	elif [[ -n "$NAME" ]]; then
-		ACTIONS+=("Unfreeze <span foreground='${P_YELLOW}'><b><i>${NAME}</i></b></span>")
+		ACTIONS+=("Unfreeze <span foreground='${P_YELLOW}'><b>${NAME}</b></span>")
 	fi
 fi
 

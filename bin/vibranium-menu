@@ -23,45 +23,7 @@ while :; do
 
     case "$CHOSEN" in
         "Vibranium Settings")
-			index=0
-
-            while :; do
-				if [[ "$(systemctl --user is-enabled waybar)" == "disabled" ]]; then
-					vibranium_opts=("<span alpha='70%'>Configure Waybar</span>")
-					index=1
-				else
-					vibranium_opts=("Configure Waybar")
-				fi
-
-                vibranium_opts+=("Configure Vibranium")
-                vibranium_chosen="$(printf "%s\n" "${vibranium_opts[@]}" | rofi_cmd "$CHOSEN" "ESC to go back" -selected-row "$index")"
-                [ -z "$vibranium_chosen" ] && break
-
-				for i in "${!vibranium_opts[@]}"; do
-					if [ "${vibranium_opts[$i]}" == "$vibranium_chosen" ]; then
-						index="$i"
-						break
-					fi
-				done
-
-                case "$vibranium_chosen" in
-					"<"*)
-						msg="You <span foreground='${P_RED}'><b>disabled</b></span> "
-						msg+="Waybar in <span foreground='${P_ACCENT}'><b>Vibranium settings</b></span>! To enable, go to:\n"
-						msg+="<span foreground='${P_YELLOW}'><b>Vibranium settings</b></span> <span foreground='${P_BLUE}'><b>→</b></span> "
-						msg+="<span foreground='${P_YELLOW}'><b>General</b></span> <span foreground='${P_BLUE}'><b>→</b></span> "
-						msg+="<span foreground='${P_YELLOW}'><b>Status bar enabled</b></span> <span foreground='${P_BLUE}'><b>→</b></span> "
-						msg+="<span foreground='${P_GREEN}'><b>True</b></span>"
-						notify-send -r 3 -t 10000 "Locked" "$msg"
-						;;
-                    "Configure Waybar")
-						"$VIBRANIUM_PATH/configure/waybar-main-menu"
-						;;
-                    "Configure Vibranium")
-						"$VIBRANIUM_PATH/configure/vibranium-main-menu"
-						;;
-                esac
-            done
+			"$VIBRANIUM_PATH/configure/vibranium-main-menu"
             ;;
 		"Help")
 			vibranium-menu-help

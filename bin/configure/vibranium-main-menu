@@ -3,22 +3,6 @@
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 export PATH="$PATH:$VIBRANIUM_PATH/configure"
 
-OPTIONS=(
-    "Idle"
-    "Audio"
-    "General"
-    "Set font"
-    "Hyprland"
-    "Set theme"
-    "Recording"
-    "Brightness"
-    "Screenshots"
-    "Night Light"
-    "Color Picker"
-    "<b><i><span foreground='${P_RED}'>Factory Reset</span></i></b>"
-)
-INDEX=0
-
 _hyprland() {
 	local hypr_index=0
 
@@ -56,10 +40,10 @@ _hyprland() {
 					[[ -z $edit_configs_chosen ]] && break
 
 					case "$edit_configs_chosen" in
-						*"Input devices"*) vibranium-cmd-launch-terminal "$EDITOR" "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf" ;;
+						*"Input devices"*) vibranium-cmd-launch-terminal "$EDITOR" "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"        ;;
 						*"Window rules"*)  vibranium-cmd-launch-terminal "$EDITOR" "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/window-rules.conf" ;;
-						*"Keybindings"*)   vibranium-cmd-launch-terminal "$EDITOR" "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/binds.conf" ;;
-						*"Monitors"*)      vibranium-cmd-launch-terminal "$EDITOR" "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/monitors.conf" ;;
+						*"Keybindings"*)   vibranium-cmd-launch-terminal "$EDITOR" "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/binds.conf"        ;;
+						*"Monitors"*)      vibranium-cmd-launch-terminal "$EDITOR" "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/monitors.conf"     ;;
 					esac
 					vibranium-cmd-kill-rofi
 				done
@@ -68,7 +52,33 @@ _hyprland() {
 	done
 }
 
+INDEX=0
+
 while :; do
+	OPTIONS=(
+		"Idle"
+		"Audio"
+	)
+
+	if [[ "$(systemctl --user is-enabled waybar)" == "enabled" ]]; then
+		OPTIONS+=("Waybar")
+	else
+		OPTIONS+=("<span alpha='70%'>Waybar</span>")
+	fi
+
+	OPTIONS+=(
+		"General"
+		"Set font"
+		"Hyprland"
+		"Set theme"
+		"Recording"
+		"Brightness"
+		"Screenshots"
+		"Night Light"
+		"Color Picker"
+		"<b><big>FACTORY RESET</big></b>"
+	)
+
 	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Vibranium" "ESC to go back" -selected-row "$INDEX")"
 	[ -z "$CHOSEN" ] && break
 
@@ -80,6 +90,18 @@ while :; do
     done
 
 	case "$CHOSEN" in
+		"Waybar")
+			waybar-main-menu
+			;;
+		*"Waybar"*)
+			msg="You <span foreground='${P_RED}'><b>disabled</b></span> "
+			msg+="Waybar in <span foreground='${P_ACCENT}'><b>Vibranium settings</b></span>! To enable, go to:\n"
+			msg+="<span foreground='${P_YELLOW}'><b>Vibranium settings</b></span> <span foreground='${P_BLUE}'><b>→</b></span> "
+			msg+="<span foreground='${P_YELLOW}'><b>General</b></span> <span foreground='${P_BLUE}'><b>→</b></span> "
+			msg+="<span foreground='${P_YELLOW}'><b>Status bar enabled</b></span> <span foreground='${P_BLUE}'><b>→</b></span> "
+			msg+="<span foreground='${P_GREEN}'><b>True</b></span>"
+			notify-send -r 3 -t 10000 "Locked" "$msg"
+			;;
 		"Set font")
 			vibranium-font-set
 			;;
@@ -116,8 +138,11 @@ while :; do
 		"Hyprland")
 			_hyprland
 			;;
-		*"Factory Reset"*)
-			factory-reset
+		*"FACTORY RESET"*)
+			msg="Sorry, this needs some polishing and bug fixes, "
+			msg+="so it's not available at the moment"
+			notify-send -r 1 -t 5000 "Vibranium" "$msg"
+			# factory-reset
 			;;
 	esac
 done
