@@ -33,9 +33,13 @@ if [[ -z "${pkg_list[*]}" ]]; then
 fi
 
 echo -e "${YELLOW}[VIBRANIUM]${RESET} ${#pkg_list[@]} packages are awaiting updates"
-echo -e "${YELLOW}[VIBRANIUM]${RESET} Starting system update"
+echo -e "${YELLOW}[VIBRANIUM]${RESET} Starting system update..."
 
-yay
+if ! yay --noconfirm --sudoloop; then
+	echo -e "${RED}[VIBRANIUM]${RESET} Something went wrong"
+	read -n1 -r -p $'\e[0;31m[VIBRANIUM]\e[0m Press any key to close this window' dummy
+	exit 1
+fi
 
 vibranium-cmd-refresh-waybar-module pacman
 printf "\r\033[K%s[VIBRANIUM]%s System update complete\n" "$GREEN" "$RESET"
