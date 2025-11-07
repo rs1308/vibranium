@@ -29,6 +29,72 @@ edit_int() {
 	done
 }
 
+edit_float() {
+	local name="$1"   # prompt title
+	local key="$2"    # hyprland config key
+	local min="$3"    # min (display only)
+	local max="$4"    # max (display only)
+	local input prompt regex
+
+	regex='^[0-9]*\.?[0-9]+$'
+
+	while :; do
+		prompt="$name (float)"
+		input="$(printf "%s" "$prompt" | rofi_cmd "$name" "$min - $max")"
+
+		[[ -z $input ]] && break
+		[[ "$input" == "$prompt" ]] && continue
+
+		# If plain integer and within range, convert to float
+		if [[ $input =~ ^[0-9]+$ ]]; then
+			case "$max" in
+				1.*)
+					[[ $input -ge 0 && $input -le 1 ]] || {
+						notify-send -r 4 -u critical -t 2000 "Vibranium" "Value must be between 0.0 and 1.0"
+						continue
+					}
+					;;
+				2.*)
+					[[ $input -ge 0 && $input -le 2 ]] || {
+						notify-send -r 4 -u critical -t 2000 "Vibranium"  "Value must be between 0.0 and 2.0"
+						continue
+					}
+					;;
+			esac
+			input="${input}.0"
+		fi
+
+		if [[ ! $input =~ $regex ]]; then
+			notify-send -r 4 -u critical -t 2000 "Vibranium" "Enter a valid float number"
+			continue
+		fi
+
+		case "$max" in
+			1.*)
+				[[ $input =~ ^0*(0(\.[0-9]+)?|1(\.0*)?)$ ]] || {
+					notify-send -r 4 -u critical -t 2000 "Vibranium" "Value must be between 0.0 and 1.0"
+					continue
+				}
+				;;
+			2.*)
+				[[ $input =~ ^0*(0(\.[0-9]+)?|1(\.[0-9]+)?|2(\.0*)?)$ ]] || {
+					notify-send -r 4 -u critical -t 2000 "Vibranium" "Value must be between 0.0 and 2.0"
+					continue
+				}
+				;;
+			*)
+				[[ $input =~ ^0*[0-9]+(\.[0-9]+)?$ ]] || {
+					notify-send -r 4 -u critical -t 2000 "Vibranium" "Invalid value"
+					continue
+				}
+				;;
+		esac
+
+		vibranium-cmd-edit-wm-config "$key:$input" "$HYPR_CONFIG"
+		break
+	done
+}
+
 set_animations_preset() {
 	local folder target current anim_opts anim_chosen
 
@@ -52,6 +118,17 @@ set_animations_preset() {
 		hyprctl -q reload config-only
 		break
 	done
+}
+
+edit_hypr_bool() {
+    local opt="$1"
+    local target="$2"
+
+    case "$opt" in
+        true)  vibranium-cmd-edit-wm-config "${target}:false" "$HYPR_CONFIG" ;;
+        false) vibranium-cmd-edit-wm-config "${target}:true"  "$HYPR_CONFIG" ;;
+    esac
+    hyprctl -q reload config-only
 }
 
 while :; do
@@ -144,48 +221,6 @@ while :; do
 			msg+="<span foreground='${P_YELLOW}'>Respect power profile</span></b>"
 			notify-send -r 1 -t 10000 "This option is locked" "$msg"
 			;;
-		"Inactive window opacity"*)
-			while :; do
-				prompt="Inactive window opacity (int / float)"
-				input="$(printf "%s" "$prompt" | rofi_cmd "Inactive opacity" "0.5 - 1")"
-				[[ -z $input ]] && break; [[ "$prompt" == "$input" ]] && continue
-
-				if [[ ! "$input" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
-					notify-send -r 1 -t 2000 "Vibranium" "Only integers or floats allowed"
-					continue
-				fi
-
-				if [[ ! "$input" =~ ^0(\.[5-9]+)?$|^1(\.0+)?$ ]]; then
-					notify-send -r 1 -t 2000 "Vibranium" "Value must be between 0.5 and 1"
-					continue
-				fi
-
-				vibranium-cmd-edit-wm-config "decoration:inactive_opacity:$input" \
-					"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/look-and-feel.conf"
-				break
-			done
-			;;
-		"Active window opacity"*)
-			while :; do
-				prompt="Active window opacity (int / float)"
-				input="$(printf "%s" "$prompt" | rofi_cmd "Active opacity" "0.5 - 1")"
-				[[ -z $input ]] && break; [[ "$prompt" == "$input" ]] && continue
-
-				if [[ ! "$input" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
-					notify-send -r 1 -t 2000 "Vibranium" "Only integers or floats allowed"
-					continue
-				fi
-
-				if [[ ! "$input" =~ ^0(\.[5-9]+)?$|^1(\.0+)?$ ]]; then
-					notify-send -r 1 -t 2000 "Vibranium" "Value must be between 0.5 and 1"
-					continue
-				fi
-
-				vibranium-cmd-edit-wm-config "decoration:active_opacity:$input" \
-					"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/look-and-feel.conf"
-				break
-			done
-			;;
 		"Smart gaps"*)
 			while true; do
 				sg_opts=("Smart gaps : ${current_smart_gaps}" "What is this?")
@@ -219,19 +254,17 @@ while :; do
 		"Border size"*)
 			edit_int "Border size" "general:border_size"
 			;;
+		"Inactive window opacity"*)
+            edit_float "Inactive opacity" "decoration:inactive_opacity" 0.0 1.0
+			;;
+		"Active window opacity"*)
+            edit_float "Active opacity" "decoration:active_opacity" 0.0 1.0
+			;;
 		"Drop window"*)
-			case "$current_shadow" in
-				true)  vibranium-cmd-edit-wm-config decoration:shadow:enabled:false "$HYPR_CONFIG" ;;
-				false) vibranium-cmd-edit-wm-config decoration:shadow:enabled:true  "$HYPR_CONFIG" ;;
-			esac
-			hyprctl -q reload config-only
+            edit_hypr_bool "$current_shadow" "decoration:shadow:enabled"
 			;;
 		"Dim inactive"*)
-			case "$current_dim" in
-				true)  vibranium-cmd-edit-wm-config decoration:dim_inactive:false "$HYPR_CONFIG" ;;
-				false) vibranium-cmd-edit-wm-config decoration:dim_inactive:true  "$HYPR_CONFIG" ;;
-			esac
-			hyprctl -q reload config-only
+            edit_hypr_bool "$current_dim" "decoration:dim_inactive"
 			;;
 		"Border roundness"*)
 			while :; do
@@ -273,158 +306,69 @@ while :; do
 			continue
 			;;
 		"Blur enabled"*)
-			while :; do
-				mapfile -t blur_opts < <(
-					hyprctl --batch -j \
-						"getoption decoration:blur:passes; \
-						 getoption decoration:blur:size; \
-						 getoption decoration:blur:enabled; \
-						 getoption decoration:blur:contrast; \
-						 getoption decoration:blur:brightness; \
-						 getoption decoration:blur:vibrancy" \
-					| jq -r '
-					  .option as $o |
-					  if ($o | test("passes|size")) then
-						.int
-					  elif ($o | test("contrast|brightness|vibrancy")) then
-						.float
-					  else
-						if .int == 1 then "true" else "false" end
-					  end
-					'
-				)
+            blur_index=0
 
-				blur_strength="${blur_opts[0]}"
-				blur_radius="${blur_opts[1]}"
-				blur_enabled="${blur_opts[2]}"
-				blur_contrast="${blur_opts[3]}"
-				blur_brightness="${blur_opts[4]}"
-				blur_saturation="${blur_opts[5]}"
+            while :; do
+                mapfile -t blur_opts < <(
+                    hyprctl --batch -j \
+                        "getoption decoration:blur:passes; \
+                        getoption decoration:blur:size; \
+                        getoption decoration:blur:enabled; \
+                        getoption decoration:blur:contrast; \
+                        getoption decoration:blur:brightness; \
+                        getoption decoration:blur:vibrancy; \
+                        getoption decoration:blur:noise" \
+                    | jq -sr '
+                        .[] | .option as $o |
+                        if ($o | test("enabled")) then (if .int == 1 then "true" else "false" end)
+                        elif ($o | test("passes|size")) then .int
+                        else .float end
+                    '
+                )
 
-				blur_options=("<b>Enabled    : $blur_enabled</b>")
+                read -r blur_strength blur_radius blur_enabled blur_contrast blur_brightness blur_saturation blur_noise <<<"${blur_opts[*]}"
 
-				if [[ $blur_enabled == false ]]; then
-					blur_options+=(
-						"<span alpha='70%'>Radius     : $blur_radius</span> <span foreground='${P_RED}'>()</span>"
-						"<span alpha='70%'>Strength   : $blur_strength</span> <span foreground='${P_RED}'>()</span>"
-						"<span alpha='70%'>Contrast   : $blur_contrast</span> <span foreground='${P_RED}'>()</span>"
-						"<span alpha='70%'>Brightness : $blur_brightness</span> <span foreground='${P_RED}'>()</span>"
-						"<span alpha='70%'>Saturation : $blur_saturation</span> <span foreground='${P_RED}'>()</span>"
-					)
-				else
-					blur_options+=(
-						"Radius     : $blur_radius"
-						"Strength   : $blur_strength"
-						"Contrast   : $blur_contrast"
-						"Brightness : $blur_brightness"
-						"Saturation : $blur_saturation"
-					)
-				fi
+                blur_labels=("Noise" "Radius" "Strength" "Contrast" "Brightness" "Saturation")
+                blur_values=("$blur_noise" "$blur_radius" "$blur_strength" "$blur_contrast" "$blur_brightness" "$blur_saturation")
 
-				blur_chosen="$(printf "%s\n" "${blur_options[@]}" | rofi_cmd "Blur" "ESC to go back")"
-				[[ -z $blur_chosen ]] && break
+                blur_options=("<b>Enabled : $blur_enabled</b>")
+                for i in "${!blur_labels[@]}"; do
+                    if [[ $blur_enabled == false ]]; then
+                        blur_options+=("<span alpha='70%'>${blur_labels[$i]} : ${blur_values[$i]}</span> <span foreground='${P_RED}'>()</span>")
+                    else
+                        blur_options+=("${blur_labels[$i]} : ${blur_values[$i]}")
+                    fi
+                done
 
-				case "$blur_chosen" in
-					*"()"*)
-						notify-send -r 1 "Vibranium" \
-							"<b>This option is <span foreground='${P_RED}'>locked</span> because blur is disabled</b>"
-						continue
-						;;
-					*"Enabled"*)
-						if [[ $current_blur == true ]]; then
-							rm "$VIBRANIUM_STATE/blur.restore"
-						else
-							touch "$VIBRANIUM_STATE/blur.restore"
-						fi
-						vibranium-cmd-toggle-blur
-						;;
-					"Saturation"*)
-						while :; do
-							prompt="Blur saturation (float)"
-							input="$(printf "%s" "$prompt" | rofi_cmd "Blur saturation"  "0.0 - 1.0")"
-							[[ -z $input ]] && break; [[ "$prompt" == "$input" ]] && continue
+                blur_chosen="$(printf '%s\n' "${blur_options[@]}" | rofi_cmd "Blur" "ESC to go back" -selected-row "$blur_index")"
+                [[ -z $blur_chosen ]] && break
 
-							if [[ $input =~ ^0*(0\.[0-9]+|1(\.0*)?)$ ]]; then
-								vibranium-cmd-edit-wm-config "decoration:blur:vibrancy:$input" "$HYPR_CONFIG"
-								break
-							else
-								notify-send -r 2 -u critical -t 1500 "Vibranium" \
-									"<span foreground='${P_RED}'>A floating point between 0.0 and 1.0!</span>"
-								continue
-							fi
-						done
-					;;
-					"Brightness"*)
-						while :; do
-							prompt="Blur brightness (float)"
-							input="$(printf "%s" "$prompt" | rofi_cmd "Blur brightness"  "0.0 - 2.0")"
-							[[ -z $input ]] && break; [[ "$prompt" == "$input" ]] && continue
+                for i in "${!blur_options[@]}"; do
+                    [[ "${blur_options[$i]}" == "$blur_chosen" ]] && blur_index="$i" && break
+                done
 
-							if [[ $input =~ ^0*(0\.[0-9]+|2(\.0*)?)$ ]]; then
-								vibranium-cmd-edit-wm-config "decoration:blur:brightness:$input" "$HYPR_CONFIG"
-								break
-							else
-								notify-send -r 2 -u critical -t 1500 "Vibranium" \
-									"<span foreground='${P_RED}'>A floating point between 0.0 and 2.0!</span>"
-								continue
-							fi
-						done
-					;;
-					"Contrast"*)
-						while :; do
-							prompt="Blur contrast (float)"
-							input="$(printf "%s"  "$prompt" | rofi_cmd "Blur contrast"  "0.0 - 2.0")"
-							[[ -z $input ]] && break; [[ "$prompt" == "$input" ]] && continue
-
-							if [[ $input =~ ^0*(0\.[0-9]+|2(\.0*)?)$ ]]; then
-								vibranium-cmd-edit-wm-config "decoration:blur:contrast:$input" "$HYPR_CONFIG"
-								break
-							else
-								notify-send -r 2 -u critical -t 1500 "Vibranium" \
-									"<span foreground='${P_RED}'>A floating point between 0.0 and 2.0!</span>"
-								continue
-							fi
-						done
-						;;
-					"Radius"*)
-						while :; do
-							prompt="Blur radius (int)"
-							input="$(printf "%s" "$prompt" | rofi_cmd "Blur radius"  "ESC to go back")"
-							[[ -z $input ]] && break; [[ "$prompt" == "$input" ]] && continue
-
-							if [[ ! $input =~ ^[0-9]+$ ]]; then
-								continue
-							else
-								vibranium-cmd-edit-wm-config "decoration:blur:size:$input" "$HYPR_CONFIG"
-
-								if (( input > 5 )); then
-									notify-send -r 1 "Vibranium" \
-										"Please note that large values may affect overall performance"
-								fi
-								break
-							fi
-						done
-						;;
-					"Strength"*)
-						while :; do
-							prompt="Blur strength (int)"
-							input="$(printf "%s" "$prompt" | rofi_cmd "Blur strength"  "ESC to go back")"
-							[[ -z $input ]] && break; [[ "$prompt" == "$input" ]] && continue
-
-							if [[ ! $input =~ ^[0-9]+$ ]]; then
-								continue
-							else
-								vibranium-cmd-edit-wm-config "decoration:blur:passes:$input" "$HYPR_CONFIG"
-
-								if (( input > 5 )); then
-									notify-send -r 1 "Vibranium" \
-										"Please note that large values may affect overall performance"
-								fi
-								break
-							fi
-						done
-				esac
-			done
+                case "$blur_chosen" in
+                    *"()"*)
+                        notify-send -r 1 "Vibranium" "Enable blur first"
+                        blur_index=0
+                        continue
+                        ;;
+                    *"Enabled"*)
+                        if [[ $current_blur == true ]]; then
+                            rm -f "$VIBRANIUM_STATE/blur.restore"
+                        else
+                            touch "$VIBRANIUM_STATE/blur.restore"
+                        fi
+                        vibranium-cmd-toggle-blur
+                        ;;
+                    *"Noise"*)      edit_float "Blur noise"      "decoration:blur:noise"      0.0 1.0 ;;
+                    *"Saturation"*) edit_float "Blur saturation" "decoration:blur:vibrancy"   0.0 1.0 ;;
+                    *"Brightness"*) edit_float "Blur brightness" "decoration:blur:brightness" 0.0 2.0 ;;
+                    *"Contrast"*)   edit_float "Blur contrast"   "decoration:blur:contrast"   0.0 2.0 ;;
+                    *"Radius"*)     edit_int   "Blur radius"     "decoration:blur:size"   ;;
+                    *"Strength"*)   edit_int   "Blur strength"   "decoration:blur:passes" ;;
+                esac
+            done
 	esac
 done
 
