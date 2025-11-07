@@ -1,34 +1,60 @@
 @import "../vibranium/theme/current/rofi.rasi"
 
 * {
-	background-color: transparent;
+    background-color: transparent;
 }
 
+/* ─── Configuration ───────────────────────────────────────────────────────── */
+
 configuration {
-	modes : [ drun, ssh ];
+    modes:                   [ drun, ssh ];
+    drun-reload-desktop-cache: true;
+    drun-use-desktop-cache:   true;
+    transient-window:         true;
+    steal-focus:              true;
+    markup:                   true;
+    sort:                     true;
+    fixed-num-lines:          false;
 
-	drun-reload-desktop-cache : true;
-	drun-use-desktop-cache    : true;
-	transient-window          : true;
-	steal-focus               : true;
-	markup                    : true;
-	sort                      : true;
-	fixed-num-lines           : false;
+    display-window: "Windows";
+    display-run:    "Command";
+    display-combi:  "Search";
+    display-emoji:  "Emoji";
+    display-drun:   "Apps";
+    display-ssh:    "SSH";
 
-	display-window      : "Windows";
-	display-run         : "Command";
-	display-combi       : "Search";
-	display-emoji       : "Emoji";
-	display-drun        : "Apps";
-	display-ssh         : "SSH";
+    icon-theme:          "Papirus";
+    drun-display-format: "{name}";
+    matching:            "prefix";
+    drun-match-fields:   "name,keywords,categories";
 
-	icon-theme          : "Papirus";
-	drun-display-format : "{name}";
-	matching            : "prefix";
-	drun-match-fields   : "name,keywords,categories";
-	monitor             : "-1";
-	scroll-method       : 1;
-	sorting-method      : "fzf";
+    monitor:       "-1";
+    scroll-method: 1;
+    sorting-method: "fzf";
+}
+
+/* ─── Base Layout ─────────────────────────────────────────────────────────── */
+
+window {
+    width:            350px;
+    padding:          20;
+    background-color: var(background);
+	transparency:     "real";
+    border:           2;
+    border-color:     var(border);
+}
+
+mainbox {
+    padding:          4px;
+    background-color: var(background);
+}
+
+/* ─── Elements ────────────────────────────────────────────────────────────── */
+
+element {
+    padding: 4px;
+    spacing: 16px;
+    cursor:  pointer;
 }
 
 element normal.normal {
@@ -36,9 +62,13 @@ element normal.normal {
     text-color:       var(foreground-muted);
 }
 
+element normal.active {
+    background-color: var(border);
+}
+
 element selected.normal {
     background-color: var(background);
-    text-color:       var(highlight);
+    text-color:       var(foreground);
 }
 
 element alternate.normal {
@@ -48,83 +78,87 @@ element alternate.normal {
 
 element-text {
     background-color: transparent;
-    cursor:           inherit;
-    highlight:        inherit;
     text-color:       inherit;
+    cursor:           inherit;
 }
 
-window {
-	width:            300px;
-    padding:          12;
-    background-color: var(background);
-    border:           2px;
-	border-color:     var(border);
+element-icon {
+    background-color: transparent;
+    size:             1.7em;
 }
 
-mainbox {
-    padding: 8px;
-	border:  2px;
-	border-color: var(border);
-}
-
-textbox {
-    text-color: var(foreground);
-}
+/* ─── Listview & Scrollbar ────────────────────────────────────────────────── */
 
 listview {
-    padding:      12px 4px 0px ;
+    padding:      20px 0 0 0;
+    spacing:      4px;
     scrollbar:    true;
+    border:       0;
+    border:       2px solid 0px 0px;
     border-color: var(border);
-    spacing:      2px ;
-    fixed-height: 0;
-    border:       2px dash 0px 0px ;
+    margin:       10px 0 0 0;
+	lines:        10;
 }
 
 scrollbar {
-    width:        2px ;
-    handle-width: 2px ;
+    width:        2px;
+    padding:      0;
+    handle-width: 2px;
+    border:       0;
     handle-color: var(border);
+}
+
+/* ─── Input Bar ───────────────────────────────────────────────────────────── */
+
+inputbar {
+    text-color: var(foreground);
+    children: [
+        "prompt",
+        "textbox-prompt-colon",
+        "entry",
+        "overlay",
+        "num-filtered-rows",
+        "textbox-num-sep",
+        "num-rows",
+        "case-indicator"
+    ];
+}
+
+prompt {
+    text-color: inherit;
+}
+
+entry {
+    text-color:        var(foreground-muted);
+    placeholder-color: var(foreground-muted);
+    cursor:            text;
+    placeholder:       " search...";
+}
+
+/* ─── Input Indicators ────────────────────────────────────────────────────── */
+
+case-indicator {
+    enabled: false;
 }
 
 num-filtered-rows {
     expand:     false;
-    text-color: var(highlight);
+    text-color: var(foreground-muted);
 }
 
 num-rows {
     expand:     false;
-    text-color: var(foreground-muted);
+    text-color: var(border);
 }
 
 textbox-num-sep {
     expand:     false;
     str:        "/";
-    text-color: var(foreground-muted);
-}
-
-inputbar {
-    padding:    6px 6px 6px 6px;
-    text-color: var(foreground);
-    children:   [ "prompt","textbox-prompt-colon","entry","overlay","num-filtered-rows","textbox-num-sep","num-rows"];
-}
-
-prompt {
-	text-color: inherit;
-}
-
-entry {
-    text-color:        var(foreground);
-    placeholder-color: var(foreground-muted);
-    placeholder:       "search";
-}
-
-element-icon {
-	size: 14px;
-	padding: 2px;
+    text-color: var(border);
 }
 
 textbox-prompt-colon {
-    margin:     0px 2px 0px 0px;
+    margin:     0 2px 0 0;
     expand:     false;
     str:        ":";
     text-color: var(foreground-muted);
