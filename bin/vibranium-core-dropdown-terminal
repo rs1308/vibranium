@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+TITLE="dropdown-terminal"
+CLASS="dropdown-terminal"
+
+# Check if window exists
+if hyprctl clients | grep -q "$TITLE"; then
+    # Get the window address from hyprctl
+    WINADDR=$(hyprctl clients -j | jq -r ".[] | select(.title == \"$TITLE\") | .address")
+    if [ -n "$WINADDR" ]; then
+        hyprctl dispatch closewindow address:"$WINADDR"
+    fi
+else
+    alacritty msg create-window --class "$CLASS" --title "$TITLE" \
+        || alacritty --class "$CLASS" --title "$TITLE" &
+fi
