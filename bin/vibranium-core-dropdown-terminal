@@ -7,5 +7,9 @@ if hyprctl clients -j | jq -e --arg title "$TITLE" '.[] | select(.title == $titl
     WINADDR=$(hyprctl clients -j | jq -r --arg title "$TITLE" '.[] | select(.title == $title) | .address')
     hyprctl dispatch closewindow address:"$WINADDR"
 else
-    vibranium-cmd-launch-cmd alacritty --title "$TITLE"
+    if pidof alacritty >/dev/null; then
+        alacritty msg create-window --class "$CLASS" --title "$TITLE"
+    else
+        vibranium-cmd-launch-cmd alacritty --class "$CLASS" --title "$TITLE"
+    fi
 fi
