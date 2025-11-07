@@ -29,89 +29,67 @@ RESET=$'\e[0m'
 # Will create a custom menu with the contents of ${custom_actions[@]} (entry per line)
 # Optional -theme-str 'configuration {show-icons: true;}' will enable icons for each entry.
 rofi_cmd() {
-	local -a opt_args=()
+    # This associative array maps text lengths to window pixel widths.
+    # It is used to keep Rofi window size visually proportional to content width.
+    # More variations make window resizing smoother between small and long menus.
+    local -A map=(
+        [80]=816 [78]=799 [76]=782 [74]=765 [72]=748 [70]=731
+        [68]=714 [66]=697 [64]=680 [62]=663 [60]=646
+        [58]=629 [56]=612 [54]=595 [52]=578 [50]=561
+        [48]=544 [46]=527 [44]=510 [42]=493 [40]=476
+        [38]=459 [36]=442 [34]=425 [32]=408 [30]=391
+        [28]=374 [26]=357 [24]=340 [22]=323 [20]=306
+        [18]=289 [16]=272 [14]=255 [12]=238 [10]=221
+        [8]=208 [6]=200 [0]=196
+    )
 
-	# Rofi's window width map
-	local -A map=(
-		[66]=863
-		[64]=834 [63]=805
-		[61]=777 [60]=748
-		[59]=719 [58]=690
-		[57]=662 [56]=633
-		[53]=604 [50]=575
-		[47]=546 [45]=518
-		[42]=489 [40]=460
-		[37]=449 [35]=437
-		[34]=403
-		[33]=397 [32]=391
-		[31]=383 [30]=374
-		[27]=366 [25]=357
-		[22]=340 [20]=322
-		[18]=305 [17]=288
-		[8]=259  [0]=230
-	)
+    if pgrep -x rofi >/dev/null; then
+        pkill -x rofi
+        exit 1
+    fi
 
-	if pidof rofi > /dev/null; then
-		killall rofi
-		exit 1
-	fi
+    # Read prompt and optional placeholder.
+    local prompt="$1"
+    local placeholder=" ${2}"
+    shift $(($# > 1 ? 2 : 1))
 
-	local prompt="$1"
-	local placeholder=" ${2}"
-	shift $(($# > 1 ? 2 : 1))
+    # Get input.
+    local input
+    input="$(</dev/stdin)"
 
-	# Read stdin into variable (so we can count lines and also pass to rofi)
-	local input
-	input="$(cat)"
+    # Remove Pango markup tags for text length calculations.
+    # We only need plain text width for layout, not formatted text.
+    local input_plain="${input//<*>/}"
 
-	# --- strip Pango markup for width/line calculations only ---
-	# Note: this removes anything between angle brackets (e.g. <span weight='bold'>, </span>, <b>, ...)
-	local input_plain
-	input_plain="$(printf "%s" "$input" | sed -E 's/<[^>]*>//g')"
+    # Determine the longest line length among menu entries.
+    # This decides how wide the window should be.
+    local maxlen_input=0 line
+    while IFS= read -r line; do
+        (( ${#line} > maxlen_input )) && maxlen_input=${#line}
+    done <<< "$input_plain"
 
-	# local lines (count lines from stripped input)
-	local lines
-	lines=$(printf "%s" "$input_plain" | grep -c '^')
+    # Compare longest entry with prompt + placeholder length.
+    # Choose whichever is longer as the base width reference.
+    local promptlen=$(( ${#prompt} + ${#placeholder} ))
+    local maxlen=$(( maxlen_input > promptlen ? maxlen_input : promptlen ))
 
-	if [[ $lines -eq 0 ]]; then
-		lines=0
-	elif [[ $lines -ge 10 ]]; then
-		lines=11
-	fi
+    # Find appropriate window width from the map.
+    local width=$(( maxlen ))
+    for k in 80 78 76 74 72 70 68 66 64 62 60 58 56 54 52 50 48 46 44 42 40 38 36 34 32 30 28 26 24 22 20 18 16 14 12 10 8 6 0; do
+        if (( width >= k )); then
+            width=${map[$k]}
+            break
+        fi
+    done
 
-	# longest line length from stripped input
-	local maxlen_input
-	maxlen_input=$(printf "%s\n" "$input_plain" | awk '{print length}' | sort -nr | head -n1)
-
-	# Make the window width dynamic, based on the width of the longest entry or prompt
-	local promptlen=$(( ${#prompt} + ${#placeholder} ))
-	local maxlen=$(( maxlen_input > promptlen ? maxlen_input : promptlen ))
-	local width=$(( maxlen ))
-
-	for k in 66 63 60 58 56 50 45 40 35 34 32 30 25 20 17 0; do
-		if (( width >= k )); then
-			width=${map[$k]}
-			break
-		fi
-	done
-
-	if [[ $VIBRANIUM_GLOBAL_APP_LAUNCHER_AUTO_SELECT == true ]]; then
-		if (( lines > 1 )); then
-			if [[ ! "${BASH_SOURCE[1]}" =~ clipboard ]]; then
-				opt_args+=(-auto-select true)
-			fi
-		fi
-	fi
-
-	# pass original input (with Pango) to rofi so markup is rendered,
-	# but sizes were calculated from input_plain (without markup)
-	printf "%s\n" "$input" | rofi -i -dmenu -p "$prompt" \
-		-markup -markup-rows -sync "${opt_args[@]}" \
-		-theme "$XDG_CONFIG_HOME/rofi/config.rasi" \
-		-theme-str 'configuration {show-icons: false;} entry {placeholder: "'"${placeholder}"'";}' \
-		-theme-str 'window {width: '"${width}px"';}' \
-		-theme-str 'listview {lines: '"${lines}"';}' \
-		-matching-negate-char '' "$@" 2>/dev/null
+    rofi -i -dmenu -p "$prompt" \
+        -markup -markup-rows -sync \
+        -theme "$XDG_CONFIG_HOME/rofi/config.rasi" \
+        -theme-str 'configuration {show-icons: false;}' \
+        -theme-str 'entry {placeholder: "'"${placeholder}"'";}' \
+        -theme-str 'window {width: '"${width}px"';}' \
+        -matching-negate-char '' "$@" 2>/dev/null \
+        <<< "$input"
 }
 
 # A spinner utility function.
@@ -161,9 +139,6 @@ spinner() {
     else
         printf "%s\n" "$msg"
     fi
-
-    # Small delay to avoid overlapping outputs
-    # sleep 1
 }
 
 # Validate that a named variable contains a numeric value (int or float) and
