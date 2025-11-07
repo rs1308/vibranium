@@ -45,6 +45,7 @@ while :; do
 		"Sleep after : $sleep_timeout min"
 		"What is this?"
 	)
+
 	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Idle timeouts" "ESC to go back" -selected-row "$INDEX")"
 	[ -z "$CHOSEN" ] && break
 
@@ -65,7 +66,7 @@ while :; do
 					notify-send -r 3 -u critical -t 1500 "Vibranium" "Only integers allowed!"
 					continue
 				}
-				
+
 				time=$(( input * 60 ))
 				_update_timeout 1 $time
 				systemctl --user restart hypridle
@@ -82,12 +83,12 @@ while :; do
 					notify-send -r 3 -u critical -t 1500 "Vibranium" "Only integers allowed!"
 					continue
 				}
-				
+
 				if (( input <= lock_timeout )); then
 					notify-send -r 3 -u critical -t 3000 "Vibranium" "Sleep timeout must be greater than $lock_timeout!"
 					continue
 				fi
-				
+
 				time=$(( input * 60 ))
 				_update_timeout 2 $time
 				systemctl --user restart hypridle

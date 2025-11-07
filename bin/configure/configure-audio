@@ -8,30 +8,22 @@ INDEX=0
 while :; do
 	source "$VIBRANIUM_USER_SETTINGS"
 
-	if [[ "$VIBRANIUM_VOLUME_USE_VISUAL_FEEDBACK" == true ]]; then
-		OPTIONS=("Visual feedback  : $VIBRANIUM_VOLUME_USE_VISUAL_FEEDBACK")
-	else
-		OPTIONS=("Visual feedback  : $VIBRANIUM_VOLUME_USE_VISUAL_FEEDBACK")
-	fi
+    OPTIONS=(
+        "Visual feedback  : $VIBRANIUM_VOLUME_USE_VISUAL_FEEDBACK"
+        "Audio feedback   : $VIBRANIUM_VOLUME_USE_AUDIO_FEEDBACK"
+    )
 
-	if [[ "$VIBRANIUM_VOLUME_USE_AUDIO_FEEDBACK" == true ]]; then
-		OPTIONS+=("Audio  feedback  : $VIBRANIUM_VOLUME_USE_AUDIO_FEEDBACK")
-	else
-		OPTIONS+=("Audio  feedback  : $VIBRANIUM_VOLUME_USE_AUDIO_FEEDBACK")
-	fi
+    OPTIONS+=(
+        "Allow above 100% : $VIBRANIUM_VOLUME_ALLOW_ABOVE_HUNDRED"
+        "Adjustment step  : $VIBRANIUM_VOLUME_ADJUSTMENT_STEP"
+    )
+    if [[ "$VIBRANIUM_GLOBAL_USE_OSD" == true ]]; then
+        OPTIONS+=("OSD feedback     : $VIBRANIUM_VOLUME_USE_OSD")
+    else
+        OPTIONS+=("<span alpha='70%'>OSD feedback     : $VIBRANIUM_VOLUME_USE_OSD</span> <span foreground='${P_RED}'>()</span>")
+    fi
 
-	if [[ "$VIBRANIUM_GLOBAL_USE_OSD" == true ]]; then
-		OPTIONS+=("OSD    feedback  : $VIBRANIUM_VOLUME_USE_OSD")
-	else
-		OPTIONS+=("<span alpha='70%'>OSD    feedback  : $VIBRANIUM_VOLUME_USE_OSD</span> <span foreground='${P_RED}'>()</span>")
-	fi
-
-	OPTIONS+=("Allow above 100% : $VIBRANIUM_VOLUME_ALLOW_ABOVE_HUNDRED")
-	OPTIONS+=(
-		"Adjustment step  : $VIBRANIUM_VOLUME_ADJUSTMENT_STEP"
-		"<b><i>Open volume control app</i></b>"
-	)
-
+    OPTIONS+=("<b>Open volume control</b>")
 	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Audio" "ESC to go back" -selected-row "$INDEX")"
 	[ -z "$CHOSEN" ] && break
 
@@ -43,7 +35,7 @@ while :; do
     done
 
 	case "$CHOSEN" in
-		*"Open volume control app"*)
+		*"Open volume control"*)
 			notify-send -r 3 "Vibranium" "Press '<span foreground='${P_YELLOW}'><b>?</b></span>' to see available keyboard shortcuts"
 			vibranium-cmd-launch-terminal wiremix
 			vibranium-cmd-kill-rofi
@@ -121,7 +113,7 @@ while :; do
 					*"()"*)
 						continue
 						;;
-					*"Audio"*) 
+					*"Audio"*)
 						toggle_bool "VIBRANIUM_VOLUME_USE_AUDIO_FEEDBACK"
 						;;
 					"Variant"*)
@@ -161,6 +153,6 @@ while :; do
 				sed -i "/^VIBRANIUM_VOLUME_ADJUSTMENT_STEP/s/=.*/=${input}/" "$VIBRANIUM_USER_SETTINGS"
 				break
 			done
-			
+
 	esac
 done

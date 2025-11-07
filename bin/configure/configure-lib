@@ -18,7 +18,7 @@ toggle_bool() {
 
 	option-validate "$setting_name"
     eval "current_value=\$$setting_name"
-    
+
     case "$current_value" in
         "true")
 			sed -i "/^${setting_name}=/s/=.*/=false/" "$VIBRANIUM_USER_SETTINGS"
