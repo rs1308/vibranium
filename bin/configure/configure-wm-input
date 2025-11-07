@@ -145,17 +145,41 @@ add_layout() {
         final_layouts="${active_layouts},${chosen}"
         vibranium-cmd-edit-wm-config "input:kb_layout:$final_layouts" \
             "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
-        notify-send -r 1 "Vibranium" "Added new Keyboard layout: $chosen"
+        notify-send -r 1 "Vibranium" "Added new Keyboard layout: <b>${chosen^^}</b>"
         break
     done
 }
 
 remove_layout() {
     local layouts
-    local
+    local chosen
+    local final_layouts
 
-    layouts="$(hyprctl -j getoption input:kb_layout | jq -r '.str')"
+    while :; do
+        IFS=',' read -r -a layouts < <(hyprctl -j getoption input:kb_layout | jq -r '.str')
 
+        chosen="$(printf "%s\n" "${layouts[@]}" | rofi_cmd "Remove layouts" "ESC to go back")"
+
+        [[ -z $chosen ]] && break
+        if [[ ! " ${layouts[*]} " =~ $chosen ]]; then
+            notify-send -r 3 -t 3000 -u critical "Vibranium" "Invalid layout"
+            continue
+        fi
+
+        final_layouts=()
+        for layout in "${layouts[@]}"; do
+            if [[ "$layout" != "$chosen" ]]; then
+                final_layouts+=("$layout")
+            fi
+        done
+
+        final_layouts_str=$(IFS=','; echo "${final_layouts[*]}")
+
+        vibranium-cmd-edit-wm-config "input:kb_layout:$final_layouts_str" \
+            "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
+        notify-send -r 1 "Vibranium" "Removed existing Keyboard layout: <b>${chosen^^}</b>"
+        break
+    done
 }
 
 layouts_menu() {
@@ -172,7 +196,7 @@ layouts_menu() {
                 add_layout
                 ;;
             "Remove existing")
-                command ...
+                remove_layout
                 ;;
         esac
     done
