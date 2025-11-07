@@ -1,16 +1,11 @@
 #!/usr/bin/env bash
 
-TITLE="dropdown-terminal"
+TITLE="Dropdown terminal"
 CLASS="dropdown-terminal"
 
-# Check if window exists
-if hyprctl clients | grep -q "$TITLE"; then
-    # Get the window address from hyprctl
-    WINADDR=$(hyprctl clients -j | jq -r ".[] | select(.title == \"$TITLE\") | .address")
-    if [ -n "$WINADDR" ]; then
-        hyprctl dispatch closewindow address:"$WINADDR"
-    fi
+if hyprctl clients -j | jq -e --arg title "$TITLE" '.[] | select(.title == $title)' >/dev/null; then
+    WINADDR=$(hyprctl clients -j | jq -r --arg title "$TITLE" '.[] | select(.title == $title) | .address')
+    hyprctl dispatch closewindow address:"$WINADDR"
 else
-    alacritty msg create-window --class "$CLASS" --title "$TITLE" \
-        || alacritty --class "$CLASS" --title "$TITLE" &
+    vibranium-cmd-launch-cmd alacritty --title "$TITLE"
 fi
