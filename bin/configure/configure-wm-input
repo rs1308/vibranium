@@ -145,7 +145,7 @@ add_layout() {
         final_layouts="${active_layouts},${chosen}"
         vibranium-cmd-edit-wm-config "input:kb_layout:$final_layouts" \
             "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
-        notify-send -r 1 "Vibranium" "Added new Keyboard layout: <b>${chosen^^}</b>"
+        notify-send -r 1 "Vibranium" "Added new keyboard layout: <b>${chosen^^}</b>"
         break
     done
 }
@@ -180,7 +180,7 @@ remove_layout() {
 
         vibranium-cmd-edit-wm-config "input:kb_layout:$final_layouts_str" \
             "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
-        notify-send -r 1 "Vibranium" "Removed existing Keyboard layout: <b>${chosen^^}</b>"
+        notify-send -r 1 "Vibranium" "Removed existing keyboard layout: <b>${chosen^^}</b>"
         break
     done
 }

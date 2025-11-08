@@ -4,6 +4,12 @@ source "$VIBRANIUM_PATH/vibranium-core-lib"
 
 CONF="$XDG_CONFIG_HOME/hypr/hyprpaper.conf"
 
+CURRENT_THEME="$(vibranium-theme-get)"
+USER_WALLPAPERS="$XDG_CONFIG_HOME/vibranium/theme/wallpapers/$CURRENT_THEME"
+
+# Get an array of all available wallpapers for the current theme
+WALLS="$XDG_CONFIG_HOME/vibranium/theme/current/backgrounds"
+
 if ! missing_str="$(vibranium-utils-is-installed hyprpaper jq)"; then
     read -r -a missing <<< "$missing_str"
     notify-send -r 4 -t 5000 -u critical "$(basename "$0")" "Missing dependencies: ${missing[*]}"
@@ -16,11 +22,14 @@ toggle_wallpaper() {
     local current
     local files
     local idx next prev
-    local walls
 
-    # Get an array of all available wallpapers for the current theme
-    walls="$XDG_CONFIG_HOME/vibranium/theme/current/backgrounds"
-    mapfile -t files < <(find "${walls}/" -type f,l | sort)
+    mapfile -t files < <(find "${WALLS}/" -type f,l | sort)
+
+    # Sort user wallpapers after builtins
+    mapfile -t user_files < <(find "${USER_WALLPAPERS}/" -type f,l | sort)
+
+    files+=("${user_files[@]}")
+
     # If it is empty (somehow) - exit
     [ ${#files[@]} -eq 0 ] && return 1
 
@@ -55,7 +64,7 @@ fi
 
 case "$1" in
     "--next" | "--prev") WALLPAPER_PATH="$(toggle_wallpaper "$1")" ;;
-    *)              WALLPAPER_PATH="$(realpath "$1")"         ;;
+    *)                   WALLPAPER_PATH="$(realpath "$1")"         ;;
 esac
 
 if [ -z "$1" ] || [[ ! $WALLPAPER_PATH =~ \.(png|jp(e)?g|webp)$ ]]; then
@@ -70,9 +79,22 @@ if [ -f "$VIBRANIUM_STATE/wallpaper.enabled" ]; then
         if [[ "$(systemctl --user is-active hyprpaper)" != "active" ]]; then
             msg="For some reason, the Wallpaper Daemon wasn't enabled.\nThe system service was enabled and the wallpaper was set"
             notify-send -r 1 -t 5000 "Vibranium" "$msg"
-            systemctl --user enable --now hyprpaper
+            systemctl --user enable --now hyprpaper &
         fi
     fi
+fi
+
+# In case if user set new wallpaper via thunar context menu
+# (e,g. user's own picture, downloaded from the internet) we
+# should copy this file to the folder that contains user wallpapers
+# only. Why copy? In case if original file gets deleted
+if [[ ! -f "$WALLS/$(basename "$WALLPAPER_PATH")" ]]; then
+    if [[ ! -d "$USER_WALLPAPERS" ]]; then
+        mkdir -p "$USER_WALLPAPERS"
+    fi
+
+    cp "$WALLPAPER_PATH" "$USER_WALLPAPERS/"
+    WALLPAPER_PATH="$USER_WALLPAPERS/$(basename "$WALLPAPER_PATH")"
 fi
 
 # Update on all monitors
