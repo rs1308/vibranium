@@ -35,7 +35,11 @@ get_i2c_bus() {
 
     NEW_INFO="$(ddcutil detect 2>/dev/null | awk '
         /I2C bus:/          { bus=$NF; sub("/dev/i2c-", "", bus); skip=0 }
-        /DRM connector:/    { sub(/^card[0-9]+-/, "", $2); name=$2; if ($2 ~ /^eDP/) skip=1 }
+        /DRM_connector:/    {
+            name=$2
+            if (name ~ /^card[0-9]+-eDP/) skip=1
+            sub(/^card[0-9]+-/, "", name)
+        }
         /This is a laptop/  { skip=1 }
         /VCP version/ && !skip { print name ":" bus }
     ')"
