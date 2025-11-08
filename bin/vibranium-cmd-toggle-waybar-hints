@@ -8,18 +8,18 @@ source "$VIBRANIUM_PATH/configure/configure-lib"
 
 option-validate "VIBRANIUM_BAR_SHOW_SHORTCUT_HINTS"
 case "$VIBRANIUM_BAR_SHOW_SHORTCUT_HINTS" in
-	true)
-		echo "Shortcut hints disabled"
-		sed -i "/^VIBRANIUM_BAR_SHOW_SHORTCUT_HINTS/s/=.*/=false/" \
-			"$VIBRANIUM_USER_SETTINGS"
-		;;
+    true)
+        echo "Shortcut hints disabled"
+        sed -i "/^VIBRANIUM_BAR_SHOW_SHORTCUT_HINTS/s/=.*/=false/" \
+            "$VIBRANIUM_USER_SETTINGS"
+        ;;
     false)
-		echo "Shortcut hints enabled"
-		sed -i "/^VIBRANIUM_BAR_SHOW_SHORTCUT_HINTS/s/=.*/=true/" \
-			"$VIBRANIUM_USER_SETTINGS"
-		;;
+        echo "Shortcut hints enabled"
+        sed -i "/^VIBRANIUM_BAR_SHOW_SHORTCUT_HINTS/s/=.*/=true/" \
+            "$VIBRANIUM_USER_SETTINGS"
+        ;;
 esac
 
 for i in $(seq 1 12); do
-	pkill -RTMIN+"${i}" waybar &
+    pkill -RTMIN+"${i}" waybar &
 done

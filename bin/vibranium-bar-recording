@@ -4,7 +4,7 @@ source "$XDG_CONFIG_HOME/vibranium/theme/current/vibranium-lib-theme"
 source "$VIBRANIUM_PATH/vibranium-core-defaults"
 source "$XDG_CONFIG_HOME/vibranium/settings"
 
-if ! pidof gpu-screen-recorder &>/dev/null; then
+if ! pidof gpu-screen-recorder &> /dev/null; then
     printf '{"text": ""}'
     exit 0
 fi

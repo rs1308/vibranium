@@ -26,7 +26,7 @@ fi
 
 # Prevent running multiple slurp instances
 if pidof slurp > /dev/null 2>&1; then
-	killall slurp
+    killall slurp
     exit 0
 fi
 
@@ -39,14 +39,14 @@ notification() {
     esac
 
     check_bool VIBRANIUM_SCREENSHOT_SAVE_TO_DISK false
-	if [[ $VIBRANIUM_SCREENSHOT_SAVE_TO_DISK == true ]]; then
-		message="saved to disk"
-	else
-		message="captured"
-	fi
+    if [[ $VIBRANIUM_SCREENSHOT_SAVE_TO_DISK == true ]]; then
+        message="saved to disk"
+    else
+        message="captured"
+    fi
 
-	[[ $VIBRANIUM_GLOBAL_COPY_TO_CLIPBOARD == true ]] \
-	&& message+="${message:+ and }copied to clipboard"
+    [[ $VIBRANIUM_GLOBAL_COPY_TO_CLIPBOARD == true ]] &&
+        message+="${message:+ and }copied to clipboard"
 
     notify-send -r 1 -t 1500 "Vibranium" "$target $message"
 }
@@ -68,9 +68,9 @@ if [[ ${VIBRANIUM_SCREENSHOT_FILE_TYPE} =~ (jpeg|jpg) ]]; then
     log "Quality: '${YELLOW}${VIBRANIUM_SCREENSHOT_JPEG_QUALITY}${RESET}'"
 
     if is_fullscreen; then
-		# Let's imagine that you are watching a video or playing a video game
-		# and you want to quickly capture a frame to send to a friend or simply enlarge it in a photo editing program.
-		# JPEG compression is great, of course, but right now we need all the details of the image!
+        # Let's imagine that you are watching a video or playing a video game
+        # and you want to quickly capture a frame to send to a friend or simply enlarge it in a photo editing program.
+        # JPEG compression is great, of course, but right now we need all the details of the image!
         check_int VIBRANIUM_SCREENSHOT_JPEG_QUALITY_FULLSCREEN 100 int
         log "Found ${YELLOW}fullscreen${RESET} window! Using ${YELLOW}\$VIBRANIUM_SCREENSHOT_JPEG_QUALITY_FULLSCREEN${RESET}"
 
@@ -102,17 +102,17 @@ fi
 
 # Determine output file path (disk or RAM)
 if [[ ${VIBRANIUM_SCREENSHOT_SAVE_TO_DISK} == true ]]; then
-	if [[ "$VIBRANIUM_XDG_DIRS_EXPOSED" == true ]]; then
-		output_dir="$(eval "echo $XDG_PICTURES_DIR/Screenshots")"
-	else
-		output_dir="$HOME/Screenshots"
-	fi
+    if [[ "$VIBRANIUM_XDG_DIRS_EXPOSED" == true ]]; then
+        output_dir="$(eval "echo $XDG_PICTURES_DIR/Screenshots")"
+    else
+        output_dir="$HOME/Screenshots"
+    fi
 
     # Ensure output directory exists
     mkdir -p "$output_dir"
 
-	# TODO: Allow the user to change the date format in the Vibranium settings.
-	# Currently, it uses EU time by default.
+    # TODO: Allow the user to change the date format in the Vibranium settings.
+    # Currently, it uses EU time by default.
     output_file="${output_dir}/screenshot_$(date +"${VIBRANIUM_DATE_FORMAT}").${VIBRANIUM_SCREENSHOT_FILE_TYPE}"
     log "Saving to: '${YELLOW}disk${RESET}'"
 else
@@ -136,7 +136,7 @@ case "$1" in
         log "Performing actions"
 
         # Use slurp to select an area; feed geometry to grim via stdin ("-g -")
-		# Yes, we use gray depending on the active theme. Why instead of the usual black with transparency? Um, I don't know. Why not?
+        # Yes, we use gray depending on the active theme. Why instead of the usual black with transparency? Um, I don't know. Why not?
         if ! slurp -d -w 1 -b "${P_GRAY}"33 -c ffffff66 | grim "${opt_options[@]}" -g - "$output_file"; then
             exit 1
         fi
@@ -156,7 +156,7 @@ case "$1" in
 
         # Optionally flash border to indicate target
         if [[ $VIBRANIUM_GLOBAL_FLASH_BORDER == true ]] && [[ ${VIBRANIUM_SCREENSHOT_FLASH_BORDER} == true ]]; then
-			_flash border &
+            _flash border &
         fi
         log "Performing actions"
         grim -g "$window_geometry" "${opt_options[@]}" "$output_file"
@@ -170,10 +170,10 @@ case "$1" in
         log "Performing actions"
         grim "${opt_options[@]}" "$output_file"
 
-		if [[ $VIBRANIUM_GLOBAL_FLASH_SCREEN == true ]] && [[ $VIBRANIUM_SCREENSHOT_FLASH_SCREEN == true ]]; then
-			log "${YELLOW}\$VIBRANIUM_SCREENSHOT_FLASH_SCREEN${RESET} is ${YELLOW}'true'${RESET}. Applying flash effect"
-			_flash screen
-		fi
+        if [[ $VIBRANIUM_GLOBAL_FLASH_SCREEN == true ]] && [[ $VIBRANIUM_SCREENSHOT_FLASH_SCREEN == true ]]; then
+            log "${YELLOW}\$VIBRANIUM_SCREENSHOT_FLASH_SCREEN${RESET} is ${YELLOW}'true'${RESET}. Applying flash effect"
+            _flash screen
+        fi
         ;;
     *) usage ;;
 esac
@@ -193,5 +193,5 @@ log "Copying to clipboard"
 
 # Copy the image to the Wayland clipboard with the correct MIME type
 if [[ $VIBRANIUM_GLOBAL_COPY_TO_CLIPBOARD == true ]]; then
-    printf "file://%s" "${output_file}"| wl-copy --type text/uri-list
+    printf "file://%s" "${output_file}" | wl-copy --type text/uri-list
 fi

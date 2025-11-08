@@ -35,8 +35,8 @@ show_volume_notification() {
         max_vol_factor=1.0
     fi
 
-	# To display the progress bar, libnotify only accepts values from 0 to 100. If the user has enabled above 100%, 
-	# we need to convert the volume values to a 100% scale in order to display the progress bar correctly.
+    # To display the progress bar, libnotify only accepts values from 0 to 100. If the user has enabled above 100%,
+    # we need to convert the volume values to a 100% scale in order to display the progress bar correctly.
     display_vol=$(awk -v v="$vol" 'BEGIN {printf "%d", v*100}')
     bar_value=$(awk -v v="$vol" -v max="$max_vol_factor" 'BEGIN {printf "%d", (v/max)*100}')
 
@@ -80,11 +80,11 @@ adjust_volume() {
     current_volume=$(wpctl get-volume "$device" | awk '{print $2}')
 
     # Stop if already at limits
-	if [[ "$direction" == "+" ]] && awk "BEGIN {exit !($current_volume >= $max_volume)}"; then
-		exit 0
-	elif [[ "$direction" == "-" ]] && awk "BEGIN {exit !($current_volume <= 0.00)}"; then
-		exit 0
-	fi
+    if [[ "$direction" == "+" ]] && awk "BEGIN {exit !($current_volume >= $max_volume)}"; then
+        exit 0
+    elif [[ "$direction" == "-" ]] && awk "BEGIN {exit !($current_volume <= 0.00)}"; then
+        exit 0
+    fi
 
     if [[ "$VIBRANIUM_VOLUME_USE_VISUAL_FEEDBACK" == true ]]; then
         if should_use_osd; then
@@ -150,7 +150,7 @@ toggle_mute() {
 # Process audio feedback if the user has enabled this option
 feedback() {
     local variant
-	local dir
+    local dir
 
     check_bool VIBRANIUM_VOLUME_USE_AUDIO_FEEDBACK true
     if [ $VIBRANIUM_VOLUME_USE_AUDIO_FEEDBACK = true ]; then
@@ -158,22 +158,22 @@ feedback() {
         variant="$VIBRANIUM_VOLUME_AUDIO_FEEDBACK_VARIANT"
 
         case "$variant" in
-            "variant1"|"variant4") dir="/usr/share/sounds/freedesktop/stereo" ;;
+            "variant1" | "variant4") dir="/usr/share/sounds/freedesktop/stereo" ;;
             "variant2")            dir="/usr/share/sounds/Yaru/stereo"        ;;
-			"variant3")            dir="/usr/share/sounds/Pop/stereo/action"  ;;
+            "variant3")   dir="/usr/share/sounds/Pop/stereo/action"  ;;
         esac
 
-		if [ ! -d "$dir" ]; then
-			error "$dir does not exist! Using the default one!"
-			dir="/usr/share/sounds/freedesktop/stereo"
-			return 0
-		fi
+        if [ ! -d "$dir" ]; then
+            error "$dir does not exist! Using the default one!"
+            dir="/usr/share/sounds/freedesktop/stereo"
+            return 0
+        fi
 
-		if [[ "$variant" == "variant4" ]]; then
-			paplay "${dir}/bell.oga" &
-		else
-			paplay "${dir}/audio-volume-change.oga" &
-		fi
+        if [[ "$variant" == "variant4" ]]; then
+            paplay "${dir}/bell.oga" &
+        else
+            paplay "${dir}/audio-volume-change.oga" &
+        fi
     else
         return 0
     fi

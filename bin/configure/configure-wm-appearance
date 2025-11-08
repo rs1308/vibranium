@@ -8,116 +8,116 @@ SMART_GAPS_CONFIG="$XDG_CONFIG_HOME/hypr/hyprland.conf.d/smart-gaps.conf"
 HYPR_CONFIG="$XDG_CONFIG_HOME/hypr/hyprland.conf.d/look-and-feel.conf"
 
 edit_int() {
-	local name="$1" # prompt
-	local key="$2" # hyprland config key
-	local input prompt
+    local name="$1" # prompt
+    local key="$2" # hyprland config key
+    local input prompt
 
-	while :; do
-		prompt="$name (int)"
-		input="$(printf "%s" "$prompt" | rofi_cmd "$name" "ESC to go back")"
+    while :; do
+        prompt="$name (int)"
+        input="$(printf "%s" "$prompt" | rofi_cmd "$name" "ESC to go back")"
 
-		[[ -z $input ]] && break
-		[[ "$input" == "$prompt" ]] && continue
+        [[ -z $input ]] && break
+        [[ "$input" == "$prompt" ]] && continue
 
-		if [[ ! "$input" =~ ^[0-9]+$ ]]; then
-			notify-send -r 4 -u critical -t 2000 "Vibranium" "Only integers allowed"
-			continue
-		fi
+        if [[ ! "$input" =~ ^[0-9]+$ ]]; then
+            notify-send -r 4 -u critical -t 2000 "Vibranium" "Only integers allowed"
+            continue
+        fi
 
-		vibranium-cmd-edit-wm-config "$key:$input" "$HYPR_CONFIG"
-		break
-	done
+        vibranium-cmd-edit-wm-config "$key:$input" "$HYPR_CONFIG"
+        break
+    done
 }
 
 edit_float() {
-	local name="$1"   # prompt title
-	local key="$2"    # hyprland config key
-	local min="$3"    # min (display only)
-	local max="$4"    # max (display only)
-	local input prompt regex
+    local name="$1" # prompt title
+    local key="$2" # hyprland config key
+    local min="$3" # min (display only)
+    local max="$4" # max (display only)
+    local input prompt regex
 
-	regex='^[0-9]*\.?[0-9]+$'
+    regex='^[0-9]*\.?[0-9]+$'
 
-	while :; do
-		prompt="$name (float)"
-		input="$(printf "%s" "$prompt" | rofi_cmd "$name" "$min - $max")"
+    while :; do
+        prompt="$name (float)"
+        input="$(printf "%s" "$prompt" | rofi_cmd "$name" "$min - $max")"
 
-		[[ -z $input ]] && break
-		[[ "$input" == "$prompt" ]] && continue
+        [[ -z $input ]] && break
+        [[ "$input" == "$prompt" ]] && continue
 
-		# If plain integer and within range, convert to float
-		if [[ $input =~ ^[0-9]+$ ]]; then
-			case "$max" in
-				1.*)
-					[[ $input -ge 0 && $input -le 1 ]] || {
-						notify-send -r 4 -u critical -t 2000 "Vibranium" "Value must be between 0.0 and 1.0"
-						continue
-					}
-					;;
-				2.*)
-					[[ $input -ge 0 && $input -le 2 ]] || {
-						notify-send -r 4 -u critical -t 2000 "Vibranium"  "Value must be between 0.0 and 2.0"
-						continue
-					}
-					;;
-			esac
-			input="${input}.0"
-		fi
+        # If plain integer and within range, convert to float
+        if [[ $input =~ ^[0-9]+$ ]]; then
+            case "$max" in
+                1.*)
+                    [[ $input -ge 0 && $input -le 1 ]] || {
+                        notify-send -r 4 -u critical -t 2000 "Vibranium" "Value must be between 0.0 and 1.0"
+                        continue
+                    }
+                    ;;
+                2.*)
+                    [[ $input -ge 0 && $input -le 2 ]] || {
+                        notify-send -r 4 -u critical -t 2000 "Vibranium" "Value must be between 0.0 and 2.0"
+                        continue
+                    }
+                    ;;
+            esac
+            input="${input}.0"
+        fi
 
-		if [[ ! $input =~ $regex ]]; then
-			notify-send -r 4 -u critical -t 2000 "Vibranium" "Enter a valid float number"
-			continue
-		fi
+        if [[ ! $input =~ $regex ]]; then
+            notify-send -r 4 -u critical -t 2000 "Vibranium" "Enter a valid float number"
+            continue
+        fi
 
-		case "$max" in
-			1.*)
-				[[ $input =~ ^0*(0(\.[0-9]+)?|1(\.0*)?)$ ]] || {
-					notify-send -r 4 -u critical -t 2000 "Vibranium" "Value must be between 0.0 and 1.0"
-					continue
-				}
-				;;
-			2.*)
-				[[ $input =~ ^0*(0(\.[0-9]+)?|1(\.[0-9]+)?|2(\.0*)?)$ ]] || {
-					notify-send -r 4 -u critical -t 2000 "Vibranium" "Value must be between 0.0 and 2.0"
-					continue
-				}
-				;;
-			*)
-				[[ $input =~ ^0*[0-9]+(\.[0-9]+)?$ ]] || {
-					notify-send -r 4 -u critical -t 2000 "Vibranium" "Invalid value"
-					continue
-				}
-				;;
-		esac
+        case "$max" in
+            1.*)
+                [[ $input =~ ^0*(0(\.[0-9]+)?|1(\.0*)?)$ ]] || {
+                    notify-send -r 4 -u critical -t 2000 "Vibranium" "Value must be between 0.0 and 1.0"
+                    continue
+                }
+                ;;
+            2.*)
+                [[ $input =~ ^0*(0(\.[0-9]+)?|1(\.[0-9]+)?|2(\.0*)?)$ ]] || {
+                    notify-send -r 4 -u critical -t 2000 "Vibranium" "Value must be between 0.0 and 2.0"
+                    continue
+                }
+                ;;
+            *)
+                [[ $input =~ ^0*[0-9]+(\.[0-9]+)?$ ]] || {
+                    notify-send -r 4 -u critical -t 2000 "Vibranium" "Invalid value"
+                    continue
+                }
+                ;;
+        esac
 
-		vibranium-cmd-edit-wm-config "$key:$input" "$HYPR_CONFIG"
-		break
-	done
+        vibranium-cmd-edit-wm-config "$key:$input" "$HYPR_CONFIG"
+        break
+    done
 }
 
 set_animations_preset() {
-	local folder target current anim_opts anim_chosen
+    local folder target current anim_opts anim_chosen
 
-	folder="$VIBRANIUM/defaults/hypr/animations"
-	target="$HOME/.config/hypr/hyprland.conf.d/animations.conf"
+    folder="$VIBRANIUM/defaults/hypr/animations"
+    target="$HOME/.config/hypr/hyprland.conf.d/animations.conf"
 
-	mapfile -t anim_opts < <(basename -a "$folder"/*.conf | sed 's/\.conf$//')
+    mapfile -t anim_opts < <(basename -a "$folder"/*.conf | sed 's/\.conf$//')
 
-	if [[ -L "$target" ]]; then
-		current="$(basename "$(readlink "$target")")"
-		current="${current%.conf}"
-	else
-		current=""
-	fi
+    if [[ -L "$target" ]]; then
+        current="$(basename "$(readlink "$target")")"
+        current="${current%.conf}"
+    else
+        current=""
+    fi
 
-	while :; do
-		anim_chosen="$(printf "%s\n" "${anim_opts[@]}" | rofi_cmd "Animations" "ESC to go back")"
-		[[ -z "$anim_chosen" ]] && break
+    while :; do
+        anim_chosen="$(printf "%s\n" "${anim_opts[@]}" | rofi_cmd "Animations" "ESC to go back")"
+        [[ -z "$anim_chosen" ]] && break
 
-		ln -sf "$folder/$anim_chosen.conf" "$target"
-		hyprctl -q reload config-only
-		break
-	done
+        ln -sf "$folder/$anim_chosen.conf" "$target"
+        hyprctl -q reload config-only
+        break
+    done
 }
 
 edit_hypr_bool() {
@@ -132,9 +132,9 @@ edit_hypr_bool() {
 }
 
 while :; do
-	mapfile -t lines < <(
-		hyprctl --batch -j \
-			"getoption decoration:rounding;         \
+    mapfile -t lines < <(
+        hyprctl --batch -j \
+            "getoption decoration:rounding;         \
              getoption animations:enabled;          \
 			 getoption general:gaps_in;             \
 			 getoption general:gaps_out;            \
@@ -143,8 +143,8 @@ while :; do
 			 getoption decoration:dim_inactive;     \
 			 getoption decoration:shadow:enabled;   \
 			 getoption decoration:active_opacity;   \
-			 getoption decoration:inactive_opacity" \
-		| jq -r '
+			 getoption decoration:inactive_opacity" |
+            jq -r '
 		  .option as $o |
 		  if   ($o | test("rounding|border_size")) then
 			.int
@@ -156,156 +156,156 @@ while :; do
 			if .int == 1 then "true" else "false" end
 		  end
 		'
-	)
+    )
 
-		current_smart_gaps=$([ -f "$SMART_GAPS_CONFIG" ] && echo true || echo false)
-		current_roundness="${lines[0]}"
-		current_animations="${lines[1]}"
-		current_gaps_in="${lines[2]}"
-		current_gaps_out="${lines[3]}"
-		current_border_size="${lines[4]}"
-		current_blur="${lines[5]}"
-		current_dim="${lines[6]}"
-		current_shadow="${lines[7]}"
-		current_active_opacity="${lines[8]}"
-		current_inactive_opacity="${lines[9]}"
-		current_animations_preset="$(basename "$(readlink "$HOME/.config/hypr/hyprland.conf.d/animations.conf")")"
-		current_animations_preset="${current_animations_preset%.conf}"
+    current_smart_gaps=$([ -f "$SMART_GAPS_CONFIG" ] && echo true || echo false)
+    current_roundness="${lines[0]}"
+    current_animations="${lines[1]}"
+    current_gaps_in="${lines[2]}"
+    current_gaps_out="${lines[3]}"
+    current_border_size="${lines[4]}"
+    current_blur="${lines[5]}"
+    current_dim="${lines[6]}"
+    current_shadow="${lines[7]}"
+    current_active_opacity="${lines[8]}"
+    current_inactive_opacity="${lines[9]}"
+    current_animations_preset="$(basename "$(readlink "$HOME/.config/hypr/hyprland.conf.d/animations.conf")")"
+    current_animations_preset="${current_animations_preset%.conf}"
 
-	OPTIONS=(
-		"Inactive window opacity : ${current_inactive_opacity}"
-		"Active window opacity   : ${current_active_opacity}"
-		"Dim inactive window     : ${current_dim}"
-		"Drop window shadow      : ${current_shadow}"
-		"Animations enabled      : ${current_animations}"
-		"Animations preset       : ${current_animations_preset}"
-		"Border roundness        : ${current_roundness}px"
-	)
+    OPTIONS=(
+        "Inactive window opacity : ${current_inactive_opacity}"
+        "Active window opacity   : ${current_active_opacity}"
+        "Dim inactive window     : ${current_dim}"
+        "Drop window shadow      : ${current_shadow}"
+        "Animations enabled      : ${current_animations}"
+        "Animations preset       : ${current_animations_preset}"
+        "Border roundness        : ${current_roundness}px"
+    )
 
-	respect="$VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE"
-	if [[ "$respect" = true && "$(vibranium-utils-power-profile-get)" == "power-saver" ]]; then
-		OPTIONS+=("<span alpha='50%'>Blur enabled            : ${current_blur}</span> <span foreground='${P_RED}'>()</span>")
-	else
-		OPTIONS+=("Blur enabled            : ${current_blur}")
-	fi
+    respect="$VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE"
+    if [[ "$respect" = true && "$(vibranium-utils-power-profile-get)" == "power-saver" ]]; then
+        OPTIONS+=("<span alpha='50%'>Blur enabled            : ${current_blur}</span> <span foreground='${P_RED}'>()</span>")
+    else
+        OPTIONS+=("Blur enabled            : ${current_blur}")
+    fi
 
-	OPTIONS+=(
-		"Border size             : ${current_border_size}"
-		"Smart gaps              : ${current_smart_gaps}"
-		"Outer gaps              : ${current_gaps_out}"
-		"Inner gaps              : ${current_gaps_in}"
-	)
+    OPTIONS+=(
+        "Border size             : ${current_border_size}"
+        "Smart gaps              : ${current_smart_gaps}"
+        "Outer gaps              : ${current_gaps_out}"
+        "Inner gaps              : ${current_gaps_in}"
+    )
 
-	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Appearance" "ESC to go back" -selected-row "$INDEX")"
-	[[ -z $CHOSEN ]] && break
+    CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Appearance" "ESC to go back" -selected-row "$INDEX")"
+    [[ -z $CHOSEN ]] && break
 
-	for i in "${!OPTIONS[@]}"; do
+    for i in "${!OPTIONS[@]}"; do
         if [ "${OPTIONS[$i]}" = "$CHOSEN" ]; then
             INDEX="$i"
             break
         fi
     done
 
-	case "$CHOSEN" in
-		"<"*)
-			msg="This option is <span foreground='${P_RED}'><b>locked</b></span> "
-			msg+="because the current <span foreground='${P_ACCENT}'><b>power profile</b></span> "
-			msg+="is <span foreground='${P_GREEN}'><b>powersave</b></span>\n\n"
-			msg+="<b>If you want to ignore this, go to the \n"
-			msg+="<span foreground='${P_YELLOW}'>Vibranium Menu</span> "
-			msg+="<span foreground='${P_ACCENT}'>→</span> "
-			msg+="<span foreground='${P_YELLOW}'>Configure Vibranium</span> "
-			msg+="<span foreground='${P_ACCENT}'>→</span> "
-			msg+="<span foreground='${P_YELLOW}'>General</span> "
-			msg+="<span foreground='${P_ACCENT}'>→</span> "
-			msg+="<span foreground='${P_YELLOW}'>Respect power profile</span></b>"
-			notify-send -r 1 -t 10000 "This option is locked" "$msg"
-			;;
-		"Smart gaps"*)
-			while true; do
-				sg_opts=("Smart gaps : ${current_smart_gaps}" "What is this?")
-				sg_chosen="$(printf "%s\n" "${sg_opts[@]}" | rofi_cmd "Smart gaps" "ESC to go back")"
-				[[ -z "$sg_chosen" ]] && break
+    case "$CHOSEN" in
+        "<"*)
+            msg="This option is <span foreground='${P_RED}'><b>locked</b></span> "
+            msg+="because the current <span foreground='${P_ACCENT}'><b>power profile</b></span> "
+            msg+="is <span foreground='${P_GREEN}'><b>powersave</b></span>\n\n"
+            msg+="<b>If you want to ignore this, go to the \n"
+            msg+="<span foreground='${P_YELLOW}'>Vibranium Menu</span> "
+            msg+="<span foreground='${P_ACCENT}'>→</span> "
+            msg+="<span foreground='${P_YELLOW}'>Configure Vibranium</span> "
+            msg+="<span foreground='${P_ACCENT}'>→</span> "
+            msg+="<span foreground='${P_YELLOW}'>General</span> "
+            msg+="<span foreground='${P_ACCENT}'>→</span> "
+            msg+="<span foreground='${P_YELLOW}'>Respect power profile</span></b>"
+            notify-send -r 1 -t 10000 "This option is locked" "$msg"
+            ;;
+        "Smart gaps"*)
+            while true; do
+                sg_opts=("Smart gaps : ${current_smart_gaps}" "What is this?")
+                sg_chosen="$(printf "%s\n" "${sg_opts[@]}" | rofi_cmd "Smart gaps" "ESC to go back")"
+                [[ -z "$sg_chosen" ]] && break
 
-				case "$sg_chosen" in
-					"Smart gaps"*)
-						vibranium-cmd-toggle-smart-gaps
-						break
-						;;
-					"What is this?")
-						msg="When <span foreground='${P_ACCENT}'><b>only one</b></span> "
-						msg+="tiling window is open on the active workspace, all\n"
-						msg+="<span foreground='${P_YELLOW}'><b>gaps</b></span>, "
-						msg+="<span foreground='${P_YELLOW}'><b>borders</b></span>, "
-						msg+="and <span foreground='${P_YELLOW}'><b>shadows</b></span> "
-						msg+="are <span foreground='${P_RED}'><b>removed</b></span> "
-						msg+="to <span foreground='${P_GREEN}'><b>maximize</b></span> usable screen space"
-						notify-send -r 3 -t 10000 "$sg_chosen" "$msg"
-						;;
-				esac
-			done
-			;;
-		"Inner gaps"*)
-			edit_int "Inner gaps" "general:gaps_in"
-			;;
-		"Outer gaps"*)
-			edit_int "Outer gaps" "general:gaps_out"
-			;;
-		"Border size"*)
-			edit_int "Border size" "general:border_size"
-			;;
-		"Inactive window opacity"*)
+                case "$sg_chosen" in
+                    "Smart gaps"*)
+                        vibranium-cmd-toggle-smart-gaps
+                        break
+                        ;;
+                    "What is this?")
+                        msg="When <span foreground='${P_ACCENT}'><b>only one</b></span> "
+                        msg+="tiling window is open on the active workspace, all\n"
+                        msg+="<span foreground='${P_YELLOW}'><b>gaps</b></span>, "
+                        msg+="<span foreground='${P_YELLOW}'><b>borders</b></span>, "
+                        msg+="and <span foreground='${P_YELLOW}'><b>shadows</b></span> "
+                        msg+="are <span foreground='${P_RED}'><b>removed</b></span> "
+                        msg+="to <span foreground='${P_GREEN}'><b>maximize</b></span> usable screen space"
+                        notify-send -r 3 -t 10000 "$sg_chosen" "$msg"
+                        ;;
+                esac
+            done
+            ;;
+        "Inner gaps"*)
+            edit_int "Inner gaps" "general:gaps_in"
+            ;;
+        "Outer gaps"*)
+            edit_int "Outer gaps" "general:gaps_out"
+            ;;
+        "Border size"*)
+            edit_int "Border size" "general:border_size"
+            ;;
+        "Inactive window opacity"*)
             edit_float "Inactive opacity" "decoration:inactive_opacity" 0.0 1.0
-			;;
-		"Active window opacity"*)
+            ;;
+        "Active window opacity"*)
             edit_float "Active opacity" "decoration:active_opacity" 0.0 1.0
-			;;
-		"Drop window"*)
+            ;;
+        "Drop window"*)
             edit_hypr_bool "$current_shadow" "decoration:shadow:enabled"
-			;;
-		"Dim inactive"*)
+            ;;
+        "Dim inactive"*)
             edit_hypr_bool "$current_dim" "decoration:dim_inactive"
-			;;
-		"Border roundness"*)
-			while :; do
-				prompt="Border rounding (int)"
-				input="$(printf "%s\n" "$prompt" | rofi_cmd "Border rounding" "0-16px")"
+            ;;
+        "Border roundness"*)
+            while :; do
+                prompt="Border rounding (int)"
+                input="$(printf "%s\n" "$prompt" | rofi_cmd "Border rounding" "0-16px")"
 
-				[ -z "$input" ] && break;
+                [ -z "$input" ] && break
 
-				[[ ! "$input" =~ ^[0-9]+$ || "$input" == "$prompt" ]] && continue
+                [[ ! "$input" =~ ^[0-9]+$ || "$input" == "$prompt" ]] && continue
 
-				if (( input < 0 || input > 16 )); then
-					notify-send -r 3 -t 1500 "Vibranium" "<span foreground='${P_RED}'>An integer between 0 and 16!</span>"
-					continue
-				fi
+                if ((input < 0 || input > 16)); then
+                    notify-send -r 3 -t 1500 "Vibranium" "<span foreground='${P_RED}'>An integer between 0 and 16!</span>"
+                    continue
+                fi
 
-				vibranium-cmd-edit-wm-config decoration:rounding:"$input" "$HYPR_CONFIG"
-				sed -i "/border-radius/s/:.*/:\t${input}px;/" \
-					"$XDG_CONFIG_HOME/rofi/config.rasi" \
-					"$XDG_CONFIG_HOME/swayosd/style.css"
-				sed -i "/corner_radius/s/=.*/= ${input}/" "$XDG_CONFIG_HOME/dunst/dunstrc"
-				hyprctl -q reload config-only
-				systemctl --user restart swayosd
-				vibranium-cmd-refresh-dunst
-				break
-			done
-			;;
-		"Animations enabled"*)
-			vibranium-cmd-toggle-animations
-			;;
-		"Animations preset"*)
-			set_animations_preset
-			;;
-		*"Blur enabled"*"()"*)
-			msg="This option is <span foreground='${P_RED}'><b>locked</b></span> "
-			msg+="because the global\noption '<span foreground='${P_YELLOW}'><b>Respect Power Profile</b></span>' "
-			msg+="is '<span foreground='${P_GREEN}'><b>true</b></span>'\n"
-			msg+="and current power profile is '<span foreground='${P_YELLOW}'><b>Powersave</b></span>'"
-			notify-send -r 1 -t 5000 "This option is locked" "$msg"
-			continue
-			;;
-		"Blur enabled"*)
+                vibranium-cmd-edit-wm-config decoration:rounding:"$input" "$HYPR_CONFIG"
+                sed -i "/border-radius/s/:.*/:\t${input}px;/" \
+                    "$XDG_CONFIG_HOME/rofi/config.rasi" \
+                    "$XDG_CONFIG_HOME/swayosd/style.css"
+                sed -i "/corner_radius/s/=.*/= ${input}/" "$XDG_CONFIG_HOME/dunst/dunstrc"
+                hyprctl -q reload config-only
+                systemctl --user restart swayosd
+                vibranium-cmd-refresh-dunst
+                break
+            done
+            ;;
+        "Animations enabled"*)
+            vibranium-cmd-toggle-animations
+            ;;
+        "Animations preset"*)
+            set_animations_preset
+            ;;
+        *"Blur enabled"*"()"*)
+            msg="This option is <span foreground='${P_RED}'><b>locked</b></span> "
+            msg+="because the global\noption '<span foreground='${P_YELLOW}'><b>Respect Power Profile</b></span>' "
+            msg+="is '<span foreground='${P_GREEN}'><b>true</b></span>'\n"
+            msg+="and current power profile is '<span foreground='${P_YELLOW}'><b>Powersave</b></span>'"
+            notify-send -r 1 -t 5000 "This option is locked" "$msg"
+            continue
+            ;;
+        "Blur enabled"*)
             blur_index=0
 
             while :; do
@@ -317,8 +317,8 @@ while :; do
                         getoption decoration:blur:contrast; \
                         getoption decoration:blur:brightness; \
                         getoption decoration:blur:vibrancy; \
-                        getoption decoration:blur:noise" \
-                    | jq -sr '
+                        getoption decoration:blur:noise" |
+                        jq -sr '
                         .[] | .option as $o |
                         if ($o | test("enabled")) then (if .int == 1 then "true" else "false" end)
                         elif ($o | test("passes|size")) then .int
@@ -326,7 +326,7 @@ while :; do
                     '
                 )
 
-                read -r blur_strength blur_radius blur_enabled blur_contrast blur_brightness blur_saturation blur_noise <<<"${blur_opts[*]}"
+                read -r blur_strength blur_radius blur_enabled blur_contrast blur_brightness blur_saturation blur_noise <<< "${blur_opts[*]}"
 
                 blur_labels=("Noise" "Radius" "Strength" "Contrast" "Brightness" "Saturation")
                 blur_values=("$blur_noise" "$blur_radius" "$blur_strength" "$blur_contrast" "$blur_brightness" "$blur_saturation")
@@ -369,6 +369,6 @@ while :; do
                     *"Strength"*)   edit_int   "Blur strength"   "decoration:blur:passes" ;;
                 esac
             done
-	esac
+            ;;
+    esac
 done
-

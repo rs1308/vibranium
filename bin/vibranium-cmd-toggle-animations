@@ -10,9 +10,9 @@ CONF="$XDG_CONFIG_HOME/hypr/hyprland.conf.d/look-and-feel.conf"
 
 # Check if animations {  } exists in config
 if ! grep -qE '^[[:space:]]*animations[[:space:]]*{' "$CONF"; then
-	# If not - get current value via IPC and write into the config file
-	VALUE=$(hyprctl -j getoption animations:enabled | jq -r '.set')
-	printf "\n\nanimations {\n\tenabled = %s\n}" "$VALUE" >> "$CONF"
+    # If not - get current value via IPC and write into the config file
+    VALUE=$(hyprctl -j getoption animations:enabled | jq -r '.set')
+    printf "\n\nanimations {\n\tenabled = %s\n}" "$VALUE" >> "$CONF"
 fi
 
 # Then get the value
@@ -22,11 +22,11 @@ ANIMATIONS_ENABLED="$(sed -n '/animations[[:space:]]*{/,/}/{s/.*enabled[[:space:
 
 # Then toggle
 if [ "$ANIMATIONS_ENABLED" = true ]; then
-	sed -i '/animations[[:space:]]*{/,/}/{s/\(enabled[[:space:]]*=[[:space:]]*\).*/\1false/}' "$CONF"
-	echo "disabled"
+    sed -i '/animations[[:space:]]*{/,/}/{s/\(enabled[[:space:]]*=[[:space:]]*\).*/\1false/}' "$CONF"
+    echo "disabled"
 elif [ "$ANIMATIONS_ENABLED" = false ]; then
-	sed -i '/animations[[:space:]]*{/,/}/{s/\(enabled[[:space:]]*=[[:space:]]*\).*/\1true/}' "$CONF"
-	echo "enabled"
+    sed -i '/animations[[:space:]]*{/,/}/{s/\(enabled[[:space:]]*=[[:space:]]*\).*/\1true/}' "$CONF"
+    echo "enabled"
 fi
 
 hyprctl -q reload config-only &

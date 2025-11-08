@@ -7,14 +7,14 @@
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 
 if ! command -v mpd > /dev/null; then
-	notify-send -r 4 -u critical -t 2000 "Vibranium" "<span foreground='${P_RED}'>MPD is not installed!</span>"
-	error "MPD is not installed!"
+    notify-send -r 4 -u critical -t 2000 "Vibranium" "<span foreground='${P_RED}'>MPD is not installed!</span>"
+    error "MPD is not installed!"
     exit 1
 fi
 
-if ! systemctl --user is-active mpd.socket mpd.service &>/dev/null; then
+if ! systemctl --user is-active mpd.socket mpd.service &> /dev/null; then
     error "MPD systemd service / socket is not enabled! To enable, run ${YELLOW}'systemctl --user enable --now mpd.socket'${RESET}"
-	notify-send -r 4 -u critical -t 1500 "Vibranium" "<span foreground='${P_RED}'>MPD systemd service / socket is not enabled!</span>"
+    notify-send -r 4 -u critical -t 1500 "Vibranium" "<span foreground='${P_RED}'>MPD systemd service / socket is not enabled!</span>"
     exit 1
 fi
 
@@ -31,11 +31,13 @@ fi
 REL="${INPUT#"$MUSIC_DIR"/}"
 
 if ! vibranium-cmd-launch-mpd-client; then
-	notify-send -r 4 -u critical -t 2000 "Vibranium" "<span foreground='${P_RED}'>No MPD players were found</span>"
-	exit 1
+    notify-send -r 4 -u critical -t 2000 "Vibranium" "<span foreground='${P_RED}'>No MPD players were found</span>"
+    exit 1
 fi
 
 # Load selected track and instanly play
-mpc insert "$REL"; mpc next; mpc play
+mpc insert "$REL"
+                   mpc next
+                             mpc play
 
 vibranium-cmd-now-playing

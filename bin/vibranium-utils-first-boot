@@ -3,20 +3,20 @@
 source "$XDG_CONFIG_HOME/vibranium/theme/current/vibranium-lib-theme"
 
 _set_city() {
-	local opt city
+    local opt city
 
-	opt="VIBRANIUM_BAR_WEATHER_MODULE_CITY"
+    opt="VIBRANIUM_BAR_WEATHER_MODULE_CITY"
 
-	# Wait for the internet connection
-	while ! curl -s --max-time 5 -I --fail https://clients3.google.com/generate_204 >/dev/null; do
-		sleep 1
-	done
+    # Wait for the internet connection
+    while ! curl -s --max-time 5 -I --fail https://clients3.google.com/generate_204 > /dev/null; do
+        sleep 1
+    done
 
-	city="$(curl -s --max-time 5 http://ip-api.com/json | jq -r '.city')"
+    city="$(curl -s --max-time 5 http://ip-api.com/json | jq -r '.city')"
 
-	"$VIBRANIUM_PATH"/configure/option-validate "$opt"
-	sed -i "s|^${opt}=.*|${opt}=\"${city}\"|" \
-		"$XDG_CONFIG_HOME/vibranium/settings"
+    "$VIBRANIUM_PATH"/configure/option-validate "$opt"
+    sed -i "s|^${opt}=.*|${opt}=\"${city}\"|" \
+        "$XDG_CONFIG_HOME/vibranium/settings"
 }
 
 msg+="\nPress <span foreground='${P_YELLOW}'><b>SUPER + A</b></span>      to open app launcher\n"

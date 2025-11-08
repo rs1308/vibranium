@@ -14,7 +14,7 @@ YAY_FLAGS=(
     "--answeredit" "N"
     "--removemake"
     "--cleanafter"
-	"--sudoloop"
+    "--sudoloop"
 )
 
 if ! tty -s; then
@@ -23,22 +23,22 @@ if ! tty -s; then
 fi
 
 _operation_canceled() {
-	case "$1" in
-		quit)
-			notify-send -r 1 "Vibranium" "Operation canceled"
-			kill 0
-			;;
-		*)
-			echo -e "${RED}[VIBRANIUM]${RESET} Operation canceled"
-			read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
-			printf '\e[?25h' # show cursor
-			;;
-	esac
-	exit 1
+    case "$1" in
+        quit)
+            notify-send -r 1 "Vibranium" "Operation canceled"
+            kill 0
+            ;;
+        *)
+            echo -e "${RED}[VIBRANIUM]${RESET} Operation canceled"
+            read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
+            printf '\e[?25h' # show cursor
+            ;;
+    esac
+    exit 1
 }
 
 _installation_complete() {
-	echo -e "${GREEN}[VIBRANIUM]${RESET} Installation complete"
+    echo -e "${GREEN}[VIBRANIUM]${RESET} Installation complete"
     read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
     printf '\e[?25h' # show cursor
     exit 0
@@ -72,7 +72,7 @@ fzf_args=(
 if [ $# -gt 0 ]; then
     chosen=()
     for pkg in "$@"; do
-        if ! pacman -Qq "$pkg" &>/dev/null; then
+        if ! pacman -Qq "$pkg" &> /dev/null; then
             chosen+=("$pkg")
         fi
     done
@@ -80,14 +80,14 @@ else
     arch_file=$(mktemp)
     yay_file=$(mktemp)
 
-    (pacman -Slq >"$arch_file") &
+    (pacman -Slq > "$arch_file") &
     spinner $! "${YELLOW}[VIBRANIUM]${RESET} Fetching Arch packages" ""
-    mapfile -t arch_packages <"$arch_file"
+    mapfile -t arch_packages < "$arch_file"
     total_packages=("${arch_packages[@]}")
 
-    (yay -Slqa >"$yay_file") &>/dev/null &
+    (yay -Slqa > "$yay_file") &> /dev/null &
     spinner $! "${YELLOW}[VIBRANIUM]${RESET} Fetching AUR packages" ""
-    mapfile -t aur_packages <"$yay_file"
+    mapfile -t aur_packages < "$yay_file"
     total_packages+=("${aur_packages[@]}")
 
     rm "$arch_file" "$yay_file"
@@ -101,13 +101,13 @@ fi
 
 filtered=()
 for package in "${chosen[@]}"; do
-    if ! pacman -Qq "$package" &>/dev/null; then
+    if ! pacman -Qq "$package" &> /dev/null; then
         filtered+=("$package")
     fi
 done
 
 if [ ${#filtered[@]} -eq 0 ]; then
-	echo -e "${GREEN}[VIBRANIUM]${RESET} Selected packages are already installed"
+    echo -e "${GREEN}[VIBRANIUM]${RESET} Selected packages are already installed"
     read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
     printf '\e[?25h' # show cursor
     exit 0
@@ -116,161 +116,161 @@ fi
 printf '\e[?25l' # Hide cursor
 echo -e "${YELLOW}[VIBRANIUM]${RESET} Validating packages"
 for package in "${filtered[@]}"; do
-	if ! yay -Si "$package" &>/dev/null; then
-		echo -e "${RED}[VIBRANIUM]${RESET} ${package} does not exist!"
-		_operation_canceled ""
-	fi
+    if ! yay -Si "$package" &> /dev/null; then
+        echo -e "${RED}[VIBRANIUM]${RESET} ${package} does not exist!"
+        _operation_canceled ""
+    fi
 done
 
 if [[ ${#chosen[@]} -gt 5 ]]; then
-	output="${YELLOW}[VIBRANIUM]${RESET} You're about to install the following packages:\n"
-	for pkg in "${chosen[@]}"; do
-		output+="      ${YELLOW}[PKG]${GRAY} - ${BLUE}${pkg}${RESET}\n"
-	done
-	printf "%b" "$output"
-	prompt=$'\e[0;33m[VIBRANIUM]\e[0m Proceed? (Y/n): '
+    output="${YELLOW}[VIBRANIUM]${RESET} You're about to install the following packages:\n"
+    for pkg in "${chosen[@]}"; do
+        output+="      ${YELLOW}[PKG]${GRAY} - ${BLUE}${pkg}${RESET}\n"
+    done
+    printf "%b" "$output"
+    prompt=$'\e[0;33m[VIBRANIUM]\e[0m Proceed? (Y/n): '
 else
-	prompt=$'\e[0;33m[VIBRANIUM]\e[0m You are about to install the following packages: \e[0;33m'"${chosen[*]}"$'\e[0m. Proceed? (Y/n): '
+    prompt=$'\e[0;33m[VIBRANIUM]\e[0m You are about to install the following packages: \e[0;33m'"${chosen[*]}"$'\e[0m. Proceed? (Y/n): '
 fi
 
 while :; do
-	printf '\e[?25h' # show cursor
+    printf '\e[?25h' # show cursor
     printf "%s" "$prompt"
     read -r answer
     case "$answer" in
-    [Yy][Ee][Ss] | [Yy] | "")
-        if ! sudo -v; then
-            _operation_canceled ""
-        fi
+        [Yy][Ee][Ss] | [Yy] | "")
+            if ! sudo -v; then
+                _operation_canceled ""
+            fi
 
-		yay -S "${YAY_FLAGS[@]}" "${filtered[@]}"
+            yay -S "${YAY_FLAGS[@]}" "${filtered[@]}"
 
-        services=()
-        provides_systemd_service=()
-        user_units=()
-        unit_types=()
+            services=()
+            provides_systemd_service=()
+            user_units=()
+            unit_types=()
 
-        for pkg in "${filtered[@]}"; do
-            units=$(pacman -Ql "$pkg" | awk '/\/systemd\/.*\.(service|socket)$/ && $2 !~ /@/ {print $2}')
-            [[ -z $units ]] && continue
+            for pkg in "${filtered[@]}"; do
+                units=$(pacman -Ql "$pkg" | awk '/\/systemd\/.*\.(service|socket)$/ && $2 !~ /@/ {print $2}')
+                [[ -z $units ]] && continue
 
-            user_socket=
-			user_service=
-            sys_socket=
-			sys_service=
+                user_socket=
+                user_service=
+                sys_socket=
+                sys_service=
 
-            while read -r unit; do
-                case "$unit" in
-                */systemd/user/*.socket)
-                    user_socket="$unit"
-                    ;;
-                */systemd/user/*.service)
-                    [[ -z $user_service ]] && user_service="$unit"
-                    ;;
-                */systemd/system/*.socket)
-                    sys_socket="$unit"
-                    ;;
-                */systemd/system/*.service)
-                    [[ -z $sys_service ]] && sys_service="$unit"
-                    ;;
+                while read -r unit; do
+                    case "$unit" in
+                        */systemd/user/*.socket)
+                            user_socket="$unit"
+                            ;;
+                        */systemd/user/*.service)
+                            [[ -z $user_service ]] && user_service="$unit"
+                            ;;
+                        */systemd/system/*.socket)
+                            sys_socket="$unit"
+                            ;;
+                        */systemd/system/*.service)
+                            [[ -z $sys_service ]] && sys_service="$unit"
+                            ;;
+                    esac
+                done <<< "$units"
+
+                if [[ -n $user_socket ]]; then
+                    provides_systemd_service+=("$pkg")
+                    user_units+=("$(basename "$user_socket")")
+                    unit_types+=("socket")
+                    unit_scope+=("user")
+                    continue
+                elif [[ -n $user_service ]]; then
+                    provides_systemd_service+=("$pkg")
+                    user_units+=("$(basename "$user_service")")
+                    unit_types+=("service")
+                    unit_scope+=("user")
+                    continue
+                fi
+
+                if [[ -n $sys_socket ]]; then
+                    provides_systemd_service+=("$pkg")
+                    services+=("$(basename "$sys_socket")")
+                    unit_types+=("socket")
+                    unit_scope+=("system")
+                    continue
+                elif [[ -n $sys_service ]]; then
+                    provides_systemd_service+=("$pkg")
+                    services+=("$(basename "$sys_service")")
+                    unit_types+=("service")
+                    unit_scope+=("system")
+                fi
+            done
+
+            if [[ ${#provides_systemd_service[@]} -eq 0 ]]; then
+                _installation_complete
+            fi
+
+            has_socket=false
+            has_service=false
+            for type in "${unit_types[@]}"; do
+                [[ $type == "socket" ]] && has_socket=true
+                [[ $type == "service" ]] && has_service=true
+            done
+
+            if $has_socket && $has_service; then
+                unit_label="systemd ${YELLOW}services${RESET} and ${YELLOW}sockets${RESET}"
+            elif $has_socket; then
+                unit_label="systemd ${YELLOW}sockets${RESET}"
+            else
+                unit_label="systemd ${YELLOW}services${RESET}"
+            fi
+
+            echo -e "${YELLOW}[VIBRANIUM]${RESET} The following packages provide ${unit_label}:"
+            for i in "${!provides_systemd_service[@]}"; do
+                pkg="${provides_systemd_service[$i]}"
+                type="${unit_types[$i]}"
+                scope="${unit_scope[$i]}"
+
+                echo -e " - ${YELLOW}$pkg${RESET} (${scope} ${type})"
+            done
+
+            prompt2=$'\e[0;33m[VIBRANIUM]\e[0m Do you wish to enable and start them now? (Y/n): '
+            while :; do
+                printf '\e[?25h' # show cursor
+                printf "%s" "$prompt2"
+                read -r answer
+                case "$answer" in
+                    [Yy][Ee][Ss] | [Yy] | "")
+                        printf '\e[?25l' # Hide cursor
+                        if [[ ${#user_units[@]} -gt 0 ]]; then
+                            echo -e "${GREEN}[VIBRANIUM]${RESET} Enabled ${YELLOW}${user_units[*]}${RESET}"
+                            systemctl -q --user --now enable "${user_units[@]}" &
+                        fi
+
+                        if [[ ${#services[@]} -gt 0 ]]; then
+                            # Since we're already in a terminal window
+                            # there is no point of using polkit window,
+                            # so use sudo
+                            echo -e "${GREEN}[VIBRANIUM]${RESET} Enabled ${YELLOW}${services[*]}${RESET}"
+                            sudo systemctl -q enable --now "${services[@]}" &
+                        fi
+                        break
+                        ;;
+                    [Nn][Oo] | [Nn])
+                        printf '\e[?25l' # Hide cursor
+                        break
+                        ;;
+                    *)              # Wrong input
+                        printf '\e[A\r\e[K' # Go up, to start, clear line
+                        ;;
                 esac
-            done <<<"$units"
+            done
 
-            if [[ -n $user_socket ]]; then
-                provides_systemd_service+=("$pkg")
-                user_units+=("$(basename "$user_socket")")
-                unit_types+=("socket")
-                unit_scope+=("user")
-                continue
-            elif [[ -n $user_service ]]; then
-                provides_systemd_service+=("$pkg")
-                user_units+=("$(basename "$user_service")")
-                unit_types+=("service")
-                unit_scope+=("user")
-                continue
-            fi
-
-            if [[ -n $sys_socket ]]; then
-                provides_systemd_service+=("$pkg")
-                services+=("$(basename "$sys_socket")")
-                unit_types+=("socket")
-                unit_scope+=("system")
-                continue
-            elif [[ -n $sys_service ]]; then
-                provides_systemd_service+=("$pkg")
-                services+=("$(basename "$sys_service")")
-                unit_types+=("service")
-                unit_scope+=("system")
-            fi
-        done
-
-        if [[ ${#provides_systemd_service[@]} -eq 0 ]]; then
-			_installation_complete
-        fi
-
-        has_socket=false
-        has_service=false
-        for type in "${unit_types[@]}"; do
-            [[ $type == "socket" ]] && has_socket=true
-            [[ $type == "service" ]] && has_service=true
-        done
-
-        if $has_socket && $has_service; then
-            unit_label="systemd ${YELLOW}services${RESET} and ${YELLOW}sockets${RESET}"
-        elif $has_socket; then
-            unit_label="systemd ${YELLOW}sockets${RESET}"
-        else
-            unit_label="systemd ${YELLOW}services${RESET}"
-        fi
-
-		echo -e "${YELLOW}[VIBRANIUM]${RESET} The following packages provide ${unit_label}:"
-        for i in "${!provides_systemd_service[@]}"; do
-            pkg="${provides_systemd_service[$i]}"
-            type="${unit_types[$i]}"
-            scope="${unit_scope[$i]}"
-
-            echo -e " - ${YELLOW}$pkg${RESET} (${scope} ${type})"
-        done
-
-        prompt2=$'\e[0;33m[VIBRANIUM]\e[0m Do you wish to enable and start them now? (Y/n): '
-        while :; do
-            printf '\e[?25h' # show cursor
-            printf "%s" "$prompt2"
-            read -r answer
-            case "$answer" in
-            [Yy][Ee][Ss] | [Yy] | "")
-                printf '\e[?25l' # Hide cursor
-                if [[ ${#user_units[@]} -gt 0 ]]; then
-					echo -e "${GREEN}[VIBRANIUM]${RESET} Enabled ${YELLOW}${user_units[*]}${RESET}"
-                    systemctl -q --user --now enable "${user_units[@]}" &
-                fi
-
-                if [[ ${#services[@]} -gt 0 ]]; then
-                    # Since we're already in a terminal window
-                    # there is no point of using polkit window,
-                    # so use sudo
-					echo -e "${GREEN}[VIBRANIUM]${RESET} Enabled ${YELLOW}${services[*]}${RESET}"
-                    sudo systemctl -q enable --now "${services[@]}" &
-                fi
-                break
-                ;;
-            [Nn][Oo] | [Nn])
-                printf '\e[?25l' # Hide cursor
-                break
-                ;;
-            *)                      # Wrong input
-                printf '\e[A\r\e[K' # Go up, to start, clear line
-                ;;
-            esac
-        done
-
-        _installation_complete
-        ;;
-    [Nn][Oo] | [Nn])
-        _operation_canceled ""
-        ;;
-    *)                      # Wrong input
-        printf '\e[A\r\e[K' # Go up, to start, clear line
-        ;;
+            _installation_complete
+            ;;
+        [Nn][Oo] | [Nn])
+            _operation_canceled ""
+            ;;
+        *)                  # Wrong input
+            printf '\e[A\r\e[K' # Go up, to start, clear line
+            ;;
     esac
 done

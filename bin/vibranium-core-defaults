@@ -1,6 +1,6 @@
 # vim:ft=bash
 # shellcheck disable=all
-# 
+#
 #           VIBRANIUM GLOBAL OPTIONS           #
 # ============================================ #
 #                                              #
@@ -164,7 +164,7 @@ VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_BACKGROUND=false
 # Default is 'mid'
 VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_STRENGTH="mid"
 
-# How much to dim the lockscreen background when VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_BACKGROUND is false. 
+# How much to dim the lockscreen background when VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_BACKGROUND is false.
 # Available options: string 'low' 'mid' 'hard'
 #
 # Default is 'hard'
@@ -232,7 +232,6 @@ VIBRANIUM_VOLUME_ADJUSTMENT_STEP=5
 #
 # Default is false
 VIBRANIUM_VOLUME_ALLOW_ABOVE_HUNDRED=false
-
 
 #      VIBRANIUM MEDIA DOWNLOADER OPTIONS      #
 # ============================================ #
@@ -651,7 +650,7 @@ VIBRANIUM_RECORDING_FLASH_SCREEN=true
 # If this file does not exist, $HOME is used.
 VIBRANIUM_RECORDING_OUTPUT_DIR=""
 
-# 
+#
 #                PLAYER OPTIONS                #
 # ============================================ #
 #                                              #

@@ -4,41 +4,42 @@
 
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 
-export SUDO_PROMPT; SUDO_PROMPT="$(printf '%s[VIBRANIUM]%s Password for %s: ' "$RED" "$RESET" "$USER")"
+export SUDO_PROMPT
+                    SUDO_PROMPT="$(printf '%s[VIBRANIUM]%s Password for %s: ' "$RED" "$RESET" "$USER")"
 
 if ! tty -s; then
-	exec setsid vibranium-cmd-launch-terminal "$0" "$@"
-	exit 0
+    exec setsid vibranium-cmd-launch-terminal "$0" "$@"
+    exit 0
 fi
 
 printf "\n\e[33m%s\e[0m\n\n" "$(cat "$VIBRANIUM/logo.txt")"
 
 if ! sudo -v; then
-	echo -e "${RED}[VIBRANIUM]${RESET} Operation aborted"
-	exit 1
+    echo -e "${RED}[VIBRANIUM]${RESET} Operation aborted"
+    exit 1
 fi
 
 # Hide cursor
 printf '\e[?25l'
 
-yay -Sy &>/dev/null &
+yay -Sy &> /dev/null &
 spinner "$!" "${YELLOW}[VIBRANIUM]${RESET} Refreshing repositories" ""
 
 mapfile -t pkg_list < <(yay -Qqu)
 
 if [[ -z "${pkg_list[*]}" ]]; then
-	echo -e "${GREEN}[VIBRANIUM]${RESET} You are up to date "
-	read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
-	exit 0
+    echo -e "${GREEN}[VIBRANIUM]${RESET} You are up to date "
+    read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
+    exit 0
 fi
 
 echo -e "${YELLOW}[VIBRANIUM]${RESET} ${#pkg_list[@]} packages are awaiting updates"
 echo -e "${YELLOW}[VIBRANIUM]${RESET} Starting system update..."
 
 if ! yay --noconfirm --sudoloop; then
-	echo -e "${RED}[VIBRANIUM]${RESET} Something went wrong"
-	read -n1 -r -p $'\e[0;31m[VIBRANIUM]\e[0m Press any key to close this window' dummy
-	exit 1
+    echo -e "${RED}[VIBRANIUM]${RESET} Something went wrong"
+    read -n1 -r -p $'\e[0;31m[VIBRANIUM]\e[0m Press any key to close this window' dummy
+    exit 1
 fi
 
 vibranium-cmd-refresh-waybar-module pacman
@@ -53,17 +54,17 @@ for pkg in "${pkg_list[@]}"; do
         while :; do
             printf "%s\e[?25h" "$prompt"
             read -r answer
-			printf '\e[?25l'
+            printf '\e[?25l'
             case "$answer" in
-                [Yy][Ee][Ss]|[Yy]|"")
-					printf '\e[?25l'
-					for i in {3..1}; do
-						printf "\r\033[K%s[VIBRANIUM]%s Restarting in %d..." "$YELLOW" "$RESET" "$i"
-						sleep 1
-					done
-					systemctl reboot
+                [Yy][Ee][Ss] | [Yy] | "")
+                    printf '\e[?25l'
+                    for i in {3..1}; do
+                        printf "\r\033[K%s[VIBRANIUM]%s Restarting in %d..." "$YELLOW" "$RESET" "$i"
+                        sleep 1
+                    done
+                    systemctl reboot
                     ;;
-                [Nn][Oo]|[Nn])
+                [Nn][Oo] | [Nn])
                     break
                     ;;
                 *)

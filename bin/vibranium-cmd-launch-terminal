@@ -8,17 +8,17 @@ source "$VIBRANIUM_PATH/vibranium-core-defaults"
 args=()
 
 case "$VIBRANIUM_DEFAULT_TERMINAL" in
-	"alacritty")
-		# If at least one active Alacritty window already exists, 
-		# send an IPC signal to create a new window in the same process to save RAM.
-		if pidof alacritty >/dev/null; then
-			args+=(msg create-window)
-		fi
+    "alacritty")
+        # If at least one active Alacritty window already exists,
+        # send an IPC signal to create a new window in the same process to save RAM.
+        if pidof alacritty > /dev/null; then
+            args+=(msg create-window)
+        fi
 
-		if command -v "$1" >/dev/null; then
-			args+=(-e)
-		fi
-		;;
+        if command -v "$1" > /dev/null; then
+            args+=(-e)
+        fi
+        ;;
 esac
 
 exec setsid uwsm app -- "$VIBRANIUM_DEFAULT_TERMINAL" "${args[@]}" "$@"

@@ -6,72 +6,71 @@ source "$VIBRANIUM_PATH/configure/configure-lib"
 WAYBAR_CFG="$XDG_CONFIG_HOME/waybar/config.jsonc"
 
 check_module() {
-	local module="$1"
-	if grep -Eq "^\s*//.*\"$module\"" "$WAYBAR_CFG"; then
-		return 0  # commented out - module disabled
-	else
-		return 1
-	fi
+    local module="$1"
+    if grep -Eq "^\s*//.*\"$module\"" "$WAYBAR_CFG"; then
+        return 0 # commented out - module disabled
+    else
+        return 1
+    fi
 }
 
 toggle_module() {
-	local module="$1"
-	if check_module "$module"; then
-		sed -i "s|^\(\s*\)//\s*\(.*\"$module\".*\)|\1\2|" "$WAYBAR_CFG"
-	else
-		sed -i "s|^\(\s*\)\(\".*$module\".*\)|\1// \2|" "$WAYBAR_CFG"
-	fi
-	systemctl --user restart waybar
+    local module="$1"
+    if check_module "$module"; then
+        sed -i "s|^\(\s*\)//\s*\(.*\"$module\".*\)|\1\2|" "$WAYBAR_CFG"
+    else
+        sed -i "s|^\(\s*\)\(\".*$module\".*\)|\1// \2|" "$WAYBAR_CFG"
+    fi
+    systemctl --user restart waybar
 }
-
 
 INDEX=0
 
 while :; do
-	source "$VIBRANIUM_USER_SETTINGS"
+    source "$VIBRANIUM_USER_SETTINGS"
 
-	if check_module 'hyprland/language'; then
-		KEYBOARD_LAYOUT_STATUS="false"
-	else
-		KEYBOARD_LAYOUT_STATUS="true"
-	fi
+    if check_module 'hyprland/language'; then
+        KEYBOARD_LAYOUT_STATUS="false"
+    else
+        KEYBOARD_LAYOUT_STATUS="true"
+    fi
 
-	if check_module 'network'; then
-		NETWORK_ENABLED="false"
-	else
-		NETWORK_ENABLED="true"
-	fi
+    if check_module 'network'; then
+        NETWORK_ENABLED="false"
+    else
+        NETWORK_ENABLED="true"
+    fi
 
-	if check_module 'pulseaudio#microphone'; then
-		MICROPHONE_ENABLED="false"
-	else
-		MICROPHONE_ENABLED="true"
-	fi
+    if check_module 'pulseaudio#microphone'; then
+        MICROPHONE_ENABLED="false"
+    else
+        MICROPHONE_ENABLED="true"
+    fi
 
-	if check_module 'pulseaudio#volume'; then
-		VOLUME_ENABLED="false"
-	else
-		VOLUME_ENABLED="true"
-	fi
+    if check_module 'pulseaudio#volume'; then
+        VOLUME_ENABLED="false"
+    else
+        VOLUME_ENABLED="true"
+    fi
 
-	if check_module 'bluetooth'; then
-		BLUETOOTH_ENABLED="false"
-	else
-		BLUETOOTH_ENABLED="true"
-	fi
+    if check_module 'bluetooth'; then
+        BLUETOOTH_ENABLED="false"
+    else
+        BLUETOOTH_ENABLED="true"
+    fi
 
-	OPTIONS=(
-		"Keyboard layout : $KEYBOARD_LAYOUT_STATUS"
-		"Power profile   : $VIBRANIUM_BAR_POWER_PROFILE_MODULE_ENABLE"
-		"Color picker    : $VIBRANIUM_BAR_COLOR_PICKER_MODULE_ENABLE"
-		"Brightness      : $VIBRANIUM_BAR_BRIGHTNESS_MODULE_ENABLE"
-		"Microphone      : $MICROPHONE_ENABLED"
-		"Bluetooth       : $BLUETOOTH_ENABLED"
-		"Weather         : $VIBRANIUM_BAR_WEATHER_MODULE_ENABLE"
-		"Network         : $NETWORK_ENABLED"
-		"Pacman          : $VIBRANIUM_BAR_PACMAN_MODULE_ENABLE"
-		"Volume          : $VOLUME_ENABLED"
-	)
+    OPTIONS=(
+        "Keyboard layout : $KEYBOARD_LAYOUT_STATUS"
+        "Power profile   : $VIBRANIUM_BAR_POWER_PROFILE_MODULE_ENABLE"
+        "Color picker    : $VIBRANIUM_BAR_COLOR_PICKER_MODULE_ENABLE"
+        "Brightness      : $VIBRANIUM_BAR_BRIGHTNESS_MODULE_ENABLE"
+        "Microphone      : $MICROPHONE_ENABLED"
+        "Bluetooth       : $BLUETOOTH_ENABLED"
+        "Weather         : $VIBRANIUM_BAR_WEATHER_MODULE_ENABLE"
+        "Network         : $NETWORK_ENABLED"
+        "Pacman          : $VIBRANIUM_BAR_PACMAN_MODULE_ENABLE"
+        "Volume          : $VOLUME_ENABLED"
+    )
 
     CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Toggle modules" "ESC to go back" -selected-row "$INDEX")"
     [ -z "$CHOSEN" ] && break
@@ -84,53 +83,52 @@ while :; do
     done
 
     case "$CHOSEN" in
-		"Bluetooth"*)
-			toggle_module 'bluetooth'
-			;;
-		"Network"*)
-			toggle_module 'network'
-			;;
-		"Microphone"*)
-			toggle_module 'pulseaudio#microphone'
-			;;
-		"Volume"*)
-			toggle_module 'pulseaudio#volume'
-			;;
-		"Keyboard layout"*)
-			toggle_module 'hyprland/language'
-			;;
+        "Bluetooth"*)
+            toggle_module 'bluetooth'
+            ;;
+        "Network"*)
+            toggle_module 'network'
+            ;;
+        "Microphone"*)
+            toggle_module 'pulseaudio#microphone'
+            ;;
+        "Volume"*)
+            toggle_module 'pulseaudio#volume'
+            ;;
+        "Keyboard layout"*)
+            toggle_module 'hyprland/language'
+            ;;
         "Color picker"*)
-			toggle_bool "VIBRANIUM_BAR_COLOR_PICKER_MODULE_ENABLE"
-			vibranium-cmd-refresh-waybar-module color-picker
-		;;
+            toggle_bool "VIBRANIUM_BAR_COLOR_PICKER_MODULE_ENABLE"
+            vibranium-cmd-refresh-waybar-module color-picker
+            ;;
         "Brightness"*)
-			toggle_bool "VIBRANIUM_BAR_BRIGHTNESS_MODULE_ENABLE"
-			vibranium-cmd-refresh-waybar-module brightness
-			;;
+            toggle_bool "VIBRANIUM_BAR_BRIGHTNESS_MODULE_ENABLE"
+            vibranium-cmd-refresh-waybar-module brightness
+            ;;
         "Power profile"*)
-			toggle_bool "VIBRANIUM_BAR_POWER_PROFILE_MODULE_ENABLE"
-			vibranium-cmd-refresh-waybar-module power-profile
-			if [ "$(vibranium-cmd-get-option VIBRANIUM_BAR_POWER_PROFILE_MODULE_ENABLE)" = "true" ] && [ "$(vibranium-utils-power-profile-get)" = "balanced" ]; then
-				# • Don't be confused! The module you just enabled is active, actually.
-				#
-				#   It isn’t shown in the bar because you’re on the "balanced" power profile,
-				#   which is the default one and doesn’t need to be displayed.
-				#
-				# • Try switching your power profile to see it in action.
-				msg="\n<span foreground='${P_GREEN}'><b>•</b></span> <span foreground='${P_PURPLE}'><b>Don't be confused! The module you just enabled is active, actually</b></span>\n\n"
-				msg+="It isn’t shown in the bar because you’re on the '<span foreground='${P_YELLOW}'><b>balanced</b></span>' power\nprofile, which is the default one and doesn’t need to be displayed.\n"
-				msg+="\n<span foreground='${P_GREEN}'><b>•</b></span> <span foreground='${P_YELLOW}'><b>Try switching your power profile to see it in action</b></span>"
-				notify-send -r 1 -t 18000 "Vibranium" "$msg"
-			fi
-			;;
+            toggle_bool "VIBRANIUM_BAR_POWER_PROFILE_MODULE_ENABLE"
+            vibranium-cmd-refresh-waybar-module power-profile
+            if [ "$(vibranium-cmd-get-option VIBRANIUM_BAR_POWER_PROFILE_MODULE_ENABLE)" = "true" ] && [ "$(vibranium-utils-power-profile-get)" = "balanced" ]; then
+                # • Don't be confused! The module you just enabled is active, actually.
+                #
+                #   It isn’t shown in the bar because you’re on the "balanced" power profile,
+                #   which is the default one and doesn’t need to be displayed.
+                #
+                # • Try switching your power profile to see it in action.
+                msg="\n<span foreground='${P_GREEN}'><b>•</b></span> <span foreground='${P_PURPLE}'><b>Don't be confused! The module you just enabled is active, actually</b></span>\n\n"
+                msg+="It isn’t shown in the bar because you’re on the '<span foreground='${P_YELLOW}'><b>balanced</b></span>' power\nprofile, which is the default one and doesn’t need to be displayed.\n"
+                msg+="\n<span foreground='${P_GREEN}'><b>•</b></span> <span foreground='${P_YELLOW}'><b>Try switching your power profile to see it in action</b></span>"
+                notify-send -r 1 -t 18000 "Vibranium" "$msg"
+            fi
+            ;;
         "Pacman"*)
-			toggle_bool "VIBRANIUM_BAR_PACMAN_MODULE_ENABLE"
-			vibranium-cmd-refresh-waybar-module pacman
-			;;
+            toggle_bool "VIBRANIUM_BAR_PACMAN_MODULE_ENABLE"
+            vibranium-cmd-refresh-waybar-module pacman
+            ;;
         "Weather"*)
-			toggle_bool "VIBRANIUM_BAR_WEATHER_MODULE_ENABLE"
-			vibranium-cmd-refresh-waybar-module weather
-			;;
+            toggle_bool "VIBRANIUM_BAR_WEATHER_MODULE_ENABLE"
+            vibranium-cmd-refresh-waybar-module weather
+            ;;
     esac
 done
-

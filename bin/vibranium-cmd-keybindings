@@ -97,9 +97,9 @@ parse_bindings() {
 }
 
 by_index() {
-	local desc="$1"
-	hyprctl -j binds |
-	jq -r --arg d "$desc" '
+    local desc="$1"
+    hyprctl -j binds |
+        jq -r --arg d "$desc" '
 	  def modmap(x):
 		if x == 0 then ""
 		elif x == 1 then "SHIFT"
@@ -131,19 +131,19 @@ by_index() {
 }
 
 case "$1" in
-	"--list"|"-l")
-		dynamic_bindings | sort -u | parse_bindings
-		;;
-	"--index"|"-i")
-		if [[ -z "$2" ]]; then
-			echo "--index requires an argument"
-			exit 1
-		fi
-		by_index "$2"
-		;;
-	*)
-		dynamic_bindings | sort -u | parse_bindings | rofi_cmd \
-			"Keybindings" "search shortcuts" -no-auto-select \
-			-theme-str 'listview{lines: 30;}'
-		;;
+    "--list" | "-l")
+        dynamic_bindings | sort -u | parse_bindings
+        ;;
+    "--index" | "-i")
+        if [[ -z "$2" ]]; then
+            echo "--index requires an argument"
+            exit 1
+        fi
+        by_index "$2"
+        ;;
+    *)
+        dynamic_bindings | sort -u | parse_bindings | rofi_cmd \
+            "Keybindings" "search shortcuts" -no-auto-select \
+            -theme-str 'listview{lines: 30;}'
+        ;;
 esac

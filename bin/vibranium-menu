@@ -3,15 +3,15 @@
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 
 OPTIONS=(
-	"Package Management"
-	"Vibranium Settings"
-	"Utilities" "Help"
+    "Package Management"
+    "Vibranium Settings"
+    "Utilities" "Help"
 )
 
 INDEX=0
 
 while :; do
-	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Vibranium" "ESC to exit" -selected-row "$INDEX")"
+    CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Vibranium" "ESC to exit" -selected-row "$INDEX")"
     [ -z "$CHOSEN" ] && break
 
     for i in "${!OPTIONS[@]}"; do
@@ -23,11 +23,11 @@ while :; do
 
     case "$CHOSEN" in
         "Vibranium Settings")
-			"$VIBRANIUM_PATH/configure/vibranium-main-menu"
+            "$VIBRANIUM_PATH/configure/vibranium-main-menu"
             ;;
-		"Help")
-			vibranium-menu-help
-			;;
+        "Help")
+            vibranium-menu-help
+            ;;
         "Package Management")
             vibranium-menu-package-management
             ;;

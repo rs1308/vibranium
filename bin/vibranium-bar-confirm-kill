@@ -5,7 +5,7 @@ ICON="\\udb84\\udf98"
 TOOLTIP="Repeat shortcut to confirm kill"
 
 if [[ -f "$STATE_FILE" ]]; then
-	printf '{"text": "%s", "tooltip": "%s"}' "$ICON" "$TOOLTIP"
+    printf '{"text": "%s", "tooltip": "%s"}' "$ICON" "$TOOLTIP"
 else
-	printf '{"text": ""}'
+    printf '{"text": ""}'
 fi

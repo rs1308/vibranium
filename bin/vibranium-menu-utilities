@@ -5,85 +5,85 @@ source "$VIBRANIUM_PATH/vibranium-core-lib"
 ACTIONS=()
 
 if systemd-inhibit | grep "Prevent system suspend is active" > /dev/null; then
-	ACTIONS+=("Allow sleep")
+    ACTIONS+=("Allow sleep")
 else
-	ACTIONS+=("Block sleep")
+    ACTIONS+=("Block sleep")
 fi
 
 ACTIONS+=("Apply tweaks" "Video downscaler")
 
-if command -v syncthing >/dev/null; then
-	if [[ "$(systemctl --user is-active syncthing)" == "active" ]]; then
-		ACTIONS+=("Launch Syncthing")
-	fi
+if command -v syncthing > /dev/null; then
+    if [[ "$(systemctl --user is-active syncthing)" == "active" ]]; then
+        ACTIONS+=("Launch Syncthing")
+    fi
 fi
 
-if command -v pass >/dev/null; then
-	ACTIONS+=("Password manager")
+if command -v pass > /dev/null; then
+    ACTIONS+=("Password manager")
 fi
 
 ACTIONS+=("Reload Vibranium")
 
 read -r PID NAME <<< "$(hyprctl -j activewindow | jq -r '[.pid,.initialTitle]|@tsv')"
 if [[ -n "$PID" && -r "/proc/$PID/stat" ]]; then
-	read -r _ _ state _ < "/proc/$PID/stat"
-	if [[ $state != T ]]; then
-		ACTIONS+=("Freeze <span foreground='${P_YELLOW}'><b>${NAME}</b></span>")
-	elif [[ -n "$NAME" ]]; then
-		ACTIONS+=("Unfreeze <span foreground='${P_YELLOW}'><b>${NAME}</b></span>")
-	fi
+    read -r _ _ state _ < "/proc/$PID/stat"
+    if [[ $state != T ]]; then
+        ACTIONS+=("Freeze <span foreground='${P_YELLOW}'><b>${NAME}</b></span>")
+    elif [[ -n "$NAME" ]]; then
+        ACTIONS+=("Unfreeze <span foreground='${P_YELLOW}'><b>${NAME}</b></span>")
+    fi
 fi
 
 while :; do
     CHOSEN="$(printf "%s\n" "${ACTIONS[@]}" | rofi_cmd "Utilities" "ESC to go back")"
 
     case "$CHOSEN" in
-		"Launch <b>Syncthing</b>")
-			syncthing browser
-			# In case if it was launched from
-			# the main menu, not the CTRL-ALT-U shortcut
-			vibranium-cmd-kill-rofi
-			exit 0
-			;;
-		"Apply tweaks")
-			while :; do
-				tweaks_opts=("System" "Apps")
-				tweaks_chosen="$(printf "%s\n" "${tweaks_opts[@]}" | rofi_cmd "Tweaks" "ESC to go back")"
-				[[ -z $tweaks_chosen ]] && break
-				
-				case "$tweaks_chosen" in
-					"Apps")
-						vibranium-menu-tweaks
-						;;
-					"System")
-						vibranium-menu-tweaks-system
-						;;
-				esac
-			done
-			;;
-		"Reload Vibranium")
-			vibranium-utils-reload
-			vibranium-cmd-kill-rofi
-			exit 0
-			;;
+        "Launch <b>Syncthing</b>")
+            syncthing browser
+            # In case if it was launched from
+            # the main menu, not the CTRL-ALT-U shortcut
+            vibranium-cmd-kill-rofi
+            exit 0
+            ;;
+        "Apply tweaks")
+            while :; do
+                tweaks_opts=("System" "Apps")
+                tweaks_chosen="$(printf "%s\n" "${tweaks_opts[@]}" | rofi_cmd "Tweaks" "ESC to go back")"
+                [[ -z $tweaks_chosen ]] && break
+
+                case "$tweaks_chosen" in
+                    "Apps")
+                        vibranium-menu-tweaks
+                        ;;
+                    "System")
+                        vibranium-menu-tweaks-system
+                        ;;
+                esac
+            done
+            ;;
+        "Reload Vibranium")
+            vibranium-utils-reload
+            vibranium-cmd-kill-rofi
+            exit 0
+            ;;
         *"sleep"*)
-			vibranium-cmd-inhibit-toggle
-			vibranium-cmd-kill-rofi
-			exit 0
+            vibranium-cmd-inhibit-toggle
+            vibranium-cmd-kill-rofi
+            exit 0
             ;;
         "Video downscaler")
             if ! vibranium-utils-video-downscaler; then
-				exit 0
-			fi
+                exit 0
+            fi
             ;;
-		"Freeze"*|"Unfreeze"*)
-			vibranium-cmd-freeze-pid-toggle
-			vibranium-cmd-kill-rofi
-			exit 0
-			;;
-		"Password manager")
-			vibranium-utils-password-manager
-			;;
+        "Freeze"* | "Unfreeze"*)
+            vibranium-cmd-freeze-pid-toggle
+            vibranium-cmd-kill-rofi
+            exit 0
+            ;;
+        "Password manager")
+            vibranium-utils-password-manager
+            ;;
         "" | *)
             exit 1
             ;;

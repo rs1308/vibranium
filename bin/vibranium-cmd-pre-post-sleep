@@ -11,7 +11,7 @@ case "$1" in
             exit 0
         fi
 
-		if [[ "$(playerctl status 2> /dev/null)" == "Playing" ]]; then
+        if [[ "$(playerctl status 2> /dev/null)" == "Playing" ]]; then
             current_volume=$(playerctl volume | head -c5)
             echo "playerctl:$current_volume" > "$VIBRANIUM_STATE/player_status"
 
@@ -41,37 +41,38 @@ case "$1" in
         ;;
 
     "after")
-		if [ "$VIBRANIUM_GLOBAL_SHOW_WELCOME_BACK_NOTIFICATION" = "true" ]; then
-			notify-send -r 5 -t 2500 "Vibranium" "Welcome back, <span foreground='${P_ACCENT}'><b>$USER</b></span>!"
-		fi
+        if [ "$VIBRANIUM_GLOBAL_SHOW_WELCOME_BACK_NOTIFICATION" = "true" ]; then
+            notify-send -r 5 -t 2500 "Vibranium" "Welcome back, <span foreground='${P_ACCENT}'><b>$USER</b></span>!"
+        fi
 
         if [ "$VIBRANIUM_GLOBAL_PAUSE_MUSIC_ON_SESSION_LOCK" = "true" ]; then
             if [ -f "$VIBRANIUM_STATE/player_status" ]; then
-                content=$(<"$VIBRANIUM_STATE/player_status")
+                content=$(< "$VIBRANIUM_STATE/player_status")
                 player_type=${content%%:*}
                 saved_vol=${content#*:}
 
-				case "$player_type" in
-					"playerctl")
-						playerctl play
-						while awk "BEGIN {exit !($(playerctl volume) < $saved_vol)}"; do
-							playerctl volume 0.002+
-						done
-						;;
-					"mpd")
-						mpc -q volume 0; mpc -q play
-						for i in {1..10}; do
-							new_vol=$((saved_vol * i / 10))
-							mpc -q volume $new_vol
-							sleep 0.05
-						done
-						;;
-				esac
+                case "$player_type" in
+                    "playerctl")
+                        playerctl play
+                        while awk "BEGIN {exit !($(playerctl volume) < $saved_vol)}"; do
+                            playerctl volume 0.002+
+                        done
+                        ;;
+                    "mpd")
+                        mpc -q volume 0
+                        mpc -q play
+                        for i in {1..10}; do
+                            new_vol=$((saved_vol * i / 10))
+                            mpc -q volume $new_vol
+                            sleep 0.05
+                        done
+                        ;;
+                esac
 
-				if [[ $VIBRANIUM_GLOBAL_SHOW_NOW_PLAYING == true ]]; then
-					sleep 2
-					vibranium-cmd-now-playing
-				fi
+                if [[ $VIBRANIUM_GLOBAL_SHOW_NOW_PLAYING == true ]]; then
+                    sleep 2
+                    vibranium-cmd-now-playing
+                fi
             fi
         fi
         ;;

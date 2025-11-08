@@ -5,17 +5,17 @@
 #	- Launch applications
 #	- Open local files in default applications
 #	- Open links
-#	- Search the internet 
+#	- Search the internet
 #
-# Please note that internet search may often be unavailable when VIBRANIUM_GLOBAL_APP_LAUNCHER_AUTO_SELECT is set to true. 
+# Please note that internet search may often be unavailable when VIBRANIUM_GLOBAL_APP_LAUNCHER_AUTO_SELECT is set to true.
 # This script can also open three additional menus with custom categories to open:
-#	- AI 
+#	- AI
 #	- Common websites
 #	- Power menu
 
-if pidof rofi >/dev/null; then
-	killall rofi
-	exit 0
+if pidof rofi > /dev/null; then
+    killall rofi
+    exit 0
 fi
 
 source "$VIBRANIUM_PATH/vibranium-core-lib"
@@ -30,19 +30,19 @@ process_input() {
 
     case "$input" in
         "file://"*)
-			# Open in default app (media viewer, text editor, whatever)
+            # Open in default app (media viewer, text editor, whatever)
             input="${input#file://}"
             vibranium-cmd-launch-cmd xdg-open "$input" &
             ;;
         "https://"*)
-			# Open in default browser
+            # Open in default browser
             vibranium-cmd-launch-cmd xdg-open "$input" &
             ;;
-		"DBus launch")
-			# org.telegram.desktop.desktop for example
-			# Let DBus do its thing
-			exit 0
-			;;
+        "DBus launch")
+            # org.telegram.desktop.desktop for example
+            # Let DBus do its thing
+            exit 0
+            ;;
         *)
             local cmd="${input%% *}"
             local args="${input#"$cmd"}"
@@ -53,11 +53,11 @@ process_input() {
             elif [[ -e "$input" ]]; then
                 setsid uwsm app -S err -- xdg-open "$input" &
                 exit 0
-            elif command -v "$cmd" >/dev/null 2>&1; then
+            elif command -v "$cmd" > /dev/null 2>&1; then
                 vibranium-cmd-launch-cmd "$cmd" $args &
             else
-				# TODO: give the user the option to choose a search engine
-				[ "$VIBRANIUM_GLOBAL_APP_LAUNCHER_AUTO_SELECT" = true ] && exit 1
+                # TODO: give the user the option to choose a search engine
+                [ "$VIBRANIUM_GLOBAL_APP_LAUNCHER_AUTO_SELECT" = true ] && exit 1
                 vibranium-cmd-launch-cmd xdg-open "https://www.google.com/search?q=${input}" &
             fi
             ;;
@@ -65,28 +65,28 @@ process_input() {
 }
 
 if [[ $VIBRANIUM_GLOBAL_APP_LAUNCHER_AUTO_SELECT == true ]]; then
-	opt_args+=(-auto-select true)
+    opt_args+=(-auto-select true)
 fi
 
 # Split for readability
 case "$1" in
-	"--web")
-		opt_args+=(-drun-categories WebApp -display-drun "Web Apps" -no-fixed-num-lines true  -disable-history)
-		opt_args+=(-icon-theme Vibranium -theme-str 'window {width: 300;}')
-		;;
-	"--ai")
-		opt_args+=(-drun-categories AI -display-drun "AIs" -no-fixed-num-lines true  -disable-history)
-		opt_args+=(-icon-theme Vibranium -theme-str 'window {width: 250;}')
-		;;
-	"--power")
-		opt_args+=(-drun-categories Power -display-drun "Power" -no-fixed-num-lines true -disable-history)
-		opt_args+=(-icon-theme Vibranium)
-		;;
-	*)
-		opt_args+=(-drun-exclude-categories 'WebApp,AI,Power')
-		;;
+    "--web")
+        opt_args+=(-drun-categories WebApp -display-drun "Web Apps" -no-fixed-num-lines true -disable-history)
+        opt_args+=(-icon-theme Vibranium -theme-str 'window {width: 300;}')
+        ;;
+    "--ai")
+        opt_args+=(-drun-categories AI -display-drun "AIs" -no-fixed-num-lines true -disable-history)
+        opt_args+=(-icon-theme Vibranium -theme-str 'window {width: 250;}')
+        ;;
+    "--power")
+        opt_args+=(-drun-categories Power -display-drun "Power" -no-fixed-num-lines true -disable-history)
+        opt_args+=(-icon-theme Vibranium)
+        ;;
+    *)
+        opt_args+=(-drun-exclude-categories 'WebApp,AI,Power')
+        ;;
 esac
-	
+
 if [ $VIBRANIUM_GLOBAL_APP_LAUNCHER_SHOW_ICONS = true ]; then
     opt_args+=(-theme-str 'configuration {show-icons: true;} element-icon {enabled: true;}')
 fi
