@@ -114,7 +114,8 @@ trap cleanup INT TERM
 if [[ "$1" =~ ^(region|window)$ ]]; then
     area="portal"
 else
-    area="screen"
+    active_monitor="$(hyprctl -j monitors | jq -r '.[] | select(.focused == true) | .name')"
+    area="$active_monitor"
 fi
 
 # Self-explanatory
