@@ -123,7 +123,7 @@ install_packages() {
 			*)
 				if pacman -Qq "$pkg" &>/dev/null; then
 					continue
-				fi	
+				fi
 				;;
 		esac
 
@@ -214,6 +214,10 @@ post_install() {
 
 	printf '{\n\t"SKIP_HOST_UPDATE": true\n}' \
 		> "$HOME/.config/discord/settings.json"
+
+	if [ -z "$(find /sys/class/backlight -mindepth 1 -maxdepth 1 2>/dev/null)" ]; then
+		sudo systemctl mask upower.service
+	fi
 }
 
 git checkout -q --detach "$(git tag --sort=-creatordate | head -n 1)"
