@@ -3,10 +3,8 @@
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 
 CONF="$XDG_CONFIG_HOME/hypr/hyprpaper.conf"
-
 CURRENT_THEME="$(vibranium-theme-get)"
 USER_WALLPAPERS="$XDG_CONFIG_HOME/vibranium/theme/wallpapers/$CURRENT_THEME"
-
 # Get an array of all available wallpapers for the current theme
 WALLS="$XDG_CONFIG_HOME/vibranium/theme/current/backgrounds"
 
@@ -16,7 +14,6 @@ if ! missing_str="$(vibranium-utils-is-installed hyprpaper jq)"; then
     exit 1
 fi
 
-# Currently broken
 toggle_wallpaper() {
     local mode="$1"
     local current
@@ -34,7 +31,7 @@ toggle_wallpaper() {
     [ ${#files[@]} -eq 0 ] && return 1
 
     current="$(vibranium-utils-wallpaper-get)"
-    idx=-1
+    idx=0
 
     for i in "${!files[@]}"; do
         if [ "${files[$i]}" = "$current" ]; then
