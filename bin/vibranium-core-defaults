@@ -14,13 +14,6 @@ VIBRANIUM_DEFAULT_TERMINAL=alacritty
 # Available options: string
 VIBRANIUM_CURSOR_THEME="macOS"
 
-# Which date format to use for the output files
-# Used in tools like screen recording and screenshots
-# Available options: string, see 'man date'
-#
-# Default is '%Y-%m-%d-%H-%M-%S' which is ISO 8601 (AKA EU time)
-VIBRANIUM_DATE_FORMAT="%Y-%m-%d-%H-%M-%S"
-
 # Whether to flash border of an active window when (usually) taking screenshots.
 # Available options: bool
 #
@@ -68,18 +61,6 @@ VIBRANIUM_GLOBAL_POWER_PROFILE_USE_OSD=true
 #
 # Default is true
 VIBRANIUM_GLOBAL_POWER_PROFILE_USE_FEEDBACK=true
-
-# Whether to use special function in app launcher, which will swap cyrillic
-# layout to latin to use search properly and back to cyrillic when menu is closed.
-# If you have no idea what you just read then you probably don't need this.
-#
-# Note: the code is not complete yet and some things kinda hardcoded, so probably
-#		you have to edit 'vibranium-core-launcher' by yourself
-#
-# Available options: bool
-#
-# Default is false
-VIBRANIUM_MENU_SWAP_LAYOUT=false
 
 # Whether to copy processed item (a screenshot, a video) to clipboard.
 # Available options: bool
@@ -189,6 +170,12 @@ VIBRANIUM_GLOBAL_POWER_MENU_STYLE="menu"
 #
 # Default is true
 VIBRANIUM_GLOBAL_SHOW_WALLPAPER=true
+
+# What search engine to use when performing web search (app launcher)
+# Available options: string 'google' 'duckduckgo' 'bing'
+#
+# Default is 'google'
+VIBRANIUM_GLOBAL_SEARCH_ENGINE="google"
 
 #           VOLUME CONTROL OPTIONS             #
 # ============================================ #

@@ -113,7 +113,7 @@ if [[ ${VIBRANIUM_SCREENSHOT_SAVE_TO_DISK} == true ]]; then
 
     # TODO: Allow the user to change the date format in the Vibranium settings.
     # Currently, it uses EU time by default.
-    output_file="${output_dir}/screenshot_$(date +"${VIBRANIUM_DATE_FORMAT}").${VIBRANIUM_SCREENSHOT_FILE_TYPE}"
+    output_file="${output_dir}/screenshot_$(date +"%Y-%m-%d_%H:%M").${VIBRANIUM_SCREENSHOT_FILE_TYPE}"
     log "Saving to: '${YELLOW}disk${RESET}'"
 else
     output_file="${XDG_RUNTIME_DIR}/latest_screenshot.${VIBRANIUM_SCREENSHOT_FILE_TYPE}"
