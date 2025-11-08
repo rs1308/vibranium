@@ -27,5 +27,5 @@
 		"on-click": "vibranium-core-brightness 1",
 		"on-click-right": "vibranium-core-brightness 100",
 		"on-click-middle": "vibranium-core-brightness 50"
-	},
+	}
 }

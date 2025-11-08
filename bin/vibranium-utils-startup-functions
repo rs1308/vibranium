@@ -6,6 +6,13 @@
 
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 
+get_i2c_bus() {
+    ddcutil detect 2>/dev/null | awk '
+         /I2C bus/ { bus=$NF; skip=0 }
+         /This is a laptop display/ { skip=1 }
+         /VCP version/ && !skip { sub("/dev/i2c-", "", bus); print bus }'
+}
+
 check_bool VIBRANIUM_GLOBAL_APP_LAUNCHER_SHOW_ON_START false
 
 if [[ "$VIBRANIUM_GLOBAL_APP_LAUNCHER_SHOW_ON_START" == true ]]; then
@@ -27,8 +34,7 @@ fi
 # ddcutil (external monitor brightness control)
 if [[ $VIBRANIUM_BRIGHTNESS_USE_DDC_CONTROL == true ]]; then
     if [ ! -f "$VIBRANIUM_STATE/i2c-bus" ]; then
-        ddcutil detect 2> /dev/null | awk -F'i2c-' '/I2C bus/{print $2}' \
-            > "$VIBRANIUM_STATE/i2c-bus"
+        get_i2c_bus > "$VIBRANIUM_STATE/i2c-bus"
     fi
 fi
 
