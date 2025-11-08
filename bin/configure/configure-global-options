@@ -67,24 +67,115 @@ _flash_submenu() {
                     spd_chosen="$(printf "%s\n" "${spd_opts[@]}" | rofi_cmd "Effect speed" "ESC to go back" -selected-row "$s_index")"
                     [[ -z "$spd_chosen" ]] && break
 
+                    local valid=false
                     for i in "${!spd_opts[@]}"; do
                         if [[ "${spd_opts[$i]}" == "$spd_chosen" ]]; then
                             s_index="$i"
+                            valid=true
                             break
                         fi
                     done
 
-                    case "$spd_chosen" in
-                        "Slow" | "Medium" | "Fast" | "Very fast")
-                            spd_chosen="${spd_chosen,,}"
-                            spd_chosen="${spd_chosen// /_}"
+                    $valid || continue
 
-                            option-validate "$speed_var"
-                            sed -i "/^${speed_var}/s/=.*/=\"${spd_chosen}\"/" \
-                                "$VIBRANIUM_USER_SETTINGS"
-                            break
-                            ;;
-                    esac
+                    spd_chosen="${spd_chosen,,}"
+                    spd_chosen="${spd_chosen// /_}"
+
+                    option-validate "$speed_var"
+                    sed -i "/^${speed_var}/s/=.*/=\"${spd_chosen}\"/" "$VIBRANIUM_USER_SETTINGS"
+                    break
+                done
+                ;;
+        esac
+    done
+}
+
+_lockscreen_blur_menu() {
+    local blur_lockscreen_options
+    local blur_lockscreen_chosen
+
+    while :; do
+        source "$VIBRANIUM_USER_SETTINGS"
+
+        if [[ $VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_BACKGROUND == false ]]; then
+            blur_lockscreen_options=(
+                "Blur background : $VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_BACKGROUND"
+                "Dim strength    : $VIBRANIUM_GLOBAL_DIM_LOCKSCREEN_STRENGTH"
+            )
+        else
+            blur_lockscreen_options=(
+                "Blur background : $VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_BACKGROUND"
+                "Blur strength   : $VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_STRENGTH"
+            )
+        fi
+
+        blur_lockscreen_chosen="$(printf "%s\n" "${blur_lockscreen_options[@]}" | rofi_cmd "Lockscreen background" "ESC to go back")"
+        [[ -z $blur_lockscreen_chosen ]] && break
+
+        case "$blur_lockscreen_chosen" in
+            "Blur background"*)
+                toggle_bool VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_BACKGROUND
+                if [ -f "$XDG_RUNTIME_DIR/vibranium-lockscreen-cache.pid" ]; then
+                    local pid
+                    pid=$(< "$XDG_RUNTIME_DIR/vibranium-lockscreen-cache.pid")
+                    if kill -0 "$pid" 2> /dev/null; then
+                        kill -TERM "$pid"
+                    fi
+                fi
+                (setsid vibranium-utils-lockscreen-cache) &
+                ;;
+            "Blur strength"*)
+                local blur_strength_options
+                local blur_strength_options
+
+                while :; do
+                    blur_strength_options=("low" "mid" "hard")
+                    blur_strength_chosen="$(printf "%s\n" "${blur_strength_options[@]}" | rofi_cmd "Blur strength" "ESC to go back")"
+                    [[ -z $blur_strength_chosen ]] && break
+                    [[ $blur_strength_chosen == "$VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_STRENGTH" ]] && break
+
+                    if [[ ! ${blur_strength_options[*]} =~ $blur_strength_chosen ]]; then
+                        continue
+                    else
+                        option-validate "VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_STRENGTH"
+                        sed -i "/VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_STRENGTH/s/=.*/=\"${blur_strength_chosen}\"/" "$VIBRANIUM_USER_SETTINGS"
+                        if [ -f "$XDG_RUNTIME_DIR/vibranium-lockscreen-cache.pid" ]; then
+                            local pid
+                            pid=$(< "$XDG_RUNTIME_DIR/vibranium-lockscreen-cache.pid")
+                            if kill -0 "$pid" 2> /dev/null; then
+                                kill -TERM "$pid"
+                            fi
+                        fi
+                        (setsid vibranium-utils-lockscreen-cache) &
+                        break
+                    fi
+                done
+                ;;
+            "Dim strength"*)
+                local dim_strength_options
+                local dim_strength_chosen
+
+                while :; do
+                    dim_strength_options=("low" "mid" "hard")
+                    dim_strength_chosen="$(printf "%s\n" "${dim_strength_options[@]}" | rofi_cmd "Dim strength" "ESC to go back")"
+                    [[ -z $dim_strength_chosen ]] && break
+                    [[ $dim_strength_chosen == "$VIBRANIUM_GLOBAL_DIM_LOCKSCREEN_STRENGTH" ]] && break
+
+                    if [[ ! ${dim_strength_options[*]} =~ $dim_strength_chosen ]]; then
+                        continue
+                    else
+                        option-validate "VIBRANIUM_GLOBAL_DIM_LOCKSCREEN_STRENGTH"
+                        sed -i "/VIBRANIUM_GLOBAL_DIM_LOCKSCREEN_STRENGTH/s/=.*/=\"${dim_strength_chosen}\"/" "$VIBRANIUM_USER_SETTINGS"
+                        if [ -f "$XDG_RUNTIME_DIR/vibranium-lockscreen-cache.pid" ]; then
+                            local pid
+                            pid=$(< "$XDG_RUNTIME_DIR/vibranium-lockscreen-cache.pid")
+                            if kill -0 "$pid" 2> /dev/null; then
+                                kill -TERM "$pid"
+                            fi
+                        fi
+                        (setsid vibranium-utils-lockscreen-cache) &
+                        break
+                    fi
                 done
                 ;;
         esac
@@ -100,11 +191,11 @@ while :; do
         "Now playing              : $VIBRANIUM_GLOBAL_SHOW_NOW_PLAYING"
         "OSD enabled              : $VIBRANIUM_GLOBAL_USE_OSD"
         "Show wallpaper           : $VIBRANIUM_GLOBAL_SHOW_WALLPAPER"
+        "Show status bar          : $bar_enabled"
         "Confirm to kill          : $VIBRANIUM_GLOBAL_CONFIRM_TO_KILL"
         "Blur lockscreen          : $VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_BACKGROUND"
         "Power menu style         : $VIBRANIUM_GLOBAL_POWER_MENU_STYLE"
         "Copy to clipboard        : $VIBRANIUM_GLOBAL_COPY_TO_CLIPBOARD"
-        "Status bar enabled       : $bar_enabled"
         "Pause music on lock      : $VIBRANIUM_GLOBAL_PAUSE_MUSIC_ON_SESSION_LOCK"
         "Welcome notification     : $VIBRANIUM_GLOBAL_SHOW_WELCOME_BACK_NOTIFICATION"
         "Terminal transparency    : $(_terminal_opacity get)"
@@ -136,17 +227,17 @@ while :; do
     done
 
     case "$CHOSEN" in
-        "Status bar"*)
+        "Show status bar"*)
             case "$bar_enabled" in
                 "true") systemctl --user disable --now waybar ;;
                 "false") systemctl --user enable --now waybar ;;
             esac
             ;;
         "Show wallpaper"*)
-            toggle_bool "VIBRANIUM_GLOBAL_SHOW_WALLPAPER"
-            case "$VIBRANIUM_GLOBAL_SHOW_WALLPAPER" in
-                true)
+            case "$(toggle_bool -v "VIBRANIUM_GLOBAL_SHOW_WALLPAPER")" in
+                false)
                     systemctl -q --user disable --now hyprpaper
+                    # In case we were in powersave mode and the cache generator was waiting for its turn
                     if [ -f "$XDG_RUNTIME_DIR/vibranium-lockscreen-cache.pid" ]; then
                         pid=$(< "$XDG_RUNTIME_DIR/vibranium-lockscreen-cache.pid")
                         if kill -0 "$pid" 2> /dev/null; then
@@ -154,8 +245,8 @@ while :; do
                         fi
                     fi
                     ;;
-                false)
-                    systemctl -q --user enable --now hyprpaper
+                true)
+                    systemctl -q --user enable --now hyprpaper &
                     vibranium-utils-lockscreen-cache &
                     ;;
             esac
@@ -185,7 +276,6 @@ while :; do
                         msg+="the result is usually slightly worse than with CPU\n\nIf your goal is to significantly reduce file size "
                         msg+="while losing as little detail as possible, a CPU is better suited for the task"
                         notify-send -r 3 -t 20000 "Vibranium" "$msg"
-                        continue
                         ;;
                 esac
             done
@@ -209,7 +299,6 @@ while :; do
                 else
                     notify-send -r 2 -u critical -t 1500 "Vibranium" \
                         "A floating point between 0.0 and 1.0!"
-                    continue
                 fi
             done
             ;;
@@ -241,12 +330,8 @@ while :; do
                 done
 
                 case "$pp_chosen" in
-                    "Use visual"*)
-                        toggle_bool VIBRANIUM_GLOBAL_POWER_PROFILE_USE_FEEDBACK
-                        ;;
-                    "Use OSD"*)
-                        toggle_bool VIBRANIUM_GLOBAL_POWER_PROFILE_USE_OSD
-                        ;;
+                    "Use visual"*) toggle_bool VIBRANIUM_GLOBAL_POWER_PROFILE_USE_FEEDBACK ;;
+                    "Use OSD"*)    toggle_bool VIBRANIUM_GLOBAL_POWER_PROFILE_USE_OSD      ;;
                     *"()"*)
                         if [[ "$use_feedback" == false ]]; then
                             msg="Visual feedback is disabled. Enable it first"
@@ -294,7 +379,9 @@ while :; do
                                     blur_enabled="$(sed -n '/decoration[[:space:]]*{/,/}/{/blur[[:space:]]*{/,/}/{s/.*enabled[[:space:]]*=[[:space:]]*\([^;]*\).*/\1/p}}' "$conf" 2> /dev/null)"
 
                                     # One-time execution at this point
-                                    [ -z "$blur_enabled" ] && blur_enabled="$(vibranium-cmd-edit-wm-config decoration:blur:enabled:"$(hyprctl -j getoption decoration:blur:enabled | jq '.set')" "$conf")"
+                                    [ -z "$blur_enabled" ] && {
+                                        blur_enabled="$(vibranium-cmd-edit-wm-config decoration:blur:enabled:"$(hyprctl -j getoption decoration:blur:enabled | jq '.set')" "$conf")"
+                                    }
 
                                     if [ "$(toggle_bool -v "VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE")" = "true" ]; then
                                         # If on power-saver and blur is on → disable blur and save blur status for later restore
@@ -316,10 +403,7 @@ while :; do
                                     msg="\n<span foreground='${P_ACCENT}'><b>•</b></span> <b>Whether to respect the active power profile when processing compute tasks</b>\n\n"
                                     msg+="When enabled, power and GPU hungry processes like cache generation, blur,\ncompute tasks, etc will be suspended on "
                                     msg+="'<span foreground='${P_GREEN}'>power-saver</span>' power profile"
-                                    # msg+="When enabled, background processes like lockscreen background pre-caching are suspended until the power profile switches to "
-                                    # msg+="'<span foreground='${P_YELLOW}'><b>Balanced</b></span>' or '<span foreground='${P_RED}'><b>Performance</b></span>'"
                                     notify-send -r 3 -t 15000 "What is this?" "$msg"
-                                    continue
                                     ;;
                             esac
                         done
@@ -344,7 +428,6 @@ while :; do
                         msg+="This could be a <span foreground='${P_YELLOW}'><b>screenshot</b></span>, a recorded or downscaled "
                         msg+="<span foreground='${P_YELLOW}'><b>video</b></span>,\nor any other type of file operation"
                         notify-send -r 3 -t 15000 "What is this?" "$msg"
-                        continue
                         ;;
                 esac
             done
@@ -377,15 +460,12 @@ while :; do
                 case "$now_playing_chosen" in
                     "Show"*)
                         toggle_bool "VIBRANIUM_GLOBAL_SHOW_NOW_PLAYING_LOCKSCREEN"
-                        continue
                         ;;
                     "Now"*)
                         toggle_bool "VIBRANIUM_GLOBAL_SHOW_NOW_PLAYING"
-                        continue
                         ;;
                     "Include"*)
                         toggle_bool "VIBRANIUM_GLOBAL_NOW_PLAYING_SHOW_ALBUM_ART"
-                        continue
                         ;;
                     "What"*)
                         msg="\n<span foreground='${P_ACCENT}'><b>•</b></span> <b>"
@@ -394,98 +474,12 @@ while :; do
                         msg+="'<span foreground='${P_GREEN}'><b>true</b></span>' and a web-based player is used, it\n"
                         msg+="takes some time to download an album art from the internet in order to display"
                         notify-send -r 3 -t 15000 "What is this?" "$msg"
-                        continue
                         ;;
                 esac
             done
             ;;
         "Blur"*)
-            while :; do
-                source "$VIBRANIUM_USER_SETTINGS"
-
-                if [[ $VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_BACKGROUND == false ]]; then
-                    blur_lockscreen_options=(
-                        "Blur background : $VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_BACKGROUND"
-                        "Dim strength    : $VIBRANIUM_GLOBAL_DIM_LOCKSCREEN_STRENGTH"
-                    )
-                else
-                    blur_lockscreen_options=(
-                        "Blur background : $VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_BACKGROUND"
-                        "Blur strength   : $VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_STRENGTH"
-                    )
-                fi
-
-                blur_lockscreen_chosen="$(printf "%s\n" "${blur_lockscreen_options[@]}" | rofi_cmd "Lockscreen background" "ESC to go back")"
-                [[ -z $blur_lockscreen_chosen ]] && break
-
-                case "$blur_lockscreen_chosen" in
-                    "Blur background"*)
-                        toggle_bool VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_BACKGROUND
-                        if [ -f "$XDG_RUNTIME_DIR/vibranium-lockscreen-cache.pid" ]; then
-                            pid=$(< "$XDG_RUNTIME_DIR/vibranium-lockscreen-cache.pid")
-                            if kill -0 "$pid" 2> /dev/null; then
-                                kill -TERM "$pid"
-                            fi
-                        fi
-                        (
-                            sleep 1
-                            setsid vibranium-utils-lockscreen-cache
-                        ) &
-                        ;;
-                    "Blur strength"*)
-                        while :; do
-                            blur_strength_options=("low" "mid" "hard")
-                            blur_strength_chosen="$(printf "%s\n" "${blur_strength_options[@]}" | rofi_cmd "Blur strength" "ESC to go back")"
-                            [[ -z $blur_strength_chosen ]] && break
-                                                [[ $blur_strength_chosen == "$VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_STRENGTH" ]] && break
-
-                            if [[ ! ${blur_strength_options[*]} =~ $blur_strength_chosen ]]; then
-                                continue
-                            else
-                                option-validate VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_STRENGTH
-                                sed -i "/VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_STRENGTH/s/=.*/=\"${blur_strength_chosen}\"/" "$VIBRANIUM_USER_SETTINGS"
-                                if [ -f "$XDG_RUNTIME_DIR/vibranium-lockscreen-cache.pid" ]; then
-                                    pid=$(< "$XDG_RUNTIME_DIR/vibranium-lockscreen-cache.pid")
-                                    if kill -0 "$pid" 2> /dev/null; then
-                                        kill -TERM "$pid"
-                                    fi
-                                fi
-                                (
-                                    sleep 1
-                                    setsid vibranium-utils-lockscreen-cache
-                                ) &
-                                break
-                            fi
-                        done
-                        ;;
-                    "Dim strength"*)
-                        while :; do
-                            dim_strength_options=("low" "mid" "hard")
-                            dim_strength_chosen="$(printf "%s\n" "${dim_strength_options[@]}" | rofi_cmd "Dim strength" "ESC to go back")"
-                            [[ -z $dim_strength_chosen ]] && break
-                                               [[ $dim_strength_chosen == "$VIBRANIUM_GLOBAL_DIM_LOCKSCREEN_STRENGTH" ]] && break
-
-                            if [[ ! ${dim_strength_options[*]} =~ $dim_strength_chosen ]]; then
-                                continue
-                            else
-                                option-validate VIBRANIUM_GLOBAL_DIM_LOCKSCREEN_STRENGTH
-                                sed -i "/VIBRANIUM_GLOBAL_DIM_LOCKSCREEN_STRENGTH/s/=.*/=\"${dim_strength_chosen}\"/" "$VIBRANIUM_USER_SETTINGS"
-                                if [ -f "$XDG_RUNTIME_DIR/vibranium-lockscreen-cache.pid" ]; then
-                                    pid=$(< "$XDG_RUNTIME_DIR/vibranium-lockscreen-cache.pid")
-                                    if kill -0 "$pid" 2> /dev/null; then
-                                        kill -TERM "$pid"
-                                    fi
-                                fi
-                                (
-                                    sleep 1
-                                    setsid vibranium-utils-lockscreen-cache
-                                ) &
-                                break
-                            fi
-                        done
-                        ;;
-                esac
-            done
+            _lockscreen_blur_menu
             ;;
         "Pause"*)
             while :; do
@@ -507,7 +501,6 @@ while :; do
                         msg+="When <span foreground='${P_GREEN}'><b>enabled</b></span>, "
                         msg+="music will fade out when the screen is\nlocked and fade back in when it is unlocked."
                         notify-send -r 3 -t 15000 "What is this?" "$msg"
-                        continue
                         ;;
                 esac
             done
@@ -527,7 +520,6 @@ while :; do
                         msg="<b>Whether to show the '<span foreground='${P_YELLOW}'>Welcome back, ${USER}!</span>' "
                         msg+="notification when unlocking session</b>\n\n"
                         notify-send -r 3 -t 15000 "What is this?" "$msg"
-                        continue
                         ;;
                 esac
             done
@@ -596,7 +588,6 @@ while :; do
                                     msg+="This can significantly speed up application launch and menu navigation, but may seem inconvenient at first\n\n"
                                     msg+="<span foreground='${P_ACCENT}'><b>•</b></span> <b>This does not affect the clipboard menu</b>"
                                     notify-send -r 3 -t 20000 "What is this?" "$msg"
-                                    continue
                                     ;;
                             esac
                         done
@@ -732,7 +723,6 @@ while :; do
                         msg+="When the <span foreground='${P_RED}'><b>force window kill</b></span> shortcut is triggered, this\n"
                         msg+="option asks you to press it again to confirm the action"
                         notify-send -r 3 -t 15000 "What is this?" "$msg"
-                        continue
                         ;;
                 esac
             done

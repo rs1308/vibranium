@@ -72,16 +72,16 @@ declare -A filters=()  # Global associative array for filters.
 # Check if blur is enabled for lockscreen backgrounds.
 if [[ $VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_BACKGROUND == true ]]; then
     case "$VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_STRENGTH" in
-        "low") filters[blurred - low]="-colorize 50% -resize 70% -blur 0x16" ;;
-        "mid") filters[blurred - mid]="-colorize 50% -resize 50% -blur 0x32" ;;
-        "hard") filters[blurred - hard]="-colorize 50% -resize 30% -blur 0x64" ;;
+        "low") filters[blurred-low]="-colorize 50% -resize 70% -blur 0x16" ;;
+        "mid") filters[blurred-mid]="-colorize 50% -resize 50% -blur 0x32" ;;
+        "hard") filters[blurred-hard]="-colorize 50% -resize 30% -blur 0x64" ;;
     esac
 else
     # If blur is disabled, apply dimming based on strength.
     case "$VIBRANIUM_GLOBAL_DIM_LOCKSCREEN_STRENGTH" in
-        "low") filters[dimmed - low]="-colorize 30%" ;;
-        "mid") filters[dimmed - mid]="-colorize 50%" ;;
-        "hard") filters[dimmed - hard]="-colorize 70%" ;;
+        "low") filters[dimmed-low]="-colorize 30%" ;;
+        "mid") filters[dimmed-mid]="-colorize 50%" ;;
+        "hard") filters[dimmed-hard]="-colorize 70%" ;;
     esac
 fi
 
