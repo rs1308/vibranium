@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Overcomplicated (as usual) script for creating screenshots. 
+# Overcomplicated (as usual) script for creating screenshots.
 # All-in wrapper for grim & slurp with a bunch of user settings on top.
 
 source "$VIBRANIUM_PATH/vibranium-core-lib"
@@ -111,7 +111,7 @@ if [[ ${VIBRANIUM_SCREENSHOT_SAVE_TO_DISK} == true ]]; then
     # Ensure output directory exists
     mkdir -p "$output_dir"
 
-	# TODO: Allow the user to change the date format in the Vibranium settings. 
+	# TODO: Allow the user to change the date format in the Vibranium settings.
 	# Currently, it uses EU time by default.
     output_file="${output_dir}/screenshot_$(date +"${VIBRANIUM_DATE_FORMAT}").${VIBRANIUM_SCREENSHOT_FILE_TYPE}"
     log "Saving to: '${YELLOW}disk${RESET}'"
@@ -156,7 +156,7 @@ case "$1" in
 
         # Optionally flash border to indicate target
         if [[ $VIBRANIUM_GLOBAL_FLASH_BORDER == true ]] && [[ ${VIBRANIUM_SCREENSHOT_FLASH_BORDER} == true ]]; then
-			_flash border
+			_flash border &
         fi
         log "Performing actions"
         grim -g "$window_geometry" "${opt_options[@]}" "$output_file"
