@@ -55,10 +55,6 @@ install_packages() {
 
 	mapfile -t packages < ./pkg_list.txt
 
-	if [ -n "$(find /sys/class/backlight -mindepth 1 -maxdepth 1 2>/dev/null)" ]; then
-		packages+=("brightnessctl")
-	fi
-
 	# GPU detection
 	case "$(lspci | grep VGA)" in
 		*"Nvidia"*)

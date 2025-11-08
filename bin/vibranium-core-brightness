@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Overcomplicated script that manages brightness control using the standard brightnessctl
+# Overcomplicated script that manages brightness control using raw sysfs values
 # as well as the DDC protocol for external monitors. The script uses state files to cache
 # active values for both methods to speed up subsequent script executions.
 # This is ESPECIALLY useful for the DDC method, because ddcutil is known to be quite slow.
@@ -67,7 +67,7 @@ set_i2c_bus() {
     fi
 
     i2c_info="$(< "$VIBRANIUM_STATE/i2c-bus")"
-    if [[ ! "$i2c_info" =~ "$ACTIVE_MONITOR" ]]; then
+    if [[ ! "$i2c_info" =~ $ACTIVE_MONITOR ]]; then
         get_i2c_bus
         unset i2c_info; i2c_info="$(< "$VIBRANIUM_STATE/i2c-bus")"
     fi
@@ -141,17 +141,11 @@ if ! compgen -G "/sys/class/backlight/*" > /dev/null; then
         ddcutil_flags=(--sleep-multiplier 0.13 --noverify --skip-ddc-checks --maxtries 1,1,1)
     fi
 else
-    if ! missing_str="$(vibranium-utils-is-installed brightnessctl)"; then
-        read -r -a missing <<< "$missing_str"
-        notify-send -r 4 -t 5000 -u critical "Vibranium - Brightness Control" "Missing dependencies: ${missing[*]}"
-        exit 1
-    fi
-
     if [[ ! -z "$ACTIVE_MONITOR" ]] && [[ ! "$ACTIVE_MONITOR" =~ eDP* ]]; then
         method="DDC"
         I2C_BUS="$(set_i2c_bus)"
     else
-        method="brightnessctl"
+        method="raw"
     fi
 fi
 
@@ -252,27 +246,33 @@ case "$method" in
         if [[ $VIBRANIUM_GLOBAL_USE_OSD == true ]] && [[ $VIBRANIUM_BRIGHTNESS_USE_OSD == true ]]; then
             osd "$new" &
         else
-            notify-send -r 2 -t 1000 "Brightness ${new}%" -h int:value:"$new"
+            if [[ ! "$ACTIVE_MONITOR" =~ eDP* ]]; then
+                source="($ACTIVE_MONITOR) "
+            else
+                source=""
+            fi
+            notify-send -r 2 -t 1000 "Brightness $source${new}%" -h int:value:"$new"
         fi
         ;;
-    "brightnessctl")
-        current_raw=$(brightnessctl g 2> /dev/null)
-        max_raw=$(brightnessctl m 2> /dev/null)
+    "raw")
+        # Read current and max brightness from kernel
+        current_raw=$(< /sys/class/backlight/*/brightness)
+        max_raw=$(< /sys/class/backlight/*/max_brightness)
         current=$((current_raw * 100 / max_raw))
 
         case "$1" in
             up)
-                arg="+${step}"
-                new=$((current + step))
+                # Step is in percent, convert to raw delta
+                delta=$((step * max_raw / 100))
+                new_raw=$((current_raw + delta))
                 ;;
             down)
-                arg="-${step}"
-                new=$((current - step))
+                delta=$((step * max_raw / 100))
+                new_raw=$((current_raw - delta))
                 ;;
             *)
                 if [[ "$1" =~ ^[0-9]+$ && $1 -ge 0 && $1 -le 100 ]]; then
-                    arg="$1"
-                    new="$arg"
+                    new_raw=$(( $1 * max_raw / 100 ))
                 else
                     error "Invalid input!"
                     exit 1
@@ -280,17 +280,23 @@ case "$method" in
                 ;;
         esac
 
-        ((new > 100)) && new=100
-        ((new < 0)) && new=0
+        # Clamp raw value
+        ((new_raw > max_raw)) && new_raw=$max_raw
+        ((new_raw < 0)) && new_raw=0
 
-        log "Method: ${YELLOW}'""$method""'${RESET}"
-        log "Current brightness: ${YELLOW}'""${current}""'${RESET}"
-        log "New brightness: ${YELLOW}'""$new""'${RESET}"
+        # Convert back to percent for logs/OSD
+        new=$((new_raw * 100 / max_raw))
+
+        log "Method: ${YELLOW}'$method'${RESET}"
+        log "Current brightness: ${YELLOW}'$current'${RESET}"
+        log "New brightness: ${YELLOW}'$new'${RESET}"
+
+        # Apply new brightness
+        echo "$new_raw" > /sys/class/backlight/*/brightness
 
         if [[ $VIBRANIUM_GLOBAL_USE_OSD == true && $VIBRANIUM_BRIGHTNESS_USE_OSD == true ]]; then
-            swayosd-client --brightness="$arg"
+            swayosd-client --brightness="$new"
         else
-            brightnessctl -q set "${new}%"
             notify-send -r 1 -t 1000 "Brightness ${new}%" -h int:value:"$new"
         fi
         ;;
