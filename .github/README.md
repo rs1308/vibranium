@@ -1,20 +1,10 @@
 # Vibranium
 
-Vibranium is an Arch Linux configuration focused on speed and high customizability.
-Thanks to the Hyprland window manager, Waybar bar, and highly customizable rofi launcher, Vibranium provides a beautiful overall look right out of the box.
+Vibranium is an Arch Linux configuration, which aims to provide beautiful-looking set of configs and themes, while being very customizable and very fast. It provides a set of overlay-based menus (rofi) where you can configure almost every aspect of your typical desktop usage: appearance of the WM & status bar, general behavior, like package management or how certain things work together.
 
 ## Installation
 
-It is recommended to install Vibranium on a clean Arch Linux installation (e.g. immediately after `archinstall`). Installation on existing systems has not been tested and is not recommended.
-
-The installer will automatically find the correct GPU drivers and install them. Ensure you have active internet connection and that `git` is installed.
-To install Vibranium, type the code below in TTY:
-
-```bash
-mkdir -p $HOME/.local/share; cd $HOME/.local/share
-git clone https://github.com/shvedes/vibranium; cd vibranium
-./install.sh
-```
+See [wiki page](https://github.com/shvedes/vibranium/wiki#installation)
 
 ## Currenet State
 
@@ -22,4 +12,4 @@ Vibranium is currently in beta testing. Some features may break or not work at a
 
 ### Code Quality
 
-The code is currently focused on functionality rather than structure. Refactoring and performance improvements will come once all core features are implemented. The project’s architecture wasn’t planned from the start, so rewriting from scratch wasn’t practical—hence the current state of the code. For further information visit [**Vibranium wiki**](https://github.com/shvedes/vibranium/wiki)
+The code is currently focused on functionality rather than structure. Refactoring and performance improvements will come once all core features are implemented. The project’s architecture wasn’t planned from the start, so rewriting from scratch wasn’t practical-hence the current state of the code. For further information visit [**Vibranium wiki**](https://github.com/shvedes/vibranium/wiki)
