@@ -7,24 +7,24 @@ INDEX=0
 WAYBAR_CONFIG="$XDG_CONFIG_HOME/waybar/config.jsonc"
 
 while :; do
-	source "$VIBRANIUM_USER_SETTINGS"
+    source "$VIBRANIUM_USER_SETTINGS"
 
-	BAR_POSITION="$(sed -n 's/.*"position"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$WAYBAR_CONFIG")"
-	BAR_HEIGHT="$(sed -n 's/.*"height"[[:space:]]*:[[:space:]]*\([^"]*\),.*/\1/p' "$WAYBAR_CONFIG")"
+    BAR_POSITION="$(sed -n 's/.*"position"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$WAYBAR_CONFIG")"
+    BAR_HEIGHT="$(sed -n 's/.*"height"[[:space:]]*:[[:space:]]*\([^"]*\),.*/\1/p' "$WAYBAR_CONFIG")"
 
-	case "$BAR_POSITION" in
-		"top")    OPTIONS=("Move top bar to bottom") ;;
-		"bottom") OPTIONS=("Move bottom bar to top") ;;
-	esac
+    case "$BAR_POSITION" in
+        "top") OPTIONS=("Move top bar to bottom") ;;
+        "bottom") OPTIONS=("Move bottom bar to top") ;;
+    esac
 
-	case "$VIBRANIUM_BAR_SHOW_SHORTCUT_HINTS" in
-		"true")  OPTIONS+=("Hide shortcut hints") ;;
-		"false") OPTIONS+=("Show shortcut hints") ;;
-	esac
+    case "$VIBRANIUM_BAR_SHOW_SHORTCUT_HINTS" in
+        "true") OPTIONS+=("Hide shortcut hints") ;;
+        "false") OPTIONS+=("Show shortcut hints") ;;
+    esac
 
-	OPTIONS+=("Configure modules" "Enabled modules" "Height: $BAR_HEIGHT")
-	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Waybar options" "ESC to go back" -selected-row "$INDEX")"
-	[ -z "$CHOSEN" ] && break
+    OPTIONS+=("Configure modules" "Enabled modules" "Height: $BAR_HEIGHT")
+    CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Waybar options" "ESC to go back" -selected-row "$INDEX")"
+    [ -z "$CHOSEN" ] && break
 
     for i in "${!OPTIONS[@]}"; do
         if [ "${OPTIONS[$i]}" = "$CHOSEN" ]; then
@@ -33,40 +33,41 @@ while :; do
         fi
     done
 
-	case "$CHOSEN" in
-		"Height"*)
-			while :; do
-				prompt="Waybar height (int)"
-				input="$(printf "%s" "$prompt" | rofi_cmd "Bar height" "30-45")"
-				[[ -z "$input" ]] && break; [[ ! "$input" =~ ^[0-9]+$ ]] && {
-					notify-send -r 1 "Vibranium" "An integer between 30-45"
-					continue
-				}
+    case "$CHOSEN" in
+        "Height"*)
+            while :; do
+                prompt="Waybar height (int)"
+                input="$(printf "%s" "$prompt" | rofi_cmd "Bar height" "30-45")"
+                [[ -z "$input" ]] && break
+                                [[ ! "$input" =~ ^[0-9]+$ ]] && {
+                    notify-send -r 1 "Vibranium" "An integer between 30-45"
+                    continue
+                }
 
-				if (( input > 45 || input < 30 )); then
-					notify-send -r 1 "Vibranium" "An integer between 30-45"
-					continue
-				fi
+                if ((input > 45 || input < 30)); then
+                    notify-send -r 1 "Vibranium" "An integer between 30-45"
+                    continue
+                fi
 
-				sed -i -E "s/(\"height\"\s*:\s*)[0-9]+/\1${input}/" "$WAYBAR_CONFIG"
-				systemctl --user restart waybar
-				break
-			done
-			;;
-		"Move"*)
-			case "$BAR_POSITION" in
-				top)    vibranium-cmd-set-waybar-position "bottom" ;;
-				bottom) vibranium-cmd-set-waybar-position "top"    ;;
-			esac
-			;;
-		"Enabled"*)
-			waybar-toggle-modules
-			;;
-		"Show"*|"Hide"*)
-			vibranium-cmd-toggle-waybar-hints
-			;;
-		"Configure modules")
-			configure-waybar-module
-			;;
-	esac
+                sed -i -E "s/(\"height\"\s*:\s*)[0-9]+/\1${input}/" "$WAYBAR_CONFIG"
+                systemctl --user restart waybar
+                break
+            done
+            ;;
+        "Move"*)
+            case "$BAR_POSITION" in
+                top) vibranium-cmd-set-waybar-position "bottom" ;;
+                bottom) vibranium-cmd-set-waybar-position "top" ;;
+            esac
+            ;;
+        "Enabled"*)
+            waybar-toggle-modules
+            ;;
+        "Show"* | "Hide"*)
+            vibranium-cmd-toggle-waybar-hints
+            ;;
+        "Configure modules")
+            configure-waybar-module
+            ;;
+    esac
 done

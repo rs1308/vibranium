@@ -8,25 +8,25 @@ if [[ $VIBRANIUM_BAR_BRIGHTNESS_MODULE_ENABLE == false ]]; then
     exit 0
 fi
 
-brightness="$(<"$VIBRANIUM_STATE/brightness")"
+brightness="$(< "$VIBRANIUM_STATE/brightness")"
 if [[ $VIBRANIUM_BAR_SHOW_SHORTCUT_HINTS == true ]]; then
-	bind1="$(vibranium-cmd-keybindings -i 'Brightness up' | sed -n '1s/^[0-9]\.\s*//p')"
-	bind2="$(vibranium-cmd-keybindings -i 'Brightness down' | sed -n '1s/^[0-9]\.\s*//p')"
+    bind1="$(vibranium-cmd-keybindings -i 'Brightness up' | sed -n '1s/^[0-9]\.\s*//p')"
+    bind2="$(vibranium-cmd-keybindings -i 'Brightness down' | sed -n '1s/^[0-9]\.\s*//p')"
 
-	guide+="<span foreground='${P_GRAY}'>---------------------------------------</span>"
-	guide+="\n<span foreground='${P_ACCENT}'> Scroll wheel</span>: adjust brightness "
-	guide+="\n<span foreground='${P_ACCENT}'> Right click</span>:  maximum brightness "
-	guide+="\n<span foreground='${P_ACCENT}'> Left  click</span>:  minimum brightness "
-	guide+="\n<span foreground='${P_ACCENT}'> Middle click</span>: half brightness "
-	guide+="\n<span foreground='${P_GRAY}'>---------------------------------------</span>\n"
+    guide+="<span foreground='${P_GRAY}'>---------------------------------------</span>"
+    guide+="\n<span foreground='${P_ACCENT}'> Scroll wheel</span>: adjust brightness "
+    guide+="\n<span foreground='${P_ACCENT}'> Right click</span>:  maximum brightness "
+    guide+="\n<span foreground='${P_ACCENT}'> Left  click</span>:  minimum brightness "
+    guide+="\n<span foreground='${P_ACCENT}'> Middle click</span>: half brightness "
+    guide+="\n<span foreground='${P_GRAY}'>---------------------------------------</span>\n"
 
-	[ -n "$bind1" ] && guide+=" <span foreground='${P_GREEN}'><b>${bind1}</b></span>: brightness up\n"
-	[ -n "$bind2" ] && guide+=" <span foreground='${P_GREEN}'><b>${bind2}</b></span>: brightness down\n"
-	guide+="<span foreground='${P_ACCENT}'> Brightness keys</span>: adjust brightness"
-	
-	tooltip="\t<span foreground='${P_ACCENT}'><b>Current brightness</b></span>: ${brightness}%\n${guide}"
+    [ -n "$bind1" ] && guide+=" <span foreground='${P_GREEN}'><b>${bind1}</b></span>: brightness up\n"
+    [ -n "$bind2" ] && guide+=" <span foreground='${P_GREEN}'><b>${bind2}</b></span>: brightness down\n"
+    guide+="<span foreground='${P_ACCENT}'> Brightness keys</span>: adjust brightness"
+
+    tooltip="\t<span foreground='${P_ACCENT}'><b>Current brightness</b></span>: ${brightness}%\n${guide}"
 else
-	tooltip="<span foreground='${P_ACCENT}'><b>Brightness</b></span>: ${brightness}%${guide}"
+    tooltip="<span foreground='${P_ACCENT}'><b>Brightness</b></span>: ${brightness}%${guide}"
 fi
 
 printf '{"text": "", "tooltip": "%s", "percentage": %s}' "$tooltip" "$brightness"

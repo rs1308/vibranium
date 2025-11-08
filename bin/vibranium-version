@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-TAG=$(git -C "$VIBRANIUM" describe --tags --abbrev=0 2>/dev/null)
+TAG=$(git -C "$VIBRANIUM" describe --tags --abbrev=0 2> /dev/null)
 HEAD=$(git -C "$VIBRANIUM" rev-parse --short HEAD)
 TAG_COMMIT=$(git -C "$VIBRANIUM" rev-list -n 1 "$TAG")
 DATE=$(git -C "$VIBRANIUM" show -s --format=%cd --date=short HEAD)
@@ -10,10 +10,10 @@ if [ "$HEAD" = "$(git -C "$VIBRANIUM" rev-parse --short "$TAG_COMMIT")" ]; then
 else
     COMMITS_AHEAD=$(git -C "$VIBRANIUM" rev-list --count "$TAG"..HEAD)
     echo "Vibranium dev ${TAG}"
-	echo "Running on ${HEAD} (${DATE})"
-	echo "${COMMITS_AHEAD} commits ahead of ${TAG}"
+    echo "Running on ${HEAD} (${DATE})"
+    echo "${COMMITS_AHEAD} commits ahead of ${TAG}"
 fi
 
 if [ -f "$VIBRANIUM_STATE/update.available" ]; then
-    echo "New version available: $(<"$VIBRANIUM_STATE/update.available")"
+    echo "New version available: $(< "$VIBRANIUM_STATE/update.available")"
 fi

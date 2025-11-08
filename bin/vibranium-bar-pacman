@@ -12,9 +12,9 @@ if [[ "$VIBRANIUM_BAR_PACMAN_MODULE_ENABLE" == "false" ]]; then
     exit 0
 fi
 
-while ! ping 8.8.8.8 -c 1 &>/dev/null; do
-	# No internet connection
-	sleep 1
+while ! ping 8.8.8.8 -c 1 &> /dev/null; do
+    # No internet connection
+    sleep 1
 done
 
 if [[ "$VIBRANIUM_BAR_SHOW_SEPARATOR" == "true" ]]; then
@@ -82,7 +82,8 @@ if [[ "$VIBRANIUM_BAR_SHOW_ANIMATION" == "true" ]]; then
 fi
 
 spinner_chars=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
-i=0; delay=0.1
+i=0
+     delay=0.1
 
 if [[ $show_spinner == true ]]; then
     # spinner while either background job is running
@@ -124,11 +125,11 @@ count=$((arch_updates + aur_updates))
 
 if [[ $count =~ [0-9] ]] && [[ "$count" -ge "$VIBRANIUM_BAR_PACMAN_MODULE_MINIMUM_PACKAGES_REQUIRED" ]]; then
     printf '{"text":"%s<span foreground=\\"%s\\" rise=\\"0.5pt\\">\\uf021</span> %s","tooltip":"<span foreground=\\"%s\\">Arch updates</span>: %s\\n<span foreground=\\"%s\\">AUR updates</span>: %s\\n%s\\n%s"}' \
-      "$separator" "$P_ACCENT" "$count" \
-      "$P_ACCENT" "$arch_updates" \
-      "$P_ACCENT" "$aur_updates" \
-      "Click to <span foreground='${P_YELLOW}'>fetch</span> updates" \
-      "Right click to <span foreground='${P_GREEN}'>install</span> updates"
+        "$separator" "$P_ACCENT" "$count" \
+        "$P_ACCENT" "$arch_updates" \
+        "$P_ACCENT" "$aur_updates" \
+        "Click to <span foreground='${P_YELLOW}'>fetch</span> updates" \
+        "Right click to <span foreground='${P_GREEN}'>install</span> updates"
     exit 0
 else
     printf '{"text": ""}'

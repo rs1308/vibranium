@@ -38,10 +38,12 @@ case "$1" in
 
         # if nothing was chosen - exit the menu, otherwise choose selected
         [ -z "$chosen" ] && exit 1
-        printf "%s\n" "$chosen"| cliphist decode | wl-copy -n
+        printf "%s\n" "$chosen" | cliphist decode | wl-copy -n
         ;;
     clear)
-        killall rofi; cliphist wipe; wl-copy --clear
+        killall rofi
+                      cliphist wipe
+                                     wl-copy --clear
         ;;
     *)
         usage

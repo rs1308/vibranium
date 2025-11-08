@@ -6,7 +6,7 @@ INDEX=0
 CONFIG="$XDG_CONFIG_HOME/hypr/hypridle.conf"
 
 _update_timeout() {
-	local file="$CONFIG"
+    local file="$CONFIG"
     local listener="$1"
     local new_timeout="$2"
 
@@ -23,8 +23,8 @@ _update_timeout() {
 }
 
 while :; do
-	readarray -t timeouts < <(
-		awk '
+    readarray -t timeouts < <(
+        awk '
 			/^\s*listener\s*{/{f=1; next}
 			/^\s*}/{f=0; next}
 			f && /^\s*timeout\s*=/ {
@@ -32,22 +32,22 @@ while :; do
 				print a[1]
 			}
 		' "$CONFIG"
-	)
+    )
 
-	lock_timeout="${timeouts[0]}"
-	sleep_timeout="${timeouts[1]}"
+    lock_timeout="${timeouts[0]}"
+    sleep_timeout="${timeouts[1]}"
 
-	lock_timeout=$(( lock_timeout / 60 ))
-	sleep_timeout=$(( sleep_timeout / 60 ))
+    lock_timeout=$((lock_timeout / 60))
+    sleep_timeout=$((sleep_timeout / 60))
 
-	OPTIONS=(
-		"Lock  after : $lock_timeout min"
-		"Sleep after : $sleep_timeout min"
-		"What is this?"
-	)
+    OPTIONS=(
+        "Lock  after : $lock_timeout min"
+        "Sleep after : $sleep_timeout min"
+        "What is this?"
+    )
 
-	CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Idle timeouts" "ESC to go back" -selected-row "$INDEX")"
-	[ -z "$CHOSEN" ] && break
+    CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Idle timeouts" "ESC to go back" -selected-row "$INDEX")"
+    [ -z "$CHOSEN" ] && break
 
     for i in "${!OPTIONS[@]}"; do
         if [ "${OPTIONS[$i]}" = "$CHOSEN" ]; then
@@ -56,50 +56,53 @@ while :; do
         fi
     done
 
-	case "$CHOSEN" in
-		"Lock"*)
-			while :; do
-				prompt="Lock timeout (int)"
-				input="$(printf "%s\n" "$prompt" | rofi_cmd "Lock timeout" "in minutes")"
-				[ -z "$input" ] && break; [ "$input" = "$prompt" ] && continue
-				[[ ! "$input" =~ ^[0-9]+$ ]] && {
-					notify-send -r 3 -u critical -t 1500 "Vibranium" "Only integers allowed!"
-					continue
-				}
+    case "$CHOSEN" in
+        "Lock"*)
+            while :; do
+                prompt="Lock timeout (int)"
+                input="$(printf "%s\n" "$prompt" | rofi_cmd "Lock timeout" "in minutes")"
+                [ -z "$input" ] && break
+                              [ "$input" = "$prompt" ] && continue
+                [[ ! "$input" =~ ^[0-9]+$ ]] && {
+                    notify-send -r 3 -u critical -t 1500 "Vibranium" "Only integers allowed!"
+                    continue
+                }
 
-				time=$(( input * 60 ))
-				_update_timeout 1 $time
-				systemctl --user restart hypridle
-				break
-			done
-			;;
-		"Sleep"*)
-			while :; do
-				prompt="Sleep timeout (int)"
-				input="$(printf "%s\n" "$prompt" | rofi_cmd "Sleep timeout" "in minutes")"
-				[ -z "$input" ] && break; [ "$input" = "$prompt" ] && continue
+                time=$((input * 60))
+                _update_timeout 1 $time
+                systemctl --user restart hypridle
+                break
+            done
+            ;;
+        "Sleep"*)
+            while :; do
+                prompt="Sleep timeout (int)"
+                input="$(printf "%s\n" "$prompt" | rofi_cmd "Sleep timeout" "in minutes")"
+                [ -z "$input" ] && break
+                              [ "$input" = "$prompt" ] && continue
 
-				[[ ! "$input" =~ ^[0-9]+$ ]] && {
-					notify-send -r 3 -u critical -t 1500 "Vibranium" "Only integers allowed!"
-					continue
-				}
+                [[ ! "$input" =~ ^[0-9]+$ ]] && {
+                    notify-send -r 3 -u critical -t 1500 "Vibranium" "Only integers allowed!"
+                    continue
+                }
 
-				if (( input <= lock_timeout )); then
-					notify-send -r 3 -u critical -t 3000 "Vibranium" "Sleep timeout must be greater than $lock_timeout!"
-					continue
-				fi
+                if ((input <= lock_timeout)); then
+                    notify-send -r 3 -u critical -t 3000 "Vibranium" "Sleep timeout must be greater than $lock_timeout!"
+                    continue
+                fi
 
-				time=$(( input * 60 ))
-				_update_timeout 2 $time
-				systemctl --user restart hypridle
-				break
-			done
-		;;
-		"What"*)
-			msg="<span foreground='${P_ACCENT}'><b>•</b></span> "
-			msg+="<b>Time of inactivity until screen lock</b>\n"
-			msg+="<span foreground='${P_ACCENT}'><b>•</b></span> "
-			msg+="<b>Time of inactivity before the system sleeps</b>"
-			notify-send -r 2 -t 5000 "What is this?" "$msg"
-	esac
+                time=$((input * 60))
+                _update_timeout 2 $time
+                systemctl --user restart hypridle
+                break
+            done
+            ;;
+        "What"*)
+            msg="<span foreground='${P_ACCENT}'><b>•</b></span> "
+            msg+="<b>Time of inactivity until screen lock</b>\n"
+            msg+="<span foreground='${P_ACCENT}'><b>•</b></span> "
+            msg+="<b>Time of inactivity before the system sleeps</b>"
+            notify-send -r 2 -t 5000 "What is this?" "$msg"
+            ;;
+    esac
 done

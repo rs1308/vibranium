@@ -2,20 +2,20 @@
 
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 
-if command -v spotify >/dev/null && command -v spicetify; then
-	if ! grep -q "adblock" "$XDG_CONFIG_HOME/spicetify/config-xpui.ini"; then
-		OPTIONS=("Install Spotify adblock")
-	else
-		OPTIONS=("Remove Spotify adblock")
-	fi
+if command -v spotify > /dev/null && command -v spicetify; then
+    if ! grep -q "adblock" "$XDG_CONFIG_HOME/spicetify/config-xpui.ini"; then
+        OPTIONS=("Install Spotify adblock")
+    else
+        OPTIONS=("Remove Spotify adblock")
+    fi
 fi
 
-if command -v chromium >/dev/null; then
-	if ! grep -q "oauth2-client-id" "$XDG_CONFIG_HOME/chromium-flags.conf"; then
-		OPTIONS+=("Enable Google sync for Chromium")
-	else
-		OPTIONS+=("Disable Google sync for Chromium")
-	fi
+if command -v chromium > /dev/null; then
+    if ! grep -q "oauth2-client-id" "$XDG_CONFIG_HOME/chromium-flags.conf"; then
+        OPTIONS+=("Enable Google sync for Chromium")
+    else
+        OPTIONS+=("Disable Google sync for Chromium")
+    fi
 fi
 
 if [ "${#OPTIONS[@]}" -eq 0 ]; then
@@ -27,20 +27,20 @@ CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "App tweaks" "ESC to go back"
 [[ -z "$CHOSEN" ]] && exit
 
 case "$CHOSEN" in
-	"Install Spotify adblock")
-		vibranium-tweaks-spicetify-adblock install
-		vibranium-cmd-kill-rofi
-		exit 0
-		;;
-	"Remove Spotify adblock")
-		vibranium-tweaks-spicetify-adblock remove
-		vibranium-cmd-kill-rofi
-		exit 0
-		;;
-	"Enable Google sync for Chromium")
-		vibranium-tweaks-chromium-sync enable
-		;;
-	"Disable Google sync for Chromium")
-		vibranium-tweaks-chromium-sync disable
-		;;
+    "Install Spotify adblock")
+        vibranium-tweaks-spicetify-adblock install
+        vibranium-cmd-kill-rofi
+        exit 0
+        ;;
+    "Remove Spotify adblock")
+        vibranium-tweaks-spicetify-adblock remove
+        vibranium-cmd-kill-rofi
+        exit 0
+        ;;
+    "Enable Google sync for Chromium")
+        vibranium-tweaks-chromium-sync enable
+        ;;
+    "Disable Google sync for Chromium")
+        vibranium-tweaks-chromium-sync disable
+        ;;
 esac

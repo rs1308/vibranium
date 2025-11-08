@@ -19,15 +19,15 @@ for file in "$VIBRANIUM"/migrations/*.sh; do
             touch "$STATE_DIR/$filename"
         else
             printf "%s[VIBRANIUM]%s Migration %s failed. Skip and continue? (y/N): " \
-				"$YELLOW" "$RESET" "$file"
+                "$YELLOW" "$RESET" "$file"
             read -r response
             case "$response" in
-            [yY][eE][sS] | [yY])
-                touch "$STATE_DIR/skipped/$filename"
-                ;;
-            *)
-                exit 1
-                ;;
+                [yY][eE][sS] | [yY])
+                    touch "$STATE_DIR/skipped/$filename"
+                    ;;
+                *)
+                    exit 1
+                    ;;
             esac
         fi
     fi

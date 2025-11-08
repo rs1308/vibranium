@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-if pidof gpu-screen-recorder >/dev/null; then
-	vibranium-core-recording
-	exit 0
+if pidof gpu-screen-recorder > /dev/null; then
+    vibranium-core-recording
+    exit 0
 fi
 
 source "$VIBRANIUM_PATH/vibranium-core-lib"

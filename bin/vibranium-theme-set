@@ -6,14 +6,14 @@ source "$VIBRANIUM_PATH/vibranium-core-lib"
 
 # Assign a theme name to the GTK theme folder name
 declare -A FAMILIES=(
-    [Gruvbox]="Hard Medium Soft Light"
-    [Everforest]="Hard Medium Soft"
-    [Tokyonight]="Night Moon"
-    [Catppuccin]="Mocha Macchiato Frappe Latte"
-    [Nightfox]="Nightfox Nordfox Carbonfox Terafox"
-    [Rosepine]="Rosepine Moon Dawn"
-    [Osaka]="Osaka Jade Solarized Light"
-	[Kanagawa]="Wave Dragon"
+     [Gruvbox]="Hard Medium Soft Light"
+     [Everforest]="Hard Medium Soft"
+     [Tokyonight]="Night Moon"
+     [Catppuccin]="Mocha Macchiato Frappe Latte"
+     [Nightfox]="Nightfox Nordfox Carbonfox Terafox"
+     [Rosepine]="Rosepine Moon Dawn"
+     [Osaka]="Osaka Jade Solarized Light"
+    [Kanagawa]="Wave Dragon"
 )
 
 declare -A STANDALONE_THEMES=(
@@ -22,50 +22,50 @@ declare -A STANDALONE_THEMES=(
 
 # Map theme to GTK theme name if special
 declare -A GTK_MAP=(
-    [Osaka - Jade]="Nightfox-Terafox"
-    [Osaka - Osaka]="Osaka-Dark"
-    [Osaka - Solarized]="Osaka-Solarized"
-    [Osaka - Light]="Osaka-Light"
-    [Nightfox - Nightfox]="Nightfox"
+     [Osaka - Jade]="Nightfox-Terafox"
+     [Osaka - Osaka]="Osaka-Dark"
+     [Osaka - Solarized]="Osaka-Solarized"
+     [Osaka - Light]="Osaka-Light"
+     [Nightfox - Nightfox]="Nightfox"
 )
 
 # Capitalized folder name = papirus icon color name
 # Temporarily set to blue for all; user will adjust manually
 declare -A PAPIRUS_COLORS=(
-    [Gruvbox-Hard]=yaru
-    [Gruvbox-Medium]=yaru
-    [Gruvbox-Soft]=yaru
-    [Gruvbox-Light]=palebrown
+     [Gruvbox - Hard]=yaru
+     [Gruvbox - Medium]=yaru
+     [Gruvbox - Soft]=yaru
+     [Gruvbox - Light]=palebrown
 
-    [Everforest-Hard]=green
-    [Everforest-Medium]=green
-    [Everforest-Soft]=green
+     [Everforest - Hard]=green
+     [Everforest - Medium]=green
+     [Everforest - Soft]=green
 
-    [Catppuccin-Mocha]=indigo
-    [Catppuccin-Macchiato]=indigo
-    [Catppuccin-Frappe]=nordic
-    [Catppuccin-Latte]=blue
+     [Catppuccin - Mocha]=indigo
+     [Catppuccin - Macchiato]=indigo
+     [Catppuccin - Frappe]=nordic
+     [Catppuccin - Latte]=blue
 
-    [Nightfox-Nightfox]=bluegrey
-    [Nightfox-Carbonfox]=black
-    [Nightfox-Nordfox]=nordic
-    [Nightfox-Terafox]=teal
+     [Nightfox - Nightfox]=bluegrey
+     [Nightfox - Carbonfox]=black
+     [Nightfox - Nordfox]=nordic
+     [Nightfox - Terafox]=teal
 
-    [Rosepine]=violet
-    [Rosepine-Moon]=violet
-    [Rosepine-Dawn]=indigo
+     [Rosepine]=violet
+     [Rosepine - Moon]=violet
+     [Rosepine - Dawn]=indigo
 
-    [Tokyonight-Night]=blue
-    [Tokyonight-Moon]=blue
+     [Tokyonight - Night]=blue
+     [Tokyonight - Moon]=blue
 
-    [Osaka-Osaka]=teal
-    [Osaka-Jade]=teal
-    [Osaka-Solarized]=darkcyan
-    [Osaka-Light]=green
+     [Osaka - Osaka]=teal
+     [Osaka - Jade]=teal
+     [Osaka - Solarized]=darkcyan
+     [Osaka - Light]=green
 
-	[Kanagawa-Wave]=yaru
-	[Kanagawa-Dragon]=yaru
-	[Kanagawa-Lotus]=palebrown
+    [Kanagawa - Wave]=yaru
+    [Kanagawa - Dragon]=yaru
+    [Kanagawa - Lotus]=palebrown
 )
 
 LINK_TARGET="$XDG_CONFIG_HOME/vibranium/theme/current"
@@ -157,39 +157,39 @@ apply_chromium_colors() {
     local current_theme
     current_theme="$(vibranium-theme-get)"
     case "$current_theme" in
-    "catppuccin-mocha") color="30, 30, 46" ;;
-    "catppuccin-macchiato") color="36, 39, 58" ;;
-    "catppuccin-frappe") color="48, 52, 70" ;;
-    "catppuccin-latte") color="239, 241, 245" ;;
+        "catppuccin-mocha") color="30, 30, 46" ;;
+        "catppuccin-macchiato") color="36, 39, 58" ;;
+        "catppuccin-frappe") color="48, 52, 70" ;;
+        "catppuccin-latte") color="239, 241, 245" ;;
 
-    "everforest-hard") color="39, 46, 51" ;;
-    "everforest-medium") color="45, 53, 59" ;;
-    "everforest-soft") color="51, 60, 67" ;;
+        "everforest-hard") color="39, 46, 51" ;;
+        "everforest-medium") color="45, 53, 59" ;;
+        "everforest-soft") color="51, 60, 67" ;;
 
-    "gruvbox-hard") color="29, 32, 33" ;;
-    "gruvbox-medium") color="40, 40, 40" ;;
-    "gruvbox-soft") color="50, 48, 47" ;;
-    "gruvbox-light") color="251, 241, 199" ;;
+        "gruvbox-hard") color="29, 32, 33" ;;
+        "gruvbox-medium") color="40, 40, 40" ;;
+        "gruvbox-soft") color="50, 48, 47" ;;
+        "gruvbox-light") color="251, 241, 199" ;;
 
-    "nightfox-carbonfox") color="22, 22, 22" ;;
-    "nightfox-nightfox") color="25, 35, 48" ;;
-    "nightfox-nordfox") color="46, 52, 64" ;;
-    "nightfox-terafox") color="21, 37, 40" ;;
+        "nightfox-carbonfox") color="22, 22, 22" ;;
+        "nightfox-nightfox") color="25, 35, 48" ;;
+        "nightfox-nordfox") color="46, 52, 64" ;;
+        "nightfox-terafox") color="21, 37, 40" ;;
 
-    "osaka-jade") color="13, 23, 19" ;;
-    "osaka-osaka") color="0, 20, 25" ;;
-    "osaka-solarized") color="0, 43, 54" ;;
-    "osaka-light") color="253, 245, 226" ;;
+        "osaka-jade") color="13, 23, 19" ;;
+        "osaka-osaka") color="0, 20, 25" ;;
+        "osaka-solarized") color="0, 43, 54" ;;
+        "osaka-light") color="253, 245, 226" ;;
 
-    "rosepine") color="25, 23, 36" ;;
-    "rosepine-moon") color="35, 33, 54" ;;
-    "rosepine-dawn") color="250, 244, 237" ;;
+        "rosepine") color="25, 23, 36" ;;
+        "rosepine-moon") color="35, 33, 54" ;;
+        "rosepine-dawn") color="250, 244, 237" ;;
 
-    "tokyonight-moon") color="34, 36, 54" ;;
-    "tokyonight-night") color="26, 27, 38" ;;
+        "tokyonight-moon") color="34, 36, 54" ;;
+        "tokyonight-night") color="26, 27, 38" ;;
 
-	"kanagawa-wave") color="31, 31, 40" ;;
-	"kanagawa-dragon") color="24, 22, 22" ;;
+        "kanagawa-wave") color="31, 31, 40" ;;
+        "kanagawa-dragon") color="24, 22, 22" ;;
     esac
 
     chromium --no-startup-window --set-theme-color="$color"
@@ -224,19 +224,19 @@ apply_theme() {
     ln -sf "$theme_path" "$LINK_TARGET"
 
     local gtk_theme="${GTK_MAP[$chosen]:-$chosen}"
-	echo "GTK THEME $gtk_theme"
+    echo "GTK THEME $gtk_theme"
 
-	case "$gtk_theme" in
-		"Nightfox-Nightfox")
-			gtk_theme="Nightfox"
-			;;
-		"Osaka-Jade")
-			gtk_theme="Nightfox-Terafox"
-			;;
-		"Osaka-Osaka")
-			gtk_theme="Osaka-Dark"
-			;;
-	esac
+    case "$gtk_theme" in
+        "Nightfox-Nightfox")
+            gtk_theme="Nightfox"
+            ;;
+        "Osaka-Jade")
+            gtk_theme="Nightfox-Terafox"
+            ;;
+        "Osaka-Osaka")
+            gtk_theme="Osaka-Dark"
+            ;;
+    esac
 
     log "Applying GTK 4 settings"
     sed -i -e "/gtk-theme-name/s/=.*/=$gtk_theme/" "$XDG_CONFIG_HOME"/gtk-{3,4}.0/settings.ini
@@ -313,11 +313,11 @@ if [[ -n "$1" ]]; then
 
     CHOSEN="${FAMILY}-${VARIANT}"
 
-	case "$CHOSEN" in
-		"Rosepine-Rosepine")
-			CHOSEN="Rosepine"
-			;;
-	esac
+    case "$CHOSEN" in
+        "Rosepine-Rosepine")
+            CHOSEN="Rosepine"
+            ;;
+    esac
 else
     while :; do
         FAMILY="$(pick_family)" || exit 1
@@ -365,7 +365,7 @@ vibranium-core-set-wallpaper "$(get_wallpaper "$CHOSEN")"
 
 log "Updating Waybar"
 if [[ "$(systemctl --user is-active waybar)" == "active" ]]; then
-	systemctl --user --force restart waybar
+    systemctl --user --force restart waybar
 fi
 
 if [[ $VIBRANIUM_GLOBAL_USE_OSD == true ]]; then
@@ -403,7 +403,7 @@ log "Updating GTK icon cache"
 warn "Note that some icons still might have previous colors."
 warn "If that's the case then restart or refresh an app"
 #waitpid $papirus_pid;
-gtk-update-icon-cache -tfq "$XDG_DATA_HOME"/icons/Papirus-{Dark,Light} &>/dev/null &
+gtk-update-icon-cache -tfq "$XDG_DATA_HOME"/icons/Papirus-{Dark,Light} &> /dev/null &
 
 if pidof thunar > /dev/null; then
     log "Reloading thunar"

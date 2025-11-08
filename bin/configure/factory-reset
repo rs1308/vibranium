@@ -28,18 +28,18 @@ reset_settings() {
 
     notify-send -r 1 -t 5000 "Vibranium" "<span foreground='${P_RED}'><b>${message}</b></span>"
 
-	return 0
+    return 0
 }
 
 factory_reset() {
-	local looknfeel_opts=(
-		"animations:enabled:true"
-		"decoration:dim_inactive:true"
-		"decoration:rounding:0"
-		"decoration:blur:enabled:false"
-		"decoration:blur:size:5"
-		"decoration:shadow:enabled:true"
-	)
+    local looknfeel_opts=(
+        "animations:enabled:true"
+        "decoration:dim_inactive:true"
+        "decoration:rounding:0"
+        "decoration:blur:enabled:false"
+        "decoration:blur:size:5"
+        "decoration:shadow:enabled:true"
+    )
 
     local stages=("confirm" "confirm x2" "confirm x3")
     local prompt input
@@ -51,55 +51,54 @@ factory_reset() {
         [ "$input" != "$prompt" ] && return 1
     done
 
-	sed -i '/^VIBRANIUM/d' "$XDG_CONFIG_HOME/vibranium/settings"
-	sed -i "/border-radius/s/:.*/:\t0px;/g" "$XDG_CONFIG_HOME/rofi/config.rasi"
-	sed -i -e '/corner_radius/s/=.*/= 0/' \
-		   -e '/progress_bar_height/s/=.*/= 15/' \
-		   -e '/progress_bar_corner_radius/s/=.*/= 0/' \
-		   "$XDG_CONFIG_HOME/dunst/dunstrc"
+    sed -i '/^VIBRANIUM/d' "$XDG_CONFIG_HOME/vibranium/settings"
+    sed -i "/border-radius/s/:.*/:\t0px;/g" "$XDG_CONFIG_HOME/rofi/config.rasi"
+    sed -i -e '/corner_radius/s/=.*/= 0/' \
+        -e '/progress_bar_height/s/=.*/= 15/' \
+        -e '/progress_bar_corner_radius/s/=.*/= 0/' \
+        "$XDG_CONFIG_HOME/dunst/dunstrc"
 
-	for opt in "${looknfeel_opts[@]}"; do
-		vibranium-cmd-edit-wm-config "$opt" \
-			"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/look-and-feel.conf"
-	done
+    for opt in "${looknfeel_opts[@]}"; do
+        vibranium-cmd-edit-wm-config "$opt" \
+            "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/look-and-feel.conf"
+    done
 
-	rm -f "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/smart-gaps.conf" || true
-	ln -sf "$VIBRANIUM/defaults/hypr/animations/default.conf" \
-		"$XDG_CONFIG_HOME/hypr/hyprland.conf.d/animations.conf"
-	vibranium-theme-set "Nightfox"
+    rm -f "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/smart-gaps.conf" || true
+    ln -sf "$VIBRANIUM/defaults/hypr/animations/default.conf" \
+        "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/animations.conf"
+    vibranium-theme-set "Nightfox"
 
-	rm -rf "$VIBRANIUM_STATE"/{wallpaper,power-profile,blur.restore}
-	printf "suspended" > "$VIBRANIUM_STATE/night-light"
+    rm -rf "$VIBRANIUM_STATE"/{wallpaper,power-profile,blur.restore}
+    printf "suspended" > "$VIBRANIUM_STATE/night-light"
 
-	if [ ! "$(vibranium-utils-power-profile-get)" = "balanced" ]; then
-		vibranium-core-power-profile-set -q balanced
-	fi
+    if [ ! "$(vibranium-utils-power-profile-get)" = "balanced" ]; then
+        vibranium-core-power-profile-set -q balanced
+    fi
 
-	if ! grep -qE '^\s*//.*"hyprland/language"' "$XDG_CONFIG_HOME/waybar/config.jsonc"; then
-		sed -i 's|^\(\s*\)\("\s*hyprland/language".*\)|\1// \2|' \
-			"$XDG_CONFIG_HOME/waybar/config.jsonc"
-	fi
+    if ! grep -qE '^\s*//.*"hyprland/language"' "$XDG_CONFIG_HOME/waybar/config.jsonc"; then
+        sed -i 's|^\(\s*\)\("\s*hyprland/language".*\)|\1// \2|' \
+            "$XDG_CONFIG_HOME/waybar/config.jsonc"
+    fi
 
-	current_volume=$(wpctl get-volume "@DEFAULT_AUDIO_SINK@")
-	[[ $current_volume =~ ([0-9]+\.[0-9]+) ]] && current_volume="${BASH_REMATCH[1]}"
+    current_volume=$(wpctl get-volume "@DEFAULT_AUDIO_SINK@")
+    [[ $current_volume =~ ([0-9]+\.[0-9]+) ]] && current_volume="${BASH_REMATCH[1]}"
 
-	if [[ $current_volume =~ ^(1\.[1-4][0-9]|1\.50|[2-9]) ]]; then
-		wpctl set-volume @DEFAULT_AUDIO_SINK@ 1.00
-	fi
+    if [[ $current_volume =~ ^(1\.[1-4][0-9]|1\.50|[2-9]) ]]; then
+        wpctl set-volume @DEFAULT_AUDIO_SINK@ 1.00
+    fi
 
+    if [[ "$(systemctl --user is-active waybar)" == "inactive" ]]; then
+        systemctl --user enable --now waybar
+        vibranium-cmd-set-waybar-position -q top
+    fi
 
-	if [[ "$(systemctl --user is-active waybar)" == "inactive" ]]; then
-		systemctl --user enable --now waybar
-		vibranium-cmd-set-waybar-position -q top
-	fi
+    if [[ "$(systemctl --user is-enabled hyprpaper)" == "disabled" ]]; then
+        systemctl --user enable --now hyprpaper
+    fi
 
-	if [[ "$(systemctl --user is-enabled hyprpaper)" == "disabled" ]]; then
-		systemctl --user enable --now hyprpaper
-	fi
+    rm -rf "${XDG_CACHE_HOME:?}/hyprlock" &
 
-	rm -rf "${XDG_CACHE_HOME:?}/hyprlock" &
-
-	notify-send -r 1 "Vibranium" "Settings have been reset to factory defaults"
+    notify-send -r 1 "Vibranium" "Settings have been reset to factory defaults"
 }
 
 while :; do
@@ -109,18 +108,18 @@ while :; do
         "Reset Waybar settings"
         "Reset brightness settings"
         "Reset screenshot settings"
-		"Reset appearance settings"
-		"Reset color picker settings"
+        "Reset appearance settings"
+        "Reset color picker settings"
         "Reset screen recording settings"
-		"<b><i>FACTORY RESET</i></b>"
+        "<b><i>FACTORY RESET</i></b>"
     )
     CHOSEN="$(printf "%s\n" "${OPTIONS[@]}" | rofi_cmd "Factory reset" "ESC to go back")"
     [ -z "$CHOSEN" ] && break
 
     case "$CHOSEN" in
-		"Reset appearance"*)
-			reset_settings "appearance" "" "Appearance settings have been restored to defaults!" \
-			"
+        "Reset appearance"*)
+            reset_settings "appearance" "" "Appearance settings have been restored to defaults!" \
+                "
 				truncate -s 0 "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/look-and-feel.conf"
 				sed -i '/border-radius/s/:.*/: 0px;/g' "$XDG_CONFIG_HOME/rofi/config.rasi"
 				sed -i '/corner_radius/s/=.*/= 0/' "$XDG_CONFIG_HOME/dunst/dunstrc"
@@ -128,35 +127,37 @@ while :; do
 				vibranium-cmd-refresh-dunst
 				hyprctl -q reload config-only
 			"
-			;;
+            ;;
         "Reset audio"*)
             reset_settings "audio" "VIBRANIUM_VOLUME" "Audio settings have been restored to defaults!"
-        ;;
+            ;;
         "Reset global"*)
             reset_settings "global" "VIBRANIUM_GLOBAL" "Global settings have been restored to defaults!"
-        ;;
+            ;;
         "Reset Waybar"*)
             reset_settings "Waybar" "VIBRANIUM_BAR" "Waybar settings have been restored to defaults!"
-			cp -r "$VIBRANIUM/config/waybar" "$HOME/.config"
-			vibranium-cmd-set-waybar-position -q top; systemctl --user restart waybar
-        ;;
+            cp -r "$VIBRANIUM/config/waybar" "$HOME/.config"
+            vibranium-cmd-set-waybar-position -q top
+                                             systemctl --user restart waybar
+            ;;
         "Reset brightness"*)
             reset_settings "brightness" "VIBRANIUM_BRIGHTNESS" "Brightness settings have been restored to defaults!"
-        ;;
+            ;;
         "Reset screenshot"*)
             reset_settings "screenshot" "VIBRANIUM_SCREENSHOT" "Screenshot settings have been restored to defaults!"
-        ;;
-		"Reset color picker settings")
-            reset_settings "color picker" "VIBRANIUM_COLOR_PICKER" "Color picker settings have been restored to defaults!" 
-			vibranium-cmd-refresh-waybar-module color-picker
-		;;
+            ;;
+        "Reset color picker settings")
+            reset_settings "color picker" "VIBRANIUM_COLOR_PICKER" "Color picker settings have been restored to defaults!"
+            vibranium-cmd-refresh-waybar-module color-picker
+            ;;
         "Reset screen recording"*)
             reset_settings "screen recording" "VIBRANIUM_RECORDING" "Screen recording settings have been restored to defaults!"
-        ;;
-		*"FACTORY RESET"*)
-			if factory_reset; then
-				vibranium-cmd-kill-rofi
-				exit 0
-			fi
+            ;;
+        *"FACTORY RESET"*)
+            if factory_reset; then
+                vibranium-cmd-kill-rofi
+                exit 0
+            fi
+            ;;
     esac
 done

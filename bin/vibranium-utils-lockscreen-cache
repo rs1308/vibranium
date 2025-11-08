@@ -9,7 +9,7 @@
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 
 if [ "$VIBRANIUM_GLOBAL_SHOW_WALLPAPER" = "false" ]; then
-	exit 0
+    exit 0
 fi
 
 # Enable GPU acceleration for ImageMagick if available (falls back to CPU).
@@ -18,7 +18,7 @@ export MAGICK_THREAD_LIMIT
 
 # We don't want to OOM on VRAM, right?
 if [[ $VIBRANIUM_IS_LAPTOP == false && $VIBRANIUM_GPU_IS_SUPPORTED == true ]]; then
-	export MAGICK_OCL_DEVICE=GPU
+    export MAGICK_OCL_DEVICE=GPU
 fi
 
 # PID and lock file paths
@@ -32,12 +32,12 @@ cleanup() {
         vibranium-cmd-refresh-waybar-module worker
     fi
     vibranium-utils-update-lockscreen
-	exit 
+    exit
 }
 trap cleanup EXIT INT TERM
 
 # Acquire lock and check for existing instance
-exec 200>"$lock_file"
+exec 200> "$lock_file"
 if ! flock -n 200; then
     echo "${GRAY}[$(date)] ${RED}Another instance is already running${RESET}"
     exit 1
@@ -46,7 +46,7 @@ fi
 # Check if old PID exists and is alive
 if [[ -f "$pid_file" ]]; then
     old_pid=$(cat "$pid_file")
-    if kill -0 "$old_pid" 2>/dev/null; then
+    if kill -0 "$old_pid" 2> /dev/null; then
         echo "${GRAY}[$(date)] ${RED}Another instance is already running${RESET}"
         exit 1
     else
@@ -71,18 +71,18 @@ declare -A filters=()  # Global associative array for filters.
 
 # Check if blur is enabled for lockscreen backgrounds.
 if [[ $VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_BACKGROUND == true ]]; then
-	case "$VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_STRENGTH" in
-		"low")  filters[blurred-low]="-colorize 50% -resize 70% -blur 0x16"  ;;
-		"mid")  filters[blurred-mid]="-colorize 50% -resize 50% -blur 0x32"  ;;
-		"hard") filters[blurred-hard]="-colorize 50% -resize 30% -blur 0x64" ;;
-	esac
+    case "$VIBRANIUM_GLOBAL_BLUR_LOCKSCREEN_STRENGTH" in
+        "low") filters[blurred - low]="-colorize 50% -resize 70% -blur 0x16" ;;
+        "mid") filters[blurred - mid]="-colorize 50% -resize 50% -blur 0x32" ;;
+        "hard") filters[blurred - hard]="-colorize 50% -resize 30% -blur 0x64" ;;
+    esac
 else
-	# If blur is disabled, apply dimming based on strength.
-	case "$VIBRANIUM_GLOBAL_DIM_LOCKSCREEN_STRENGTH" in
-		"low")  filters[dimmed-low]="-colorize 30%"  ;;
-		"mid")  filters[dimmed-mid]="-colorize 50%"  ;;
-		"hard") filters[dimmed-hard]="-colorize 70%" ;;
-	esac
+    # If blur is disabled, apply dimming based on strength.
+    case "$VIBRANIUM_GLOBAL_DIM_LOCKSCREEN_STRENGTH" in
+        "low") filters[dimmed - low]="-colorize 30%" ;;
+        "mid") filters[dimmed - mid]="-colorize 50%" ;;
+        "hard") filters[dimmed - hard]="-colorize 70%" ;;
+    esac
 fi
 
 needed=0
@@ -105,7 +105,7 @@ needs_processing() {
     local type="$2"
     local cached
 
-	cached="${cache_dir}/$(basename "${file%.*}")-${type}.jpg"
+    cached="${cache_dir}/$(basename "${file%.*}")-${type}.jpg"
     # Compare timestamps: if source is newer or cache missing, or force=true.
     if [[ ! -f "$cached" || "$file" -nt "$cached" || "$force" == true ]]; then
         return 0
@@ -117,12 +117,11 @@ needs_processing() {
 # This limits CPU usage to respect power modes.
 set_thread_limit() {
     case "$(vibranium-utils-power-profile-get)" in
-        "power-saver")   MAGICK_THREAD_LIMIT=$(( $(nproc) / 4 )) ;;
-        "balanced")      MAGICK_THREAD_LIMIT=$(( $(nproc) / 2 )) ;;
+        "power-saver")   MAGICK_THREAD_LIMIT=$(($( nproc) / 4))  ;;
+        "balanced")      MAGICK_THREAD_LIMIT=$(($( nproc) / 2))  ;;
         "performance")   MAGICK_THREAD_LIMIT=$(nproc) ;;
     esac
 }
-
 
 # First pass: Count how many images require processing without doing the work.
 # This optimizes early exit if cache is already up-to-date.
@@ -135,7 +134,7 @@ for file in "${backgrounds[@]}"; do
 done
 
 # Early exit if no processing is needed.
-if (( needed == 0 )); then
+if ((needed == 0)); then
     log "Hyprlock cache is up to date"  # Assuming 'log' is defined in the sourced lib.
     exit 0
 fi
@@ -149,13 +148,13 @@ process_file_forcibly() {
         cached="${cache_dir}/$(basename "${file%.*}")-${type}.jpg"
         if [[ "$single_file" == false ]]; then
             # Update Waybar with current processing file.
-				echo "Caching $(basename "$cached")" > "$XDG_RUNTIME_DIR/worker.active"
+            echo "Caching $(basename "$cached")" > "$XDG_RUNTIME_DIR/worker.active"
             vibranium-cmd-refresh-waybar-module worker
         fi
         echo "${GRAY}[$(date)] ${BLUE}Processing ($type): ${YELLOW}${cached}${RESET}"
-		# DO NOT QUOTE THIS
+        # DO NOT QUOTE THIS
         magick "$file" $filter "$cached"
-		vibranium-utils-update-lockscreen
+        vibranium-utils-update-lockscreen
     done
 }
 
@@ -163,11 +162,11 @@ process_file_forcibly() {
 # Only applies if not in single_file mode and respect_power is true.
 handle_power_pause() {
     if [[ "$single_file" == true ]]; then
-		# Ignore current power profile for single file
+        # Ignore current power profile for single file
         return
     fi
 
-	if [[ "$(vibranium-cmd-get-option VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE)" == true ]]; then
+    if [[ "$(vibranium-cmd-get-option VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE)" == true ]]; then
         local current_profile
         current_profile="$(vibranium-utils-power-profile-get)"
 
@@ -181,10 +180,10 @@ handle_power_pause() {
 
             # notify-send -r 1 -t 10000 "Vibranium" "Background cache generation paused due to powersave profile.\nIt will resume once the profile changes or respect option is disabled."
 
-			if [[ "$single_file" == false ]]; then
-				echo "suspended" > "$XDG_RUNTIME_DIR/worker.active"
-				vibranium-cmd-refresh-waybar-module worker
-			fi
+            if [[ "$single_file" == false ]]; then
+                echo "suspended" > "$XDG_RUNTIME_DIR/worker.active"
+                vibranium-cmd-refresh-waybar-module worker
+            fi
 
             local was_paused=true
 
@@ -192,7 +191,7 @@ handle_power_pause() {
 
             # Loop until conditions change: either respect_power=false or profile != power-saver.
             while :; do
-				if [[ "$(vibranium-cmd-get-option VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE)" == false ]]; then
+                if [[ "$(vibranium-cmd-get-option VIBRANIUM_GLOBAL_RESPECT_POWER_PROFILE)" == false ]]; then
                     break
                 fi
 
@@ -228,14 +227,14 @@ for file in "${backgrounds[@]}"; do
             filter="${filters[$type]}"
             cached="${cache_dir}/$(basename "${file%.*}")-${type}.jpg"
 
-			if [[ "$single_file" == false ]]; then
-				# Update Waybar with current processing file.
-				echo "Caching $(basename "$cached")" > "$XDG_RUNTIME_DIR/worker.active"
-				vibranium-cmd-refresh-waybar-module worker
-			fi
+            if [[ "$single_file" == false ]]; then
+                # Update Waybar with current processing file.
+                echo "Caching $(basename "$cached")" > "$XDG_RUNTIME_DIR/worker.active"
+                vibranium-cmd-refresh-waybar-module worker
+            fi
 
             echo "${GRAY}[$(date)] ${BLUE}Processing ($type): ${YELLOW}${cached}${RESET}"
-			# DO NOT QUOTE THIS
+            # DO NOT QUOTE THIS
             magick "$file" $filter "$cached"
         fi
     done
@@ -243,8 +242,8 @@ done
 
 # Cleanup: Remove worker active file and refresh Waybar.
 if [[ "$single_file" == false ]]; then
-	rm "$XDG_RUNTIME_DIR/worker.active"
-	vibranium-cmd-refresh-waybar-module worker
+    rm "$XDG_RUNTIME_DIR/worker.active"
+    vibranium-cmd-refresh-waybar-module worker
 fi
 
 vibranium-utils-update-lockscreen

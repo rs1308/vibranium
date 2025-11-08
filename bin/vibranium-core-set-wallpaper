@@ -16,15 +16,15 @@ toggle_wallpaper() {
     local current
     local files
     local idx next prev
-	local walls
+    local walls
 
-	# Get an array of all available wallpapers for the current theme
-	walls="$XDG_CONFIG_HOME/vibranium/theme/current/backgrounds"
+    # Get an array of all available wallpapers for the current theme
+    walls="$XDG_CONFIG_HOME/vibranium/theme/current/backgrounds"
     mapfile -t files < <(find "${walls}/" -type f,l | sort)
-	# If it is empty (somehow) - exit
+    # If it is empty (somehow) - exit
     [ ${#files[@]} -eq 0 ] && return 1
 
-	current="$(vibranium-utils-wallpaper-get)"
+    current="$(vibranium-utils-wallpaper-get)"
     idx=-1
 
     for i in "${!files[@]}"; do
@@ -34,28 +34,28 @@ toggle_wallpaper() {
         fi
     done
 
-	# Next / Prev
+    # Next / Prev
     case "$mode" in
         --next)
-            next=$(( (idx + 1) % ${#files[@]} ))
+            next=$(((idx + 1) % ${#files[@]}))
             printf "%s\n" "${files[$next]}"
             ;;
         --prev)
-            prev=$(( (idx - 1 + ${#files[@]}) % ${#files[@]} ))
+            prev=$(((idx - 1 + ${#files[@]}) % ${#files[@]}))
             printf "%s\n" "${files[$prev]}"
             ;;
     esac
 }
 
 if [ -f "$VIBRANIUM_STATE/wallpaper.enabled" ]; then
-	if [[ "$(<"$VIBRANIUM_STATE/wallpaper.enabled")" == false ]]; then
-		exit 0
-	fi
+    if [[ "$(< "$VIBRANIUM_STATE/wallpaper.enabled")" == false ]]; then
+        exit 0
+    fi
 fi
 
 case "$1" in
-    "--next"|"--prev") WALLPAPER_PATH="$(toggle_wallpaper "$1")" ;;
-	*)                 WALLPAPER_PATH="$(realpath "$1")"         ;;
+    "--next" | "--prev") WALLPAPER_PATH="$(toggle_wallpaper "$1")" ;;
+    *)              WALLPAPER_PATH="$(realpath "$1")"         ;;
 esac
 
 if [ -z "$1" ] || [[ ! $WALLPAPER_PATH =~ \.(png|jp(e)?g|webp)$ ]]; then
@@ -66,13 +66,13 @@ if [ -z "$1" ] || [[ ! $WALLPAPER_PATH =~ \.(png|jp(e)?g|webp)$ ]]; then
 fi
 
 if [ -f "$VIBRANIUM_STATE/wallpaper.enabled" ]; then
-	if [[ "$(<"$VIBRANIUM_STATE/wallpaper.enabled")" == true ]]; then
-		if [[ "$(systemctl --user is-active hyprpaper)" != "active" ]]; then
-			msg="For some reason, the Wallpaper Daemon wasn't enabled.\nThe system service was enabled and the wallpaper was set"
-			notify-send -r 1 -t 5000 "Vibranium" "$msg"
-			systemctl --user enable --now hyprpaper
-		fi
-	fi
+    if [[ "$(< "$VIBRANIUM_STATE/wallpaper.enabled")" == true ]]; then
+        if [[ "$(systemctl --user is-active hyprpaper)" != "active" ]]; then
+            msg="For some reason, the Wallpaper Daemon wasn't enabled.\nThe system service was enabled and the wallpaper was set"
+            notify-send -r 1 -t 5000 "Vibranium" "$msg"
+            systemctl --user enable --now hyprpaper
+        fi
+    fi
 fi
 
 # Update on all monitors
@@ -83,7 +83,8 @@ printf "# Auto-generated file! All changes will be overwritten.\n" > "$CONF"
 printf "preload = %s\nwallpaper = , %s" "${WALLPAPER_PATH}" "$WALLPAPER_PATH" >> "$CONF"
 
 # Save to state file for further restpre on theme switch
-STATE_FILE="$VIBRANIUM_STATE/wallpaper/$(vibranium-theme-get)"; mkdir -p "$VIBRANIUM_STATE/wallpaper"
+STATE_FILE="$VIBRANIUM_STATE/wallpaper/$(vibranium-theme-get)"
+                                                                mkdir -p "$VIBRANIUM_STATE/wallpaper"
 printf "%s" "$WALLPAPER_PATH" > "$STATE_FILE"
 
 # Update lockscreen background

@@ -33,17 +33,17 @@ rofi_cmd() {
     # It is used to keep Rofi window size visually proportional to content width.
     # More variations make window resizing smoother between small and long menus.
     local -A map=(
-        [80]=816 [78]=799 [76]=782 [74]=765 [72]=748 [70]=731
-        [68]=714 [66]=697 [64]=680 [62]=663 [60]=646
-        [58]=629 [56]=612 [54]=595 [52]=578 [50]=561
-        [48]=544 [46]=527 [44]=510 [42]=493 [40]=476
-        [38]=459 [36]=442 [34]=425 [32]=408 [30]=391
-        [28]=374 [26]=357 [24]=340 [22]=323 [20]=306
-        [18]=289 [16]=272 [14]=255 [12]=238 [10]=221
-        [8]=208 [6]=200 [0]=196
+         [80]=816 [78]=799 [76]=782 [74]=765 [72]=748 [70]=731
+         [68]=714 [66]=697 [64]=680 [62]=663 [60]=646
+         [58]=629 [56]=612 [54]=595 [52]=578 [50]=561
+         [48]=544 [46]=527 [44]=510 [42]=493 [40]=476
+         [38]=459 [36]=442 [34]=425 [32]=408 [30]=391
+         [28]=374 [26]=357 [24]=340 [22]=323 [20]=306
+         [18]=289 [16]=272 [14]=255 [12]=238 [10]=221
+         [8]=208 [6]=200 [0]=196
     )
 
-    if pgrep -x rofi >/dev/null; then
+    if pgrep -x rofi > /dev/null; then
         pkill -x rofi
         exit 1
     fi
@@ -55,7 +55,7 @@ rofi_cmd() {
 
     # Get input.
     local input
-    input="$(</dev/stdin)"
+    input="$(< /dev/stdin)"
 
     # Remove Pango markup tags for text length calculations.
     # We only need plain text width for layout, not formatted text.
@@ -65,18 +65,18 @@ rofi_cmd() {
     # This decides how wide the window should be.
     local maxlen_input=0 line
     while IFS= read -r line; do
-        (( ${#line} > maxlen_input )) && maxlen_input=${#line}
+        ((${#line} > maxlen_input))   && maxlen_input=${#line}
     done <<< "$input_plain"
 
     # Compare longest entry with prompt + placeholder length.
     # Choose whichever is longer as the base width reference.
-    local promptlen=$(( ${#prompt} + ${#placeholder} ))
-    local maxlen=$(( maxlen_input > promptlen ? maxlen_input : promptlen ))
+    local promptlen=$((${#prompt} + ${#placeholder}))
+    local maxlen=$((maxlen_input > promptlen ? maxlen_input : promptlen))
 
     # Find appropriate window width from the map.
-    local width=$(( maxlen ))
+    local width=$((maxlen))
     for k in 80 78 76 74 72 70 68 66 64 62 60 58 56 54 52 50 48 46 44 42 40 38 36 34 32 30 28 26 24 22 20 18 16 14 12 10 8 6 0; do
-        if (( width >= k )); then
+        if ((width >= k)); then
             width=${map[$k]}
             break
         fi
@@ -102,7 +102,7 @@ rofi_cmd() {
         -theme-str 'entry {placeholder: "'"${placeholder}"'";}' \
         -theme-str 'window {width: '"${width}px"';}' \
         -matching-negate-char '' "${rofi_opts[@]}" \
-        "$@" 2>/dev/null <<< "$input"
+        "$@" 2> /dev/null <<< "$input"
 }
 
 # A spinner utility function.
@@ -131,7 +131,7 @@ spinner() {
     # Delay between spinner frames (seconds)
     local delay=0.07
     # Spinner frames (this actually can be any symbol)
-	local spinstr=('-' '\' '|' '/')
+    local spinstr=('-' '\' '|' '/')
     # ANSI sequence to clear the current line
     local clear_line="\r\033[K"
 
@@ -329,23 +329,23 @@ is_in_game() {
 }
 
 is_headless() {
-	if [ -t 0 ] && [ -c /dev/tty ]; then
-		return 1
-	else
-		return 0
-	fi
+    if [ -t 0 ] && [ -c /dev/tty ]; then
+        return 1
+    else
+        return 0
+    fi
 }
 
 log() {
-	! is_headless && echo -e "${BLUE}[INFO]${RESET} ${*}"
+    ! is_headless && echo -e "${BLUE}[INFO]${RESET} ${*}"
 }
 
 warn() {
-	! is_headless && echo -e "${YELLOW}[WARNING]${RESET} ${*}"
+    ! is_headless && echo -e "${YELLOW}[WARNING]${RESET} ${*}"
 }
 
 error() {
-	! is_headless && echo -e "${RED}[ERROR]${RESET} ${*}"
+    ! is_headless && echo -e "${RED}[ERROR]${RESET} ${*}"
 }
 
 # Usage: _flash <border|screen>
@@ -358,8 +358,8 @@ _flash() {
     check_enum VIBRANIUM_GLOBAL_FLASH_SCREEN_SPEED "medium" slow medium fast very_fast
 
     declare -A speed_map=(
-        [slow]=0.35 [medium]=0.25
-        [fast]=0.15 [very_fast]=0.05
+         [slow]=0.35 [medium]=0.25
+         [fast]=0.15 [very_fast]=0.05
     )
 
     case "$type" in

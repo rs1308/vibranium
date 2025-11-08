@@ -22,10 +22,10 @@ _update() {
     }
 
     latest_tag=$(git -C "$VIBRANIUM" tag --sort=-creatordate | head -n 1)
-    current_tag=$(git -C "$VIBRANIUM" describe --tags --exact-match 2>/dev/null ||
+    current_tag=$(git -C "$VIBRANIUM" describe --tags --exact-match 2> /dev/null ||
         git -C "$VIBRANIUM" rev-parse --short HEAD)
 
-    latest_commit=$(git -C "$VIBRANIUM" rev-parse "$latest_tag" 2>/dev/null)
+    latest_commit=$(git -C "$VIBRANIUM" rev-parse "$latest_tag" 2> /dev/null)
     current_commit=$(git -C "$VIBRANIUM" rev-parse HEAD)
 
     echo -e "${YELLOW}[VIBRANIUM]${RESET} Local: $current_tag ($current_commit)"
@@ -88,24 +88,24 @@ _update() {
     printf '\e[?25h' # Show cursor
 }
 
-printf "\n\e[33m%s\e[0m\n\n" "$(<"$VIBRANIUM/logo.txt")"
+printf "\n\e[33m%s\e[0m\n\n" "$(< "$VIBRANIUM/logo.txt")"
 PROMPT=$'\e[0;33m[VIBRANIUM]\e[0m Proceed with update? (Y/n): '
 
 while :; do
     printf "%s" "$PROMPT"
     read -r answer
     case "$answer" in
-    [Yy][Ee][Ss] | [Yy] | "")
-        _update
-        exit 0
-        ;;
-    [Nn] | [Nn][Oo])
-        echo -e "${RED}[VIBRANIUM]${RESET} Operation aborted"
-        read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
-        exit 1
-        ;;
-    *)
-        continue
-        ;;
+        [Yy][Ee][Ss] | [Yy] | "")
+            _update
+            exit 0
+            ;;
+        [Nn] | [Nn][Oo])
+            echo -e "${RED}[VIBRANIUM]${RESET} Operation aborted"
+            read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
+            exit 1
+            ;;
+        *)
+            continue
+            ;;
     esac
 done
