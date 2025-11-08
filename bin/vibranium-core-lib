@@ -339,7 +339,7 @@ error() {
 _flash() {
     local type speed_var seconds
 
-	type="$1"
+    type="$1"
 
     check_enum VIBRANIUM_GLOBAL_FLASH_BORDER_SPEED "medium" slow medium fast very_fast
     check_enum VIBRANIUM_GLOBAL_FLASH_SCREEN_SPEED "medium" slow medium fast very_fast
@@ -352,21 +352,22 @@ _flash() {
     case "$type" in
         border) speed_var=VIBRANIUM_GLOBAL_FLASH_BORDER_SPEED ;;
         screen) speed_var=VIBRANIUM_GLOBAL_FLASH_SCREEN_SPEED ;;
+        *) return 1 ;;
     esac
 
-    seconds=${speed_map[$(eval echo \$$speed_var)]}
+    seconds=${speed_map[${!speed_var}]}
 
     [[ "$(hyprctl -j getoption animations:enabled | jq -r '.int')" == 0 ]] && return 0
 
     if [[ $type == border ]]; then
         for _ in 1 2; do
             hyprctl -q "keyword general:col.active_border rgb(ffffff)"
-            sleep $seconds
+            sleep "$seconds"
             hyprctl -q reload
         done
     else
         hyprctl -q hyprsunset gamma 150
-        sleep $seconds
+        sleep "$seconds"
         hyprctl -q hyprsunset gamma 100
     fi
 }
