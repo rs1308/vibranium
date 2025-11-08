@@ -14,7 +14,6 @@ ffmpegthumbnailer
 yaru-sound-theme
 noto-fonts-extra
 noto-fonts-emoji
-pop-sound-theme
 zram-generator
 pacman-contrib
 pipewire-pulse

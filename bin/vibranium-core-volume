@@ -158,9 +158,12 @@ feedback() {
         variant="$VIBRANIUM_VOLUME_AUDIO_FEEDBACK_VARIANT"
 
         case "$variant" in
-            "variant1" | "variant4") dir="/usr/share/sounds/freedesktop/stereo" ;;
-            "variant2")            dir="/usr/share/sounds/Yaru/stereo"        ;;
-            "variant3")   dir="/usr/share/sounds/Pop/stereo/action"  ;;
+            "variant1" | "variant3")
+                dir="/usr/share/sounds/freedesktop/stereo"
+                ;;
+            "variant2")
+                dir="/usr/share/sounds/Yaru/stereo"
+                ;;
         esac
 
         if [ ! -d "$dir" ]; then
@@ -169,7 +172,7 @@ feedback() {
             return 0
         fi
 
-        if [[ "$variant" == "variant4" ]]; then
+        if [[ "$variant" == "variant3" ]]; then
             paplay "${dir}/bell.oga" &
         else
             paplay "${dir}/audio-volume-change.oga" &

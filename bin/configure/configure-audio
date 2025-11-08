@@ -9,14 +9,12 @@ while :; do
     source "$VIBRANIUM_USER_SETTINGS"
 
     OPTIONS=(
+        "Allow above 100% : $VIBRANIUM_VOLUME_ALLOW_ABOVE_HUNDRED"
+        "Adjustment step  : $VIBRANIUM_VOLUME_ADJUSTMENT_STEP"
         "Visual feedback  : $VIBRANIUM_VOLUME_USE_VISUAL_FEEDBACK"
         "Audio feedback   : $VIBRANIUM_VOLUME_USE_AUDIO_FEEDBACK"
     )
 
-    OPTIONS+=(
-        "Allow above 100% : $VIBRANIUM_VOLUME_ALLOW_ABOVE_HUNDRED"
-        "Adjustment step  : $VIBRANIUM_VOLUME_ADJUSTMENT_STEP"
-    )
     if [[ "$VIBRANIUM_GLOBAL_USE_OSD" == true ]]; then
         OPTIONS+=("OSD feedback     : $VIBRANIUM_VOLUME_USE_OSD")
     else
@@ -118,7 +116,7 @@ while :; do
                         ;;
                     "Variant"*)
                         while :; do
-                            audio_variant_options=("variant 1" "variant 2" "variant 3" "variant 4")
+                            audio_variant_options=("variant 1" "variant 2" "variant 3")
                             audio_variant_chosen="$(printf "%s\n" "${audio_variant_options[@]}" | rofi_cmd "Audio variant" "ESC to go back")"
                             [[ -z "$audio_variant_chosen" ]] && break
                             [[ "$audio_variant_chosen" == "$VIBRANIUM_VOLUME_AUDIO_FEEDBACK_VARIANT" ]] && break
