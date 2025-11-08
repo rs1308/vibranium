@@ -5,7 +5,18 @@
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 
 export SUDO_PROMPT
-                    SUDO_PROMPT="$(printf '%s[VIBRANIUM]%s Password for %s: ' "$RED" "$RESET" "$USER")"
+SUDO_PROMPT="$(printf '%s[VIBRANIUM]%s Password for %s: ' "$RED" "$RESET" "$USER")"
+
+_operation_canceled() {
+    echo -e "${RED}[VIBRANIUM]${RESET} Operation canceled"
+    read -n1 -r -p $'\e[0;33m[VIBRANIUM]\e[0m Press any key to close this window' dummy
+    printf '\e[?25h' # show cursor
+
+    # Here we use code 0 because system update
+    # already has been performed successfuly,
+    # we just canceling system reboot
+    exit 0
+}
 
 if ! tty -s; then
     exec setsid vibranium-cmd-launch-terminal "$0" "$@"
@@ -58,9 +69,15 @@ for pkg in "${pkg_list[@]}"; do
             case "$answer" in
                 [Yy][Ee][Ss] | [Yy] | "")
                     printf '\e[?25l'
+
+                    # Cancel countdown & system reboot on CTRL C
+                    trap '_operation_canceled' INT
+
                     for i in {3..1}; do
-                        printf "\r\033[K%s[VIBRANIUM]%s Restarting in %d..." "$YELLOW" "$RESET" "$i"
-                        sleep 1
+                        for dots in "" "." ".." "..."; do
+                            printf "\r\033[K%s[VIBRANIUM]%s Restarting in %d%s" "$YELLOW" "$RESET" "$i" "$dots"
+                            sleep 0.25
+                        done
                     done
                     systemctl reboot
                     ;;
