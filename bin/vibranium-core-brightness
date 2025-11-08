@@ -33,10 +33,28 @@ elif [[ ! $# =~ ^(up|down|[0-9])$ ]]; then
     exit 1
 fi
 
+get_i2c_bus() {
+    # We should ignore internal monitors.
+    # ddcutil displays a note that one of the
+    # i2c buses is a laptop screen, so we can
+    # exclude this from the output.
+    #
+    # Note: I only have 1 monitor, so when 2 or more
+    # monitors available, this function will return
+    # one i2c bus per line, so it wont work as expected.
+    #
+    # PRs are welcome.
+    ddcutil detect 2>/dev/null | awk '
+        /I2C bus/ { bus=$NF; skip=0 }
+        /This is a laptop display/ { skip=1 }
+        /VCP version/ && !skip { sub("/dev/i2c-", "", bus); print bus }
+'
+}
+
 # Yes, I know that this file is created at the start of the session in the startup-functions file.
 # But let's make it more robust.
 if [[ ! -f "$VIBRANIUM_STATE/i2c-bus" ]]; then
-    I2C_BUS="$(ddcutil detect 2> /dev/null | awk -F'i2c-' '/I2C bus/{print $2}')"
+    I2C_BUS="$(get_i2c_bus)"
 else
     I2C_BUS="$(< "$VIBRANIUM_STATE/i2c-bus")"
 fi
