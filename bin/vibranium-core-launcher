@@ -5,11 +5,11 @@
 #	- Launch applications
 #	- Open local files in default applications
 #	- Open links
-#	- Search the internet
+#	- Search the internet 
 #
-# Please note that internet search may often be unavailable when VIBRANIUM_GLOBAL_APP_LAUNCHER_AUTO_SELECT is set to true.
+# Please note that internet search may often be unavailable when VIBRANIUM_GLOBAL_APP_LAUNCHER_AUTO_SELECT is set to true. 
 # This script can also open three additional menus with custom categories to open:
-#	- AI
+#	- AI 
 #	- Common websites
 #	- Power menu
 
@@ -86,7 +86,7 @@ case "$1" in
 		opt_args+=(-drun-exclude-categories 'WebApp,AI,Power')
 		;;
 esac
-
+	
 if [ $VIBRANIUM_GLOBAL_APP_LAUNCHER_SHOW_ICONS = true ]; then
     opt_args+=(-theme-str 'configuration {show-icons: true;} element-icon {enabled: true;}')
 fi
