@@ -20,10 +20,23 @@ fi
 
 source "$VIBRANIUM_PATH/vibranium-core-lib"
 
-# ROFI_THEME="$HOME/.config/rofi/config.rasi"
-
-check_bool VIBRANIUM_MENU_SWAP_LAYOUT true
 check_bool VIBRANIUM_GLOBAL_APP_LAUNCHER_SHOW_ICONS true
+
+search_engine() {
+    check_enum VIBRANIUM_GLOBAL_SEARCH_ENGINE "google" google duckduckgo bing
+
+    case "$VIBRANIUM_GLOBAL_SEARCH_ENGINE" in
+        "google")
+            echo "https://www.google.com/search?q="
+            ;;
+        "duckduckgo")
+            echo "https://duckduckgo.com/?q="
+            ;;
+        "bing")
+            # God forgive me
+            echo "https://bing.com/search?q="
+    esac
+}
 
 process_input() {
     local input="$*"
@@ -58,7 +71,7 @@ process_input() {
             else
                 # TODO: give the user the option to choose a search engine
                 [ "$VIBRANIUM_GLOBAL_APP_LAUNCHER_AUTO_SELECT" = true ] && exit 1
-                vibranium-cmd-launch-cmd xdg-open "https://www.google.com/search?q=${input}" &
+                vibranium-cmd-launch-cmd xdg-open "$(search_engine)${input}" &
             fi
             ;;
     esac
