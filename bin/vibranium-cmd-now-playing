@@ -19,7 +19,7 @@ check_bool VIBRANIUM_GLOBAL_SHOW_NOW_PLAYING_LOCKSCREEN true
 
 album_art="$XDG_RUNTIME_DIR/album_art"
 
-# Get player type
+# Get player type and metadata
 if [[ "$(playerctl status 2> /dev/null)" =~ ^(Playing|Paused)$ ]]; then
     player="playerctl"
     IFS='^' read -r title artist <<< "$(playerctl metadata --format '{{title}}^{{artist}}' 2> /dev/null)"
@@ -31,17 +31,44 @@ else
     exit 1
 fi
 
+# If $artist & (or) $title does not exist
+if [[ -z "$title" ]]; then
+    if [[ "$player" == "playerctl" ]]; then
+        url="$(playerctl metadata --format '{{xesam:url}}' 2> /dev/null)"
+        if [[ "$url" =~ ^file:// ]]; then
+            filename="$(basename "${url#file://}")"
+        else
+            filename="$(basename "$url")"  # Fallback for non-file URLs, e.g., spotify:track:id
+        fi
+    else
+        filename="$(mpc current -f "%file%" 2> /dev/null)"
+    fi
+    if [[ -z "$filename" ]]; then
+        filename="Unknown track"
+    fi
+    pango_output="$filename"
+    plain_output="$filename"
+    notify_body="<span foreground='${P_ORANGE}'> $filename</span>"
+else
+    if [[ -z "$artist" ]]; then
+        pango_output="$title"
+        plain_output="$title"
+        notify_body="<span foreground='${P_ORANGE}'> $title</span>"
+    else
+        pango_output="$title <span foreground='${P_YELLOW}'>by</span> $artist"
+        plain_output="$title by $artist"
+        notify_body="<span foreground='${P_ORANGE}'> $title</span>\n<span foreground='${P_YELLOW}'> $artist</span>"
+    fi
+fi
+
 # Build pango formatted message for the lock screen.
-# Reminder: You can turn off the display of the current track on the lock screen in the Vibranium settings.
 if [[ "$1" =~ ^(--hyprlock)$ ]]; then
     if [[ "$VIBRANIUM_GLOBAL_SHOW_NOW_PLAYING_LOCKSCREEN" == true ]]; then
-        printf \
-            "<span size='20000' foreground='${P_ACCENT}' rise='-3.5pt'><b>󰝚</b></span> %s <span foreground='${P_YELLOW}'>by</span> %s" \
-            "$title" "$artist"
+        printf "<span size='20000' foreground='${P_ACCENT}' rise='-3.5pt'><b>󰝚</b></span> %s" "$pango_output"
         exit 0
     fi
 else
-    echo "${title} by ${artist}"
+    echo "$plain_output"
 fi
 
 # Reminder:
@@ -61,12 +88,7 @@ if [ "$VIBRANIUM_GLOBAL_NOW_PLAYING_SHOW_ALBUM_ART" = "true" ]; then
             mpc readpicture "$(mpc --format "%file%" current)" > "$album_art"
             ;;
     esac
-else
-    exit 0
 fi
-
-notify_body="<span foreground='${P_ORANGE}'> ${title}</span>\n"
-notify_body+="<span foreground='${P_YELLOW}'> ${artist}</span>"
 
 # Even if the file inside $album_art does not exist, notify-send will still send a notification,
 # although without the cover art, so we do not check for the existence of the file.
