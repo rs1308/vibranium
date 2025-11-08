@@ -214,6 +214,10 @@ post_install() {
 	if [ -z "$(find /sys/class/backlight -mindepth 1 -maxdepth 1 2>/dev/null)" ]; then
 		sudo systemctl mask upower.service
 	fi
+
+	if [ -n "$(find /sys/class/backlight -mindepth 1 -maxdepth 1 2>/dev/null)" ]; then
+		sudo usermod -aG video "$USER"
+	fi
 }
 
 git checkout -q --detach "$(git tag --sort=-creatordate | head -n 1)"
