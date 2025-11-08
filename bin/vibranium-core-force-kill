@@ -33,11 +33,12 @@ if [ -f "$STATE_FILE" ]; then
     # In this case, we terminate the process to avoid accidentally killing it
     if [ "$PREV_PID" -ne "$PID" ] 2> /dev/null; then
         rm -f "$STATE_FILE"
+        vibranium-cmd-refresh-waybar-module confirm-kill &
         exit 1
     fi
     # second press → confirmed
     rm -f "$STATE_FILE"
-    vibranium-cmd-refresh-waybar-module confirm-kill
+    vibranium-cmd-refresh-waybar-module confirm-kill &
 else
     # If the state file does not exist, it means that this is the first time the script has been run (before confirmation).
     # We record the PID of the active window for subsequent confirmation and wait three seconds.
