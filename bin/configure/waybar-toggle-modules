@@ -63,7 +63,6 @@ while :; do
         "Keyboard layout : $KEYBOARD_LAYOUT_STATUS"
         "Power profile   : $VIBRANIUM_BAR_POWER_PROFILE_MODULE_ENABLE"
         "Color picker    : $VIBRANIUM_BAR_COLOR_PICKER_MODULE_ENABLE"
-        "Brightness      : $VIBRANIUM_BAR_BRIGHTNESS_MODULE_ENABLE"
         "Microphone      : $MICROPHONE_ENABLED"
         "Bluetooth       : $BLUETOOTH_ENABLED"
         "Weather         : $VIBRANIUM_BAR_WEATHER_MODULE_ENABLE"
@@ -101,10 +100,6 @@ while :; do
         "Color picker"*)
             toggle_bool "VIBRANIUM_BAR_COLOR_PICKER_MODULE_ENABLE"
             vibranium-cmd-refresh-waybar-module color-picker
-            ;;
-        "Brightness"*)
-            toggle_bool "VIBRANIUM_BAR_BRIGHTNESS_MODULE_ENABLE"
-            vibranium-cmd-refresh-waybar-module brightness
             ;;
         "Power profile"*)
             toggle_bool "VIBRANIUM_BAR_POWER_PROFILE_MODULE_ENABLE"

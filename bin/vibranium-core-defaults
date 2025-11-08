@@ -485,14 +485,6 @@ VIBRANIUM_BAR_COLOR_PICKER_MODULE_ENABLE=false
 # Default is true
 VIBRANIUM_BAR_POWER_PROFILE_MODULE_ENABLE=true
 
-# Whether to enable brightness module.
-# Available options: bool
-#
-# Note: setting this to false doesn't disable systemwide brightness control.
-#
-# Default is false
-VIBRANIUM_BAR_BRIGHTNESS_MODULE_ENABLE=false
-
 # Whether to enable a Waybar module which will track package updates.
 # Available options: bool
 #
