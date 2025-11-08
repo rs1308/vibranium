@@ -34,7 +34,7 @@
 			"$XDG_DATA_HOME/vibranium/defaults/waybar/workspaces.jsonc",
 			"$XDG_DATA_HOME/vibranium/defaults/waybar/vibranium-update.jsonc"
 		],
- 
+
 		// All custom modules provided here can and should be enabled or disabled directly
 		// in Vibranium settings.
 		"modules-left": ["hyprland/workspaces"],
@@ -49,7 +49,6 @@
 			"custom/power-profile",
 			"custom/dynamic-separator",
 			// "hyprland/language",
-			"custom/brightness",
 			"custom/night-light",
 			"pulseaudio#volume",
 			"pulseaudio#microphone",
