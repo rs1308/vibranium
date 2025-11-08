@@ -82,14 +82,20 @@ rofi_cmd() {
         fi
     done
 
+    if [[ "$VIBRANIUM_GLOBAL_APP_LAUNCHER_AUTO_SELECT" == true ]]; then
+        if [[ ! "${BASH_SOURCE[1]}" =~ clipboard ]]; then
+            rofi_opts=(-auto-select)
+        fi
+    fi
+
     rofi -i -dmenu -p "$prompt" \
         -markup -markup-rows -sync \
         -theme "$XDG_CONFIG_HOME/rofi/config.rasi" \
         -theme-str 'configuration {show-icons: false;}' \
         -theme-str 'entry {placeholder: "'"${placeholder}"'";}' \
         -theme-str 'window {width: '"${width}px"';}' \
-        -matching-negate-char '' "$@" 2>/dev/null \
-        <<< "$input"
+        -matching-negate-char '' "${rofi_opts[@]}" \
+        "$@" 2>/dev/null <<< "$input"
 }
 
 # A spinner utility function.
