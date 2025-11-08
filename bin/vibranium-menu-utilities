@@ -13,9 +13,7 @@ fi
 ACTIONS+=("Apply tweaks" "Video downscaler")
 
 if command -v syncthing > /dev/null; then
-    if [[ "$(systemctl --user is-active syncthing)" == "active" ]]; then
-        ACTIONS+=("Launch Syncthing")
-    fi
+    ACTIONS+=("Launch Syncthing")
 fi
 
 if command -v pass > /dev/null; then
@@ -38,8 +36,8 @@ while :; do
     CHOSEN="$(printf "%s\n" "${ACTIONS[@]}" | rofi_cmd "Utilities" "ESC to go back")"
 
     case "$CHOSEN" in
-        "Launch <b>Syncthing</b>")
-            syncthing browser
+        "Launch Syncthing")
+            vibranium-app-syncthing
             # In case if it was launched from
             # the main menu, not the CTRL-ALT-U shortcut
             vibranium-cmd-kill-rofi
