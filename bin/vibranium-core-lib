@@ -82,9 +82,16 @@ rofi_cmd() {
         fi
     done
 
+    local lines
+    while IFS= read -r _; do
+        ((lines++))
+    done <<< "$input_plain"
+
     if [[ "$VIBRANIUM_GLOBAL_APP_LAUNCHER_AUTO_SELECT" == true ]]; then
-        if [[ ! "${BASH_SOURCE[1]}" =~ clipboard ]]; then
-            rofi_opts=(-auto-select)
+        if (( lines > 1 )); then
+            if [[ ! "${BASH_SOURCE[1]}" =~ clipboard ]]; then
+                rofi_opts=(-auto-select)
+            fi
         fi
     fi
 
