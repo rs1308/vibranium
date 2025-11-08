@@ -154,7 +154,7 @@ feedback() {
 
     check_bool VIBRANIUM_VOLUME_USE_AUDIO_FEEDBACK true
     if [ $VIBRANIUM_VOLUME_USE_AUDIO_FEEDBACK = true ]; then
-        check_enum VIBRANIUM_VOLUME_AUDIO_FEEDBACK_VARIANT "variant1" variant1 variant2 variant3 variant4
+        check_enum VIBRANIUM_VOLUME_AUDIO_FEEDBACK_VARIANT "variant1" variant1 variant2 variant3
         variant="$VIBRANIUM_VOLUME_AUDIO_FEEDBACK_VARIANT"
 
         case "$variant" in

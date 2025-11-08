@@ -57,6 +57,7 @@ while :; do
 
                             if [[ $current_volume =~ ^(1\.[1-4][0-9]|1\.50|[2-9]) ]]; then
                                 wpctl set-volume @DEFAULT_AUDIO_SINK@ 1.00
+                                notify-send -r 1 "Vibranium" "The volume has been restored to 100%"
                                 break
                             fi
                         fi

@@ -95,7 +95,7 @@ if [[ $VIBRANIUM_COLOR_PICKER_SHOW_SELECTED_COLOR == true ]]; then
 fi
 
 # Update the Waybar module so that it receives the current cache in the tooltip
-vibranium-cmd-refresh-waybar-module color-picker
+vibranium-cmd-refresh-waybar-module color-picker &
 notify-send -r 1 -t 1500 -i "$preview_img" "Color Picker" "Selected color copied to clipboard"
 
 rm "$preview_img"

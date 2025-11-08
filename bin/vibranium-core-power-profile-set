@@ -85,6 +85,7 @@ else
         "up" | "+")
             next_index=$(((current_index + 1) % ${#profiles[@]}))
             ;;
+        # No UX planned for this
         "down" | "-")
             next_index=$(((current_index - 1 + ${#profiles[@]}) % ${#profiles[@]}))
             ;;

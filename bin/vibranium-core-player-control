@@ -54,15 +54,20 @@ PLAYER=""
 STATUS=""
 
 # First, check for Playing players
-for p in playerctl mpd; do
-    stat=$(get_player_status "$p")
-    if [ $? -eq 0 ] && [ "$stat" = "Playing" ]; then
-        PLAYER="$p"
-        STATUS="$stat"
-        echo "$PLAYER" > "$PLAYER_CACHE_FILE"  # Update cache since it's Playing
-        break
-    fi
-done
+if ! command -v mpc > /dev/null; then
+    PLAYER="playerctl"
+else
+    for p in playerctl mpd; do
+        stat=$(get_player_status "$p")
+        if [ $? -eq 0 ] && [ "$stat" = "Playing" ]; then
+            PLAYER="$p"
+            STATUS="$stat"
+            echo "$PLAYER" > "$PLAYER_CACHE_FILE"  # Update cache since it's Playing
+            break
+        fi
+    done
+fi
+
 
 # If no Playing, check cache for Paused
 if [ -z "$PLAYER" ] && [ -f "$PLAYER_CACHE_FILE" ]; then

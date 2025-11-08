@@ -93,7 +93,7 @@ start_recording() {
         -fm "$VIBRANIUM_RECORDING_FRAMERATE_MODE" \
         "${opt_flags[@]}" -o "$output_file" &> "$log_file" &
 
-    # We record the PID of the screen recording process and wait 100 milliseconds to allow the process to start
+    # We record the PID of the screen recording process and wait 100 milliseconds to let the process to start
     pid=$!
     sleep 0.1
 
@@ -173,9 +173,9 @@ log "Framerate mode: ${YELLOW}$VIBRANIUM_RECORDING_FRAMERATE_MODE${RESET}"
 
 # If recording has not started (see above), reassign the video codec and encoder as a fallback
 if ! start_recording "$VIBRANIUM_RECORDING_VIDEO_CODEC"; then
-    log "Hardware codec failed, switching to CPU encoding"
+    warn "Hardware codec failed, switching to CPU encoding"
     VIBRANIUM_RECORDING_VIDEO_CODEC="h264"
-                                            FALLBACK_CPU_USED=true
+    FALLBACK_CPU_USED=true
     opt_flags+=(-encoder cpu)
 
     # Since the second attempt to start recording will overwrite the log that has just been generated,
@@ -184,7 +184,7 @@ if ! start_recording "$VIBRANIUM_RECORDING_VIDEO_CODEC"; then
 
     # If the recording failed to start the second time, then the user has serious problems :D
     if ! start_recording; then
-        msg="\n<span foreground='${P_GREEN}'><b>•</b></span> "
+        msg="\n<span foreground='${P_ACCENT}'><b>•</b></span> "
         msg+="<span foreground='${P_RED}'><b>Recording failed on both GPU and CPU encoders!</b></span>\n\n"
         msg+="The screen recording could not start using the selected hardware encoder,\n"
         msg+="nor could it fall back to CPU-based encoding.\n"
