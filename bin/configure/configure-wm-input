@@ -124,6 +124,34 @@ get_layouts() {
     printf '%s\n' "${layouts[@]}"
 }
 
+
+# yep, theese functions just have been copied
+# straight from the other script. For now
+check_module() {
+    local config
+    local module="$1"
+    config="$XDG_CONFIG_HOME/waybar/config.jsonc"
+    if grep -Eq "^\s*//.*\"$module\"" "$config"; then
+        return 0 # commented out - module disabled
+    else
+        return 1
+    fi
+}
+
+toggle_module() {
+    local module="$1"
+    local config
+
+    config="$XDG_CONFIG_HOME/waybar/config.jsonc"
+    if check_module "$module"; then
+        sed -i "s|^\(\s*\)//\s*\(.*\"$module\".*\)|\1\2|" "$config"
+    else
+        sed -i "s|^\(\s*\)\(\".*$module\".*\)|\1// \2|" "$config"
+    fi
+    systemctl --user restart waybar
+}
+
+
 add_layout() {
     local layouts
     local chosen
@@ -148,6 +176,17 @@ add_layout() {
         notify-send -r 1 "Vibranium" "Added new keyboard layout: <b>${chosen^^}</b>"
         break
     done
+
+    local number_layouts
+    number_layouts="$(hyprctl -j getoption input:kb_layout | jq -r '.str' | awk -F, '{print NF}')"
+
+    # Enable layout waybar module automatically if
+    # more then 1 layout
+    if (( number_layouts > 1 )); then
+        if check_module 'hyprland/language'; then
+            toggle_module 'hyprland/language'
+        fi
+    fi
 }
 
 remove_layout() {
@@ -173,16 +212,20 @@ remove_layout() {
             fi
         done
 
-        final_layouts_str=$(
-                            IFS=','
-                                     echo "${final_layouts[*]}"
-        )
-
+        final_layouts_str=$(IFS=,; echo "${final_layouts[*]}")
         vibranium-cmd-edit-wm-config "input:kb_layout:$final_layouts_str" \
             "$XDG_CONFIG_HOME/hypr/hyprland.conf.d/input.conf"
         notify-send -r 1 "Vibranium" "Removed existing keyboard layout: <b>${chosen^^}</b>"
         break
     done
+
+    local number_layouts
+    number_layouts="$(hyprctl -j getoption input:kb_layout | jq -r '.str' | awk -F, '{print NF}')"
+    if (( number_layouts == 1 )); then
+        if ! check_module 'hyprland/language'; then
+            toggle_module 'hyprland/language'
+        fi
+    fi
 }
 
 layouts_menu() {
