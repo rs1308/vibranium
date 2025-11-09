@@ -1,37 +1,40 @@
 #!/usr/bin/env bash
 
 source "$VIBRANIUM_PATH/vibranium-core-lib"
+source "$VIBRANIUM_USER_SETTINGS"
+
+check_bool VIBRANIUM_GLOBAL_PAUSE_MUSIC_ON_SESSION_LOCK true
+restore_flag="$XDG_RUNTIME_DIR/restore-player"
+
+player_is_playing() {
+    [[ "$(playerctl status 2>/dev/null)" == "Playing" ]] || \
+    [[ "$(mpc status 2>/dev/null | awk 'NR==2 {print $1}')" == "[playing]" ]]
+}
 
 case "$1" in
-    "before")
-        if [ "$VIBRANIUM_GLOBAL_PAUSE_MUSIC_ON_SESSION_LOCK" = "false" ]; then
-            exit 0
-        fi
+    before)
+        [[ $VIBRANIUM_GLOBAL_PAUSE_MUSIC_ON_SESSION_LOCK == true ]] || exit 0
 
-        if [[ "$(playerctl status 2> /dev/null)" == "Playing" ]]; then
+        if player_is_playing; then
             vibranium-core-player-control toggle &
-            touch "$XDG_RUNTIME_DIR/restore-player"
-        elif [[ "$(mpc status 2> /dev/null | awk 'NR==2 {print $1}')" == "[playing]" ]]; then
-            touch "$XDG_RUNTIME_DIR/restore-player"
-            vibranium-core-player-control toggle &
+            : > "$restore_flag"
         fi
         ;;
-    "after")
-        if [ "$VIBRANIUM_GLOBAL_SHOW_WELCOME_BACK_NOTIFICATION" = "true" ]; then
+    after)
+        check_bool VIBRANIUM_GLOBAL_SHOW_WELCOME_BACK_NOTIFICATION false
+        if [[ $VIBRANIUM_GLOBAL_SHOW_WELCOME_BACK_NOTIFICATION == true ]]; then
             notify-send -r 5 -t 2500 "Vibranium" "Welcome back, <span foreground='${P_ACCENT}'><b>$USER</b></span>!"
-            delay=true
+            delay=2
         fi
 
-        if [ "$VIBRANIUM_GLOBAL_PAUSE_MUSIC_ON_SESSION_LOCK" = "true" ]; then
-            if [ -f "$XDG_RUNTIME_DIR/restore-player" ]; then
-                vibranium-core-player-control toggle &
-                rm "$XDG_RUNTIME_DIR/restore-player"
-
-                if [[ $VIBRANIUM_GLOBAL_SHOW_NOW_PLAYING == true ]]; then
-                    [[ -n $delay ]] && sleep 2
-                    vibranium-cmd-now-playing
-                fi
+        if [[ -f $restore_flag ]]; then
+            vibranium-core-player-control toggle &
+            check_bool VIBRANIUM_GLOBAL_SHOW_NOW_PLAYING false
+            if [[ $VIBRANIUM_GLOBAL_SHOW_NOW_PLAYING == true ]]; then
+                [[ -n $delay ]] && sleep "$delay"
+                vibranium-cmd-now-playing
             fi
+            rm -f "$restore_flag"
         fi
         ;;
 esac
