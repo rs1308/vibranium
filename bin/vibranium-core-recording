@@ -130,8 +130,10 @@ fi
 # nvim +:$(grep -nm1 user-dirs $XDG_CONFIG_HOME/uwsm/env | awk '{print int($1)}') $XDG_CONFIG_HOME/uwsm/env
 if [[ $VIBRANIUM_XDG_DIRS_EXPOSED == true ]]; then
     output_dir=$(eval "echo $XDG_VIDEOS_DIR/Screencasts")
+    output_dir="${output_dir/#$HOME/\$HOME}"
 else
     output_dir=$HOME/Screencasts
+    output_dir="${output_dir/#$HOME/\$HOME}"
 fi
 
 mkdir -p "$output_dir"
@@ -148,9 +150,9 @@ if pid=$(pidof gpu-screen-recorder); then
     vibranium-cmd-refresh-waybar-module recording-indicator
 
     log "Copying video to clipboard"
-    msg="File saved to <span foreground='${P_YELLOW}'><b>$output_dir</b></span> "
+    msg="File saved to <span foreground='${P_YELLOW}'>$output_dir</span> "
     if [ $VIBRANIUM_GLOBAL_COPY_TO_CLIPBOARD = true ]; then
-        msg+="& <span foreground='${P_YELLOW}'><b>copied to clipboard</b></span>"
+        msg+="and copied to clipboard"
         # Copy just recorded video into clipboard with its mime type (not just file path)
         # We filter by content screencast-*, in case there are recordings from other software (e.g., OBS)
         # in the same folder that uses a different date format.
@@ -159,7 +161,7 @@ if pid=$(pidof gpu-screen-recorder); then
         [ -n "$last_file" ] && printf "file://%s" "$last_file" | wl-copy -t text/uri-list
     fi
 
-    notify-send -r 1 "Screen Recording" "$msg"
+    notify-send -r 1 "Vibranium" "$msg"
     log "Done. Exiting"
     exit 0
 fi
@@ -206,7 +208,7 @@ if [ $VIBRANIUM_GLOBAL_FLASH_SCREEN = true ] && [ $VIBRANIUM_RECORDING_FLASH_SCR
 fi
 
 log "Updating waybar module"
-notify-send -r 1 -t 1000 "Screen Recording" "Screen recording is active"
+notify-send -r 1 -t 1000 "Vibranium" "<i>Screen recording is active</i>"
 vibranium-cmd-refresh-waybar-module recording-indicator
 
 # Wait for the recording process to complete
